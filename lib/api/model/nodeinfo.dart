@@ -31,7 +31,7 @@ class NodeInfo {
   int? rank;
   int? satoshis;
   int? height;
-  int? confirmation;
+  int? confirmations;
   String scriptPubKey;
 
   NodeInfo({

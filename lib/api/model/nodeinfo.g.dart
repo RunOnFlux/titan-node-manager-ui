@@ -27,7 +27,7 @@ NodeInfo _$NodeInfoFromJson(Map<String, dynamic> json) => NodeInfo(
       ..rank = json['rank'] as int?
       ..satoshis = json['satoshis'] as int?
       ..height = json['height'] as int?
-      ..confirmation = json['confirmation'] as int?;
+      ..confirmations = json['confirmations'] as int?;
 
 Map<String, dynamic> _$NodeInfoToJson(NodeInfo instance) => <String, dynamic>{
       'collateral': instance.collateral,
@@ -48,6 +48,6 @@ Map<String, dynamic> _$NodeInfoToJson(NodeInfo instance) => <String, dynamic>{
       'rank': instance.rank,
       'satoshis': instance.satoshis,
       'height': instance.height,
-      'confirmation': instance.confirmation,
+      'confirmations': instance.confirmations,
       'scriptPubKey': instance.scriptPubKey,
     };
