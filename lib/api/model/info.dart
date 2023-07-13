@@ -1,0 +1,29 @@
+import 'package:json_annotation/json_annotation.dart';
+
+part 'info.g.dart';
+
+@JsonSerializable()
+class Info {
+  int runningFlux;
+  int inactiveFlux;
+  int active;
+  int inactive;
+  int cumulus;
+  int nimbus;
+  int stratus;
+  int nextPaymentWindow;
+
+  Info({
+    required this.runningFlux,
+    required this.inactiveFlux,
+    required this.active,
+    required this.inactive,
+    required this.cumulus,
+    required this.nimbus,
+    required this.stratus,
+    required this.nextPaymentWindow,
+  });
+
+  factory Info.fromJson(Map<String, dynamic> json) => _$InfoFromJson(json);
+  Map<String, dynamic> toJson() => _$InfoToJson(this);
+}

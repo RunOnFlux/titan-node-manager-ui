@@ -4,39 +4,14 @@ import 'dart:convert';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-
-class Info {
-  final int runningFlux;
-  final int inactiveFlux;
-  final int activeNodes;
-  final int inactiveNodes;
-  final int cumulus;
-  final int nimbus;
-  final int stratus;
-  final int nextPaymentWindow;
-
-  Info({
-    this.runningFlux = 0,
-    this.inactiveFlux = 0,
-    this.activeNodes = 0,
-    this.inactiveNodes = 0,
-    this.cumulus = 0,
-    this.nimbus = 0,
-    this.stratus = 0,
-    this.nextPaymentWindow = 0,
-  });
-
-  @override
-  String toString() {
-    String string =
-        'runningFlux: $runningFlux \n inactiveFlux: $inactiveFlux \n activeNodes: $activeNodes \n inactiveNodes: $inactiveNodes \n cumulus:  $cumulus \n nimbus: $nimbus \n stratus: $stratus \n nextPayWindow: $nextPaymentWindow';
-    return string;
-  }
-}
+import 'package:testapp/api/model/info.dart';
+import 'package:testapp/api/model/nodeinfo.dart';
 
 class MyApp extends StatelessWidget {
   final Info processedInfo;
-  const MyApp({required this.processedInfo, super.key});
+  final List<NodeInfo> nodeInfoList;
+  const MyApp(
+      {required this.processedInfo, required this.nodeInfoList, super.key});
 
   static const double determinedHeight = 200;
 
@@ -53,7 +28,7 @@ class MyApp extends StatelessWidget {
           child: SingleChildScrollView(
             child: Column(
               children: [
-                ...displayInfoProperties(processedInfo),
+                ...displayInfoProperties(processedInfo, nodeInfoList),
               ],
             ),
           ),
@@ -83,27 +58,6 @@ class MyApp extends StatelessWidget {
   }
 }
 
-// converts object of type _jsonmap to Info
-Info objectToInfo(dynamic object) {
-  print('Running objectoinfo');
-  try {
-    Info info = Info(
-      runningFlux: object['runningFlux'],
-      inactiveFlux: object['inactiveFlux'],
-      activeNodes: object['active'],
-      inactiveNodes: object['inactive'],
-      cumulus: object['cumulus'],
-      nimbus: object['nimbus'],
-      stratus: object['stratus'],
-      nextPaymentWindow: object['nextPaymentWindow'],
-    );
-    return info;
-  } on Exception catch (e) {
-    print('error: $e');
-    throw Error();
-  }
-}
-
 // Returns object containing macro info
 Future<Info> fetchInfo() async {
   final response = await http.get(Uri.parse('http://localhost:4444/api/info'));
@@ -113,39 +67,48 @@ Future<Info> fetchInfo() async {
   print(jsonData['runningFlux']);
   print('jsondata type ${jsonData.runtimeType}');
 
-  final infoFuture = objectToInfo(jsonData);
+  final infoFuture = Info.fromJson(jsonData);
   print('done converting');
   print(infoFuture.runningFlux);
   print('jsondata type ${infoFuture.runtimeType}');
   return infoFuture;
 }
 
-Future<List> fetchNodes() async {
-  final response = await http.get(Uri.parse('http://localhost:4444/api/info'));
+Future<List<NodeInfo>> fetchNodes() async {
+  final response =
+      await http.get(Uri.parse('http://localhost:4444/api/nodeinfo'));
   final data = response.body;
   final jsonData = jsonDecode(data);
-  return [];
+
+  Iterable l = jsonDecode(data);
+  List<NodeInfo> nodeinfolist =
+      List<NodeInfo>.from(l.map((model) => NodeInfo.fromJson(model)));
+
+  return nodeinfolist;
 }
 
-List<Widget> displayInfoProperties(Info info) {
+List<Widget> displayInfoProperties(Info info, List<NodeInfo> nodeInfoList) {
   print('displaying');
   return [
     Text('Total Flux running: ${info.runningFlux}'),
     Text('Total Flux offline: ${info.inactiveFlux}'),
-    Text('Nodes running: ${info.activeNodes}'),
-    Text('Nodes offline: ${info.inactiveNodes}'),
+    Text('Nodes running: ${info.active}'),
+    Text('Nodes offline: ${info.inactive}'),
     Text('Cumulus nodes running: ${info.cumulus}'),
     Text('Nimbus nodes running: ${info.nimbus}'),
     Text('Stratus nodes running: ${info.stratus}'),
     Text('Next Payment Window: ${info.nextPaymentWindow}'),
+    Text('Node Info: ${nodeInfoList[0].collateral}'),
   ];
 }
 
 void main() async {
   final processedInfo = await fetchInfo();
+  final nodeInfoList = await fetchNodes();
   print('in main, done processing');
 
   runApp(MyApp(
     processedInfo: processedInfo,
+    nodeInfoList: nodeInfoList,
   ));
 }
