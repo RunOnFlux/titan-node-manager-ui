@@ -1,11 +1,14 @@
 // ignore_for_file: avoid_print
 
 import 'dart:convert';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:testapp/api/model/info.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
+import 'package:testapp/ui/app/app.dart';
+import 'package:testapp/utils/settings.dart';
 
 class MyApp extends StatelessWidget {
   final Info processedInfo;
@@ -120,35 +123,6 @@ Table buildTable(nodelist) {
   return nodeTable;
 }
 
-// Returns object containing macro info
-Future<Info> fetchInfo() async {
-  final response = await http.get(Uri.parse('http://localhost:4444/api/info'));
-  final data = response.body;
-  final jsonData = jsonDecode(data);
-
-  print(jsonData['runningFlux']);
-  print('jsondata type ${jsonData.runtimeType}');
-
-  final infoFuture = Info.fromJson(jsonData);
-  print('done converting');
-  print(infoFuture.runningFlux);
-  print('jsondata type ${infoFuture.runtimeType}');
-  return infoFuture;
-}
-
-Future<List<NodeInfo>> fetchNodes() async {
-  final response =
-      await http.get(Uri.parse('http://localhost:4444/api/nodeinfo'));
-  final data = response.body;
-  final jsonData = jsonDecode(data);
-
-  Iterable l = jsonDecode(data);
-  List<NodeInfo> nodeinfolist =
-      List<NodeInfo>.from(l.map((model) => NodeInfo.fromJson(model)));
-
-  return nodeinfolist;
-}
-
 List<Widget> displayInfoProperties(Info info, List<NodeInfo> nodeInfoList) {
   print('displaying');
   return [
@@ -164,17 +138,21 @@ List<Widget> displayInfoProperties(Info info, List<NodeInfo> nodeInfoList) {
   ];
 }
 
-void main() async {
-  final processedInfo = await fetchInfo();
-  final nodeInfoList = await fetchNodes();
-  print('nodeInfoList is type ${nodeInfoList.runtimeType}');
-  final nodeTable = buildTable(nodeInfoList);
-  print('nodetable: $nodeTable');
-  print('in main, done processing');
+// Using a package called Provider
+// Inside the app we create a change notifier
+// This is async fetch the data
+// Don't fetch data outside of a widget
 
-  runApp(MyApp(
-    processedInfo: processedInfo,
-    nodeInfoList: nodeInfoList,
-    nodeTable: nodeTable,
-  ));
+// Create a base widget which we have MyApp
+// Change notifier goes and fetches the data that we want
+
+// Once the change notifier has the data - change flag to not loading
+
+// Widgets look at the notifier flag for loading and behave accordingly.
+
+void main() async {
+  GetIt.I.registerSingleton<NodeManagerInfo>(NodeManagerInfo());
+  await NodeManagerSettings().initialize();
+
+  runApp(NodeManagerApp());
 }
