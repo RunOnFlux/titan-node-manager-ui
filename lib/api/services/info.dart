@@ -22,6 +22,7 @@ class InfoService {
   }
 
   Future<List<NodeInfo>> fetchNodeInfo() async {
+    print('fetching node info');
     final response =
         await http.get(Uri.parse('http://localhost:4444/api/nodeinfo'));
     final data = response.body;
