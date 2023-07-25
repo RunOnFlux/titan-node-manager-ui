@@ -5,93 +5,34 @@ import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
-import 'package:testapp/api/model/info.dart';
-import 'package:testapp/api/model/nodeinfo.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/utils/settings.dart';
 
-// class MyApp extends StatelessWidget {
-//   final Info processedInfo;
-//   final List<NodeInfo> nodeInfoList;
-//   final Table nodeTable;
+// - * Create a table item for the inactive transactions.
 
-//   const MyApp(
-//       {required this.processedInfo,
-//       required this.nodeInfoList,
-//       required this.nodeTable,
-//       super.key});
+// - * This can be its own list item from the menu on the right.
 
-//   static const double determinedHeight = 200;
+// - The table will look simlar to the current table except the first column will be a button that says start fluxnode.
 
-//   @override
-//   Widget build(BuildContext context) {
-//     return MaterialApp(
-//       home: Scaffold(
-//         appBar: AppBar(
-//           backgroundColor: Colors.blue,
-//           title: const Text('Nodes'),
-//         ),
-//         body: Padding(
-//           padding: const EdgeInsets.all(15.0),
-//           child: ListView(
-//             children: [
-//               ...displayInfoProperties(processedInfo, nodeInfoList),
-//               nodeTable,
-//             ],
-//           ),
-//         ),
-//         floatingActionButton: FloatingActionButton(
-//           child: Icon(Icons.add),
-//           onPressed: () {
-//             print('Clicked');
-//           },
-//         ),
-//         persistentFooterButtons: <Widget>[
-//           TextButton(
-//             onPressed: () {},
-//             child: const Text('Button 1'),
-//           ),
-//           TextButton(
-//             onPressed: () {},
-//             child: const Text('Button 2'),
-//           ),
-//           TextButton(
-//             onPressed: () {},
-//             child: const Text('Button 3'),
-//           ),
-//         ],
-//       ),
-//     );
-//   }
-// }
+// - When clicked this will send the command to the backend server api for starting a fluxnode.
 
-// List<Widget> displayInfoProperties(Info info, List<NodeInfo> nodeInfoList) {
-//   print('displaying');
-//   return [
-//     Text('Total Flux running: ${info.runningFlux}'),
-//     Text('Total Flux offline: ${info.inactiveFlux}'),
-//     Text('Nodes running: ${info.active}'),
-//     Text('Nodes offline: ${info.inactive}'),
-//     Text('Cumulus nodes running: ${info.cumulus}'),
-//     Text('Nimbus nodes running: ${info.nimbus}'),
-//     Text('Stratus nodes running: ${info.stratus}'),
-//     Text('Next Payment Window: ${info.nextPaymentWindow}'),
-//     Text('Node Info: ${nodeInfoList[0].confirmations}'),
-//   ];
-// }
+// - Lets also get the response from the server add display it to the user with a pop up message card.
 
-// Using a package called Provider
-// Inside the app we create a change notifier
-// This is async fetch the data
-// Don't fetch data outside of a widget
+// - On the homepage, lets add a last refeshed time (that shows that time from when this data was fetched)
 
-// Create a base widget which we have MyApp
-// Change notifier goes and fetches the data that we want
+// - * Can we make the ip addresses clickable and if clicked they would open a tab to the fluxnode server on that ip address. example = http://ipaddresshere:16126/
 
-// Once the change notifier has the data - change flag to not loading
+// - * Can we make the text on inactive nodes red
 
-// Widgets look at the notifier flag for loading and behave accordingly.
+// - * Can we make the text on active nodes green
 
+// - * Change the named of Running Flux to - Collateralized Total
+
+// - * Lets add a label to next payment number that says blocks or minutes depending on what the number means. If it is an estimated use a ~
+
+// - See if you can create filters on the table headers. For example. If I was to click Tier it would sort by the other Tiers
+
+// - See if you can add a search bar to the table(s) that allow you to search for IP Address, Tier, Collateral.
 void main() async {
   GetIt.I.registerSingleton<NodeManagerInfo>(NodeManagerInfo());
   await NodeManagerSettings().initialize();

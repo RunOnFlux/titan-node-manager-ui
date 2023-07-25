@@ -8,6 +8,8 @@ import 'package:flutter_base/ui/widgets/sidemenu/menu_item.dart';
 import 'package:provider/provider.dart';
 import 'package:testapp/api/model/info.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
+import 'package:testapp/api/model/inactiveInfo.dart';
+
 import 'package:testapp/ui/app/router.dart';
 
 import '../../utils/settings.dart';
@@ -77,6 +79,7 @@ class NodeManagerAppState extends MinimalAppState<NodeManagerApp>
 class NodeManagerInfo with ChangeNotifier {
   late Info info;
   late List<NodeInfo> nodeinfo;
+  late List<InactiveInfo> inactiveInfo;
 }
 
 class NodeManagerAppConfig extends AppConfig {

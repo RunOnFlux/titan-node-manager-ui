@@ -4,7 +4,7 @@ import 'package:flutter_base/ui/widgets/titled_card.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
 import 'package:testapp/ui/app/app.dart';
-
+import 'package:url_launcher/url_launcher.dart';
 import 'package:data_table_2/data_table_2.dart';
 
 class NodeInfoCard extends StatelessWidget with GetItMixin {
@@ -20,59 +20,97 @@ class NodeInfoCard extends StatelessWidget with GetItMixin {
 }
 
 DataTable2 buildDataTable(nodelist) {
-  print('inside buildDataTable');
+  List<Map<String, dynamic Function(dynamic)>> attributes = [
+    {'IP Address': (node) => node.ip},
+    {'Tier': (node) => node.tier},
+    {'Rank': (node) => node.rank.toString()},
+    // {'Collateral': (node) => node.collateral},
+    {'Txhash': (node) => node.txhash},
+    // {'Outidx': (node) => node.outidx},
+    // {'Network': (node) => node.network},
+    {'Added Height': (node) => node.added_height.toString()},
+    {'Confirmed Height': (node) => node.confirmed_height.toString()},
+    // {'Last Confirmed Height': (node) => node.last_confirmed_height.toString()},
+    // {'Last Paid Height': (node) => node.last_paid_height.toString()},
+    // {'Payment Address': (node) => node.payment_address},
+    // {'Pubkey': (node) => node.pubkey},
+    // {'Active Since': (node) => node.activesince},
+    // {'Last Paid': (node) => node.lastpaid},
+    // {'Amount': (node) => node.amount},
+    // {'Satoshis': (node) => node.satoshis.toString()},
+    // {'Height': (node) => node.height.toString()},
+    // {'Confirmations': (node) => node.confirmations.toString()},
+    // {'ScriptPubKey': (node) => node.scriptPubKey},
+  ];
+
   return DataTable2(
       columnSpacing: 12,
       horizontalMargin: 12,
       minWidth: 600,
-      columns: const [
-        DataColumn2(
-          label: Text('IP Address'),
-        ),
-        DataColumn2(
-          label: Text('Tier'),
-        ),
-        DataColumn2(
-          label: Text('Rank'),
-        ),
-      ],
+      columns: attributes
+          .map((attribute) => DataColumn2(
+                label: Text(attribute.keys.first),
+              ))
+          .toList(),
       rows: nodelist
           .map<DataRow>(
-            (node) => buildDataRow(node),
+            (node) => buildDataRow(node, attributes),
           )
           .toList());
 }
 
-DataRow buildDataRow(node) {
-  DataRow dataRow = DataRow(cells: [
-    // DataCell(Text(node.collateral),),
-    // DataCell(Text(node.txhash),),
-    // DataCell(Text(node.outidx),),
-    DataCell(
-      Text(node.ip),
-    ),
-    // DataCell(
-    //   Text(node.network),
-    // ),
-    // DataCell(Text(node.added_height.toString()),),
-    // DataCell(Text(node.confirmed_height.toString()),),
-    // DataCell(Text(node.last_confirmed_height.toString()),),
-    // DataCell(Text(node.last_paid_height.toString()),),
-    DataCell(
-      Text(node.tier),
-    ),
-    // DataCell(Text(node.payment_address),),
-    // DataCell(Text(node.pubkey),),
-    // DataCell(Text(node.activesince),),
-    // DataCell(Text(node.lastpaid),),
-    // DataCell(Text(node.amount),),
-    DataCell(
-      Text(node.rank.toString()),
-    ),
-    // DataCell(Text(node.satoshis.toString()),),
-    // DataCell(Text(node.height.toString()),),
-    // DataCell(Text(node.confirmations.toString()),),
-    // DataCell(Text(node.scriptPubKey),),
-  ]);
-  return dataRow;
+// DataRow buildDataRow(node, attributes) {
+//   DataRow dataRow = DataRow(
+//       cells: attributes
+//           .map<DataCell>((attribute) => {
+//                 DataCell(
+//                   Text(attribute.values.first(node),
+//                       style: const TextStyle(color: Colors.green)),
+//                 )
+//               })
+//           .toList());
+//   return dataRow;
+// }
+
+DataRow buildDataRow(node, attributes) {
+  return DataRow(
+    cells: attributes.map<DataCell>((attribute) {
+      if (attribute.keys.first == 'IP Address') {
+        return DataCell(
+          InkWell(
+            child: Text(
+              attribute.values.first(node),
+              style: const TextStyle(color: Colors.blue),
+            ),
+            onTap: () async {
+              // String url = 'http://' + attribute.values.first(node);
+              String ip = attribute.values.first(node);
+              String url = '';
+              print('ip--> $ip');
+              if (ip.contains(':')) {
+                print('Unique port detected (${ip.split(':')[1]})');
+                // url = 'http://${ip}/';
+                url = 'http://${ip.split(':')[0]}/16126';
+              } else {
+                url = 'http://${ip}:16126/';
+              }
+              print('url: $url');
+              if (await canLaunchUrl((Uri.parse(url)))) {
+                await launchUrl(Uri.parse(url));
+              } else {
+                throw 'Could not launch $url';
+              }
+            },
+          ),
+        );
+      } else {
+        return DataCell(
+          Text(
+            attribute.values.first(node),
+            style: const TextStyle(color: Colors.green),
+          ),
+        );
+      }
+    }).toList(),
+  );
 }

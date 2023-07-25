@@ -5,6 +5,8 @@ import 'package:flutter_base/ui/routes/routes.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/screens/home/home_screen.dart';
 
+import '../screens/inactive/inactive_screen.dart';
+
 class NodeManagerRouter extends AppRouter {
   NodeManagerRouter._p() {
     routes = buildRoutes();
@@ -19,6 +21,13 @@ class NodeManagerRouter extends AppRouter {
         route: '/',
         body: HomeScreen(),
         title: 'Home',
+        icon: Icons.home,
+        includeInMenu: true,
+      ),
+      NavigationRoute(
+        route: '/inactive',
+        body: InactiveScreen(),
+        title: 'Inactive',
         icon: Icons.home,
         includeInMenu: true,
       ),

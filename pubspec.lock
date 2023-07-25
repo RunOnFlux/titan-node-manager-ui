@@ -245,10 +245,10 @@ packages:
     dependency: "direct main"
     description:
       name: data_table_2
-      sha256: d124747f10b12cdfe5c46f6ee5fd5da896be7245b4fd8a46015a6283e31176d9
+      sha256: "3898c424db33437ba2eb8e6bd2e7db3635a19efc0daadfaee427e1949f399b0f"
       url: "https://pub.dev"
     source: hosted
-    version: "2.5.3"
+    version: "2.5.6"
   equatable:
     dependency: transitive
     description:
@@ -315,7 +315,7 @@ packages:
     description:
       path: "."
       ref: master
-      resolved-ref: be4b009875c3aa17a80dcc1cfd655ed3a4d9b7cb
+      resolved-ref: c59648afefb71e3ba6a1661f4b5b42a7b074bdc1
       url: "https://github.com/RunOnFlux/flutter_base"
     source: git
     version: "0.0.9"
@@ -715,10 +715,10 @@ packages:
     dependency: transitive
     description:
       name: plugin_platform_interface
-      sha256: "6a2128648c854906c53fa8e33986fc0247a1116122f9534dd20e3ab9e16a32bc"
+      sha256: "43798d895c929056255600343db8f049921cbec94d31ec87f1dc5c16c01935dd"
       url: "https://pub.dev"
     source: hosted
-    version: "2.1.4"
+    version: "2.1.5"
   pool:
     dependency: transitive
     description:
@@ -965,7 +965,7 @@ packages:
     source: hosted
     version: "2.2.2"
   url_launcher:
-    dependency: transitive
+    dependency: "direct main"
     description:
       name: url_launcher
       sha256: "781bd58a1eb16069412365c98597726cd8810ae27435f04b3b4d3a470bacd61e"
@@ -976,10 +976,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: "15f5acbf0dce90146a0f5a2c4a002b1814a6303c4c5c075aa2623b2d16156f03"
+      sha256: "78cb6dea3e93148615109e58e42c35d1ffbf5ef66c44add673d0ab75f12ff3af"
       url: "https://pub.dev"
     source: hosted
-    version: "6.0.36"
+    version: "6.0.37"
   url_launcher_ios:
     dependency: transitive
     description:
