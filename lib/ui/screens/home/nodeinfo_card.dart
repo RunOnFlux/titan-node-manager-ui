@@ -59,19 +59,6 @@ DataTable2 buildDataTable(nodelist) {
           .toList());
 }
 
-// DataRow buildDataRow(node, attributes) {
-//   DataRow dataRow = DataRow(
-//       cells: attributes
-//           .map<DataCell>((attribute) => {
-//                 DataCell(
-//                   Text(attribute.values.first(node),
-//                       style: const TextStyle(color: Colors.green)),
-//                 )
-//               })
-//           .toList());
-//   return dataRow;
-// }
-
 DataRow buildDataRow(node, attributes) {
   return DataRow(
     cells: attributes.map<DataCell>((attribute) {
@@ -83,13 +70,11 @@ DataRow buildDataRow(node, attributes) {
               style: const TextStyle(color: Colors.blue),
             ),
             onTap: () async {
-              // String url = 'http://' + attribute.values.first(node);
               String ip = attribute.values.first(node);
               String url = '';
               print('ip--> $ip');
               if (ip.contains(':')) {
                 print('Unique port detected (${ip.split(':')[1]})');
-                // url = 'http://${ip}/';
                 url = 'http://${ip.split(':')[0]}/16126';
               } else {
                 url = 'http://${ip}:16126/';

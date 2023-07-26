@@ -12,11 +12,11 @@ import 'package:testapp/utils/settings.dart';
 
 // - * This can be its own list item from the menu on the right.
 
-// - The table will look simlar to the current table except the first column will be a button that says start fluxnode.
+// - * The table will look simlar to the current table except the first column will be a button that says start fluxnode.
 
-// - When clicked this will send the command to the backend server api for starting a fluxnode.
+// - * When clicked this will send the command to the backend server api for starting a fluxnode.
 
-// - Lets also get the response from the server add display it to the user with a pop up message card.
+// - * Lets also get the response from the server add display it to the user with a pop up message card.
 
 // - On the homepage, lets add a last refeshed time (that shows that time from when this data was fetched)
 

@@ -35,7 +35,6 @@ DataTable2 buildDataTable(nodelist) {
     {'Height': (node) => node.height.toString()},
     {'Confirmations': (node) => node.confirmations.toString()},
   ];
-
   return DataTable2(
       columnSpacing: 12,
       horizontalMargin: 12,
@@ -54,7 +53,7 @@ DataTable2 buildDataTable(nodelist) {
 }
 
 DataRow buildDataRow(node, attributes) {
-  var startCell = DataCell(startNodeButton(node));
+  var startCell = DataCell(StartNodeButton(node));
   DataRow dataRow = DataRow(
       cells: [startCell] +
           attributes
@@ -66,19 +65,74 @@ DataRow buildDataRow(node, attributes) {
   return dataRow;
 }
 
-ElevatedButton startNodeButton(node) {
-  // startNode(node);
-  var button = ElevatedButton(
-    child: const Text('Start Fluxnode'),
-    onPressed: () {
-      var response = startNode(node);
-      print('response body: ${response}');
-    },
-  );
-  return button;
+class StartNodeButton extends StatelessWidget {
+  final dynamic node;
+
+  StartNodeButton(this.node, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      child: const Text('Start Fluxnode'),
+      onPressed: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return FutureBuilder<http.Response>(
+              future: startNode(context, node),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const AlertDialog(
+                    title: Text('Loading...'),
+                    content: CircularProgressIndicator(),
+                  );
+                } else if (snapshot.hasError) {
+                  return AlertDialog(
+                    title: const Text('Error'),
+                    content: const Text('Failed to start Fluxnode.'),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  );
+                } else {
+                  // Handle the successful response here
+                  String responseString = snapshot.data!.body;
+                  return AlertDialog(
+                    // title: const Text(''),
+                    content: Text(responseString),
+                    actions: [
+                      TextButton(
+                        onPressed: () {
+                          Navigator.of(context).pop();
+                        },
+                        child: const Text('OK'),
+                      ),
+                    ],
+                  );
+                }
+              },
+            );
+          },
+        );
+      },
+    );
+  }
+
+  // Future<http.Response> startNode(dynamic node) async {
+  //   // Your code to make the HTTP request and return the response
+  //   // For example:
+  //   var url = Uri.parse('http://your_api_endpoint');
+  //   var response = await http.get(url);
+  //   return response;
+  // }
 }
 
-Future<http.Response> startNode(node) async {
+Future<http.Response> startNode(BuildContext context, node) async {
   var txhash = node.txid;
   var outidx = node.vout;
 
@@ -86,14 +140,13 @@ Future<http.Response> startNode(node) async {
     'txhash': txhash,
     'outidx': outidx,
   };
-  print('startNode: \n txhash-->${txhash} \n body-->$requestBody');
+  // print('startNode: \n txhash-->${txhash} \n body-->$requestBody');
   var url = Uri.parse('http://localhost:4444/api/startnode');
-  print(url);
+
   final response = await http.post(
     url,
     body: jsonEncode(requestBody),
     headers: {'Content-Type': 'application/json'},
   );
-  print('response body in startNode: ${response.body}');
   return response;
 }
