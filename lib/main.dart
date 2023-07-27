@@ -18,7 +18,7 @@ import 'package:testapp/utils/settings.dart';
 
 // - * Lets also get the response from the server add display it to the user with a pop up message card.
 
-// - On the homepage, lets add a last refeshed time (that shows that time from when this data was fetched)
+// - * On the homepage, lets add a last refeshed time (that shows that time from when this data was fetched)
 
 // - * Can we make the ip addresses clickable and if clicked they would open a tab to the fluxnode server on that ip address. example = http://ipaddresshere:16126/
 
@@ -30,7 +30,7 @@ import 'package:testapp/utils/settings.dart';
 
 // - * Lets add a label to next payment number that says blocks or minutes depending on what the number means. If it is an estimated use a ~
 
-// - See if you can create filters on the table headers. For example. If I was to click Tier it would sort by the other Tiers
+// - * See if you can create filters on the table headers. For example. If I was to click Tier it would sort by the other Tiers
 
 // - See if you can add a search bar to the table(s) that allow you to search for IP Address, Tier, Collateral.
 void main() async {

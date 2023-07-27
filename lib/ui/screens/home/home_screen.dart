@@ -8,6 +8,7 @@ import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/ui/screens/home/info_card.dart';
 import 'package:testapp/ui/screens/home/info_prop_card.dart';
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
+import 'package:testapp/ui/screens/home/last_refresh_card.dart';
 
 class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {
   HomeScreen({Key? key}) : super(key: key, title: 'Home');
@@ -39,10 +40,19 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
             ),
           ],
         ),
-        SizedBox(
-          height: 600, // Replace with desired height
+        Container(
+          // Something is wrong with the spacing for the nodeinfocard
+          // height 660 makes it look normal but if anything is changed it'll look janky
+          height: 660,
+          // decoration: BoxDecoration(
+          //   border: Border.all(
+          //     color: Colors.grey,
+          //     width: 3,
+          //   ),
+          // ),
           child: NodeInfoCard(),
         ),
+        LastRefresh(),
       ],
     );
   }
