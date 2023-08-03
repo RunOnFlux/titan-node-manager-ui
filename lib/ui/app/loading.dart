@@ -17,8 +17,7 @@ class NodeManagerLoadingNotifier extends LoadingNotifier {
     GetIt.I<NodeManagerInfo>().info = info;
     GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo;
     GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo;
-    GetIt.I<NodeManagerInfo>().lastRefresh =
-        DateTime.now().millisecondsSinceEpoch;
+    GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
     loadingComplete = true;
     notifyListeners();

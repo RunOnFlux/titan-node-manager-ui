@@ -24,6 +24,17 @@ class InactiveInfo {
     required this.confirmations,
   });
 
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is InactiveInfo &&
+        other.txid == txid; // compare other properties if needed
+  }
+
+  @override
+  int get hashCode => txid.hashCode; // include other properties if needed
+
   factory InactiveInfo.fromJson(Map<String, dynamic> json) =>
       _$InactiveInfoFromJson(json);
   Map<String, dynamic> toJson() => _$InactiveInfoToJson(this);

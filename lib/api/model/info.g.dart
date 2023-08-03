@@ -15,6 +15,7 @@ Info _$InfoFromJson(Map<String, dynamic> json) => Info(
       nimbus: json['nimbus'] as int,
       stratus: json['stratus'] as int,
       nextPaymentWindow: json['nextPaymentWindow'] as int,
+      time: json['time'] as int,
     );
 
 Map<String, dynamic> _$InfoToJson(Info instance) => <String, dynamic>{
@@ -26,4 +27,5 @@ Map<String, dynamic> _$InfoToJson(Info instance) => <String, dynamic>{
       'nimbus': instance.nimbus,
       'stratus': instance.stratus,
       'nextPaymentWindow': instance.nextPaymentWindow,
+      'time': instance.time,
     };

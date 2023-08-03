@@ -14,7 +14,7 @@ class LastRefresh extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
     final lastRefreshTime = watchOnly((NodeManagerInfo x) => x.lastRefresh);
-
+    print('lastRefreshTime:$lastRefreshTime');
     return StreamBuilder<int>(
       stream: Stream.periodic(const Duration(seconds: 1), (i) => i),
       builder: (context, snapshot) {

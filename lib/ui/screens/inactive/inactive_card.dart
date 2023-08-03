@@ -39,23 +39,37 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   List<DataRow> allDataRows = [];
   List<DataRow> filteredRows = [];
+  Map<String, InactiveInfo> selectedRows =
+      {}; // Holds txhash:outidx for each row
+  DataTable? dataTable;
+  bool showButton = false;
 
   int? _sortColumnIndex;
   bool _sortAscending = true;
 
+  Color primaryColorDark = const Color.fromARGB(255, 38, 86, 198);
+  Color darkText = const Color.fromARGB(255, 208, 210, 214);
+  Color scaffoldBackgroundDark = const Color.fromARGB(255, 20, 22, 41);
+  Color cardColorDark = Color.fromARGB(255, 58, 58, 78);
+  Color rowColor = const Color.fromARGB(255, 14, 16, 33);
+
   List<Map<String, dynamic Function(dynamic)>> attributes = [
-    {'': (node) => ''},
     {'Txhash': (node) => node.txid},
     {'Amount': (node) => node.amount.toString()},
-    {'Satoshis': (node) => node.satoshis.toString()},
-    {'Height': (node) => node.height.toString()},
-    {'Confirmations': (node) => node.confirmations.toString()},
+    {'Vout': (node) => node.vout.toString()},
+
+    // {'Satoshis': (node) => node.satoshis.toString()},
+    // {'Height': (node) => node.height.toString()},
+    // {'Confirmations': (node) => node.confirmations.toString()},
+    {'': (node) => ''},
   ];
 
   @override
   void initState() {
     super.initState();
     loadData();
+    showButton = false;
+    rowColor = scaffoldBackgroundDark;
   }
 
   void loadData() {
@@ -67,15 +81,29 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   @override
   Widget build(BuildContext context) {
+    allDataRows =
+        nodeinfo.map((node) => buildDataRow(node, attributes)).toList();
     return BootstrapContainer(children: [
-      SizedBox(
-          child: TextField(
-        onChanged: filterData, // Filter the data when the search query changes.
-        decoration: const InputDecoration(
-          labelText: "Search",
-          suffixIcon: Icon(Icons.search),
-        ),
-      )),
+      Visibility(
+        maintainSize: true,
+        maintainAnimation: true,
+        maintainState: true,
+        visible: showButton,
+        child: StartSelectedNodes(selectedRows.values.toList()),
+      ),
+      Align(
+        alignment: Alignment.centerRight,
+        child: SizedBox(
+            width: 200,
+            child: TextField(
+              onSubmitted:
+                  filterData, // Filter the data when the search query changes.
+              decoration: const InputDecoration(
+                labelText: "Search",
+                suffixIcon: Icon(Icons.search),
+              ),
+            )),
+      ),
       SizedBox(height: 600, child: buildDataTable())
     ]);
   }
@@ -94,8 +122,7 @@ class _MyDataTableState extends State<_MyDataTable> {
             } else {
               return ''; // or some default value
             }
-          }).join(' ');
-
+          }).join('***'); // should change this
           return rowContent.toLowerCase().contains(query.toLowerCase());
         }).toList();
       });
@@ -132,17 +159,30 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   DataTable2 buildDataTable() {
     return DataTable2(
-        columnSpacing: 12,
+        // border: TableBorder.all(color: Colors.white),
+        showCheckboxColumn: false,
+        // columnSpacing: 12,
         horizontalMargin: 12,
+        smRatio: .5,
+        lmRatio: 2,
         minWidth: 600,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
         columns: attributes.map((attribute) {
           // Headerless column
           if (attribute.keys.first == '') {
-            return DataColumn2(label: Text(''));
+            return DataColumn2(size: ColumnSize.M, label: Text(''));
           } else {
+            if (attribute.keys.first == 'Txhash') {
+              return DataColumn2(
+                size: ColumnSize.L,
+                label: Text(attribute.keys.first),
+                onSort: (columnIndex, ascending) =>
+                    _onSort(columnIndex, ascending),
+              );
+            }
             return DataColumn2(
+              size: ColumnSize.S,
               label: Text(attribute.keys.first),
               onSort: (columnIndex, ascending) =>
                   _onSort(columnIndex, ascending),
@@ -152,13 +192,23 @@ class _MyDataTableState extends State<_MyDataTable> {
         rows: filteredRows);
   }
 
+  bool selectedContains(node) {
+    String myKey = node.txid;
+    bool contain = selectedRows.containsKey(myKey);
+    return contain;
+  }
+
+  Map<String, Color> rowColors = {};
+
   DataRow buildDataRow(node, attributes) {
+    // print('building data row');
     var startCell = DataCell(StartNodeButton(node));
     List<DataCell> cells = attributes.map<DataCell>((attribute) {
       // Headerless column contains startnode button
       if (attribute.keys.first == '') {
         return startCell;
       } else {
+        if (attribute.keys.first == 'Txhash') {}
         return DataCell(
           Text(attribute.values.first(node),
               style: const TextStyle(color: Colors.red)),
@@ -166,20 +216,52 @@ class _MyDataTableState extends State<_MyDataTable> {
       }
     }).toList();
 
-    return DataRow(cells: cells);
+    return DataRow(
+      color:
+          MaterialStateProperty.resolveWith<Color>((Set<MaterialState> states) {
+        return rowColors[node.txid] ?? scaffoldBackgroundDark;
+      }),
+      cells: cells,
+      selected: true,
+      onSelectChanged: (bool? selected) {
+        String myKey = node.txid;
+        if (selected != null) {
+          selected = selectedContains(node);
+          setState(() {
+            if (selected == false) {
+              rowColors[myKey] = cardColorDark;
+              selectedRows[myKey] = node;
+              print('Selectedrows Size: ${selectedRows.length}');
+              print('Node added');
+              if (selectedRows.length > 1) {
+                showButton = true;
+              }
+            } else {
+              rowColors[myKey] = scaffoldBackgroundDark;
+              selectedRows.remove(myKey);
+              if (selectedRows.length <= 1) {
+                print('removing selected rows button');
+                showButton = false;
+              }
+              print('Node removed');
+            }
+          });
+        }
+      },
+    );
   }
 }
 
 class StartNodeButton extends StatelessWidget {
-  final dynamic node;
+  final InactiveInfo node;
 
-  StartNodeButton(this.node, {Key? key}) : super(key: key);
+  const StartNodeButton(this.node, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return ElevatedButton(
       child: const Text('Start Fluxnode'),
-      // Tries startNode and send the api's response as popup message
+      // Attempts startNode and send the api's response as popup message
       onPressed: () {
         showDialog(
           context: context,
@@ -211,14 +293,6 @@ class StartNodeButton extends StatelessWidget {
                   String responseString = snapshot.data!.body;
                   return AlertDialog(
                     content: Text(responseString),
-                    actions: [
-                      TextButton(
-                        onPressed: () {
-                          Navigator.of(context).pop(); // dismisses popup
-                        },
-                        child: const Text('OK'),
-                      ),
-                    ],
                   );
                 }
               },
@@ -238,7 +312,6 @@ Future<http.Response> startNode(BuildContext context, node) async {
     'txhash': txhash,
     'outidx': outidx,
   };
-  // print('startNode: \n txhash-->${txhash} \n body-->$requestBody');
   var url = Uri.parse('http://localhost:4444/api/startnode');
 
   final response = await http.post(
@@ -247,4 +320,44 @@ Future<http.Response> startNode(BuildContext context, node) async {
     headers: {'Content-Type': 'application/json'},
   );
   return response;
+}
+
+class StartSelectedNodes extends StatelessWidget {
+  final List<InactiveInfo> nodes;
+  List<FutureBuilder<http.Response>> responseList = [];
+  String fullResponse = '';
+
+  StartSelectedNodes(this.nodes, {Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context) {
+    print('displaying start selected nodes button');
+    return ElevatedButton(
+      child: const Text('Start Selected Nodes'),
+      onPressed: () {
+        print('button pressed');
+        List<Future<http.Response>> nodeFutures = nodes.map((node) {
+          return startNode(context, node);
+        }).toList();
+
+        Future.wait(nodeFutures).then((responses) async {
+          for (var response in responses) {
+            fullResponse += '${response.body}\n';
+          }
+          fullResponse = fullResponse.substring(
+              0, fullResponse.length - 1); // erases newline at the end
+          await showDialog(
+            context: context,
+            builder: (context) {
+              return AlertDialog(
+                scrollable: true,
+                content: Text(fullResponse),
+              );
+            },
+          );
+          fullResponse = '';
+        });
+      },
+    );
+  }
 }

@@ -6,7 +6,7 @@ import 'package:testapp/ui/app/app.dart';
 
 class GenericCard extends StatelessWidget {
   final String propertyName;
-  final int propertyValue;
+  final dynamic propertyValue;
 
   const GenericCard({required this.propertyName, required this.propertyValue});
 
@@ -14,7 +14,17 @@ class GenericCard extends StatelessWidget {
   Widget build(BuildContext context) {
     return Card(
       child: ListTile(
-        title: Text(propertyName),
+        title: Text(
+          propertyName,
+          style: TextStyle(
+            color: propertyName == 'Inactive Nodes'
+                ? Colors.red
+                : propertyName == 'Active Nodes'
+                    ? Colors.green
+                    : Colors
+                        .white, // Default color when propertyName is neither 'Inactive Nodes' nor 'Active Nodes'
+          ),
+        ),
         subtitle: Text(propertyValue.toString()),
       ),
     );

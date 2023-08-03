@@ -27,21 +27,24 @@ class InfoCard extends StatelessWidget with GetItMixin {
     };
 
     return BootstrapContainer(
-      fluid: true,
-      children: [
-        BootstrapRow(
-          children: infoMap.entries.map((entry) {
-            return BootstrapCol(
-              fit: FlexFit.tight,
-              sizes: 'col-12 col-sm-3',
-              child: GenericCard(
-                propertyName: entry.key,
-                propertyValue: entry.value,
-              ),
-            );
-          }).toList(),
-        ),
-      ],
-    );
+  fluid: true,
+  children: [
+    BootstrapRow(
+      children: infoMap.entries
+        .where((entry) => entry.key != 'time')
+        .map((entry) => 
+          BootstrapCol(
+            fit: FlexFit.tight,
+            sizes: 'col-12 col-sm-3',
+            child: GenericCard(
+              propertyName: entry.key,
+              propertyValue: entry.value,
+            ),
+          )
+        ).toList(),
+    ),
+  ],
+);
+
   }
 }

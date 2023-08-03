@@ -12,6 +12,7 @@ class Info {
   int nimbus;
   int stratus;
   int nextPaymentWindow;
+  int time;
 
   Info({
     required this.runningFlux,
@@ -22,6 +23,7 @@ class Info {
     required this.nimbus,
     required this.stratus,
     required this.nextPaymentWindow,
+    required this.time,
   });
 
   factory Info.fromJson(Map<String, dynamic> json) => _$InfoFromJson(json);
