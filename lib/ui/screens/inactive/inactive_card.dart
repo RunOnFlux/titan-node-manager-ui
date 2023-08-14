@@ -2,12 +2,9 @@ import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
-import 'package:flutter_base/ui/widgets/titled_card.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/inactiveInfo.dart';
-import 'package:testapp/api/model/nodeinfo.dart';
 import 'package:testapp/ui/app/app.dart';
-import 'package:testapp/api/services/fetchInfo.dart';
 import 'package:http/http.dart' as http;
 
 import 'package:data_table_2/data_table_2.dart';
@@ -42,25 +39,22 @@ class _MyDataTableState extends State<_MyDataTable> {
   Map<String, InactiveInfo> selectedRows =
       {}; // Holds txhash:outidx for each row
   DataTable? dataTable;
-  bool showButton = false;
+  bool showButton = false; // start selected nodes button
 
   int? _sortColumnIndex;
   bool _sortAscending = true;
 
-  Color primaryColorDark = const Color.fromARGB(255, 38, 86, 198);
-  Color darkText = const Color.fromARGB(255, 208, 210, 214);
   Color scaffoldBackgroundDark = const Color.fromARGB(255, 20, 22, 41);
-  Color cardColorDark = Color.fromARGB(255, 58, 58, 78);
-  Color rowColor = const Color.fromARGB(255, 14, 16, 33);
+  Color cardColorDark = const Color.fromARGB(255, 58, 58, 78);
 
+  Color rowColor =
+      const Color.fromARGB(255, 14, 16, 33); // changed when selected
+
+  // contains attributes to be displayed in the table
   List<Map<String, dynamic Function(dynamic)>> attributes = [
     {'Txhash': (node) => node.txid},
     {'Amount': (node) => node.amount.toString()},
     {'Vout': (node) => node.vout.toString()},
-
-    // {'Satoshis': (node) => node.satoshis.toString()},
-    // {'Height': (node) => node.height.toString()},
-    // {'Confirmations': (node) => node.confirmations.toString()},
     {'': (node) => ''},
   ];
 
@@ -83,89 +77,65 @@ class _MyDataTableState extends State<_MyDataTable> {
   Widget build(BuildContext context) {
     allDataRows =
         nodeinfo.map((node) => buildDataRow(node, attributes)).toList();
-    return BootstrapContainer(children: [
-      Visibility(
-        maintainSize: true,
-        maintainAnimation: true,
-        maintainState: true,
-        visible: showButton,
-        child: StartSelectedNodes(selectedRows.values.toList()),
-      ),
-      Align(
-        alignment: Alignment.centerRight,
-        child: SizedBox(
-            width: 200,
-            child: TextField(
-              onSubmitted:
-                  filterData, // Filter the data when the search query changes.
-              decoration: const InputDecoration(
-                labelText: "Search",
-                suffixIcon: Icon(Icons.search),
+    return BootstrapContainer(
+      // decoration:
+      //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
+      fluid: true,
+      children: [
+        BootstrapRow(
+          children: [
+            BootstrapCol(
+              // Start all selected nodes button
+              sizes: 'col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2',
+              child: Visibility(
+                maintainSize: true,
+                maintainAnimation: true,
+                maintainState: true,
+                visible: showButton,
+                child: StartSelectedNodes(selectedRows.values.toList()),
               ),
-            )),
-      ),
-      SizedBox(height: 600, child: buildDataTable())
-    ]);
-  }
-
-  void filterData(String query) {
-    if (query.isEmpty) {
-      setState(() => filteredRows = allDataRows);
-    } else {
-      setState(() {
-        filteredRows = allDataRows.where((row) {
-          String rowContent = row.cells.map((cell) {
-            if (cell.child is Text) {
-              return (cell.child as Text).data!;
-            } else if (cell.child is InkWell) {
-              return ((cell.child as InkWell).child as Text).data!;
-            } else {
-              return ''; // or some default value
-            }
-          }).join('***'); // should change this
-          return rowContent.toLowerCase().contains(query.toLowerCase());
-        }).toList();
-      });
-    }
-  }
-
-  void _onSort(int columnIndex, bool ascending) {
-    setState(() {
-      _sortColumnIndex = columnIndex;
-      _sortAscending = ascending;
-
-      // Sort the data based on the selected column and sorting direction
-      filteredRows.sort((a, b) {
-        final aValue = (a.cells[columnIndex].child as Text).data!;
-        final bValue = (b.cells[columnIndex].child as Text).data!;
-
-        bool isNumeric =
-            num.tryParse(aValue) != null && num.tryParse(bValue) != null;
-
-        if (isNumeric) {
-          double aNumber = double.parse(aValue);
-          double bNumber = double.parse(bValue);
-          return ascending
-              ? aNumber.compareTo(bNumber)
-              : bNumber.compareTo(aNumber);
-        } else {
-          return ascending
-              ? Comparable.compare(aValue, bValue)
-              : Comparable.compare(bValue, aValue);
-        }
-      });
-    });
+            ),
+            BootstrapCol(
+              // White space
+              child: SizedBox(),
+              sizes: 'col-12 col-sm-7 col-md-7 col-lg-7 col-xl-7',
+            ),
+            BootstrapCol(
+              // Search bar
+              sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
+              child: Align(
+                alignment: Alignment.centerRight,
+                child: SizedBox(
+                  width: 200,
+                  child: TextField(
+                    onSubmitted: filterData,
+                    onChanged: (query) {
+                      if (query.isEmpty) {
+                        setState(() => filteredRows = allDataRows);
+                      }
+                    },
+                    decoration: const InputDecoration(
+                      labelText: "Search",
+                      suffixIcon: Icon(Icons.search),
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+        SizedBox(height: 600, child: buildDataTable()),
+      ],
+    );
   }
 
   DataTable2 buildDataTable() {
     return DataTable2(
-        // border: TableBorder.all(color: Colors.white),
+        // decoration:
+        //     BoxDecoration(border: Border.all(color: Colors.green, width: 4)),
         showCheckboxColumn: false,
-        // columnSpacing: 12,
-        horizontalMargin: 12,
         smRatio: .5,
         lmRatio: 2,
-        minWidth: 600,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
         columns: attributes.map((attribute) {
@@ -174,11 +144,12 @@ class _MyDataTableState extends State<_MyDataTable> {
             return DataColumn2(size: ColumnSize.M, label: Text(''));
           } else {
             if (attribute.keys.first == 'Txhash') {
+              // Make the txhash column longer than the others.
               return DataColumn2(
                 size: ColumnSize.L,
                 label: Text(attribute.keys.first),
-                onSort: (columnIndex, ascending) =>
-                    _onSort(columnIndex, ascending),
+                // onSort: (columnIndex, ascending) =>
+                //     _onSort(columnIndex, ascending),
               );
             }
             return DataColumn2(
@@ -190,12 +161,6 @@ class _MyDataTableState extends State<_MyDataTable> {
           }
         }).toList(),
         rows: filteredRows);
-  }
-
-  bool selectedContains(node) {
-    String myKey = node.txid;
-    bool contain = selectedRows.containsKey(myKey);
-    return contain;
   }
 
   Map<String, Color> rowColors = {};
@@ -247,6 +212,63 @@ class _MyDataTableState extends State<_MyDataTable> {
             }
           });
         }
+      },
+    );
+  }
+
+  bool selectedContains(node) {
+    String myKey = node.txid;
+    bool contain = selectedRows.containsKey(myKey);
+    return contain;
+  }
+
+  void filterData(String query) {
+    if (query.isEmpty) {
+      setState(() => filteredRows = allDataRows);
+    } else {
+      setState(() {
+        filteredRows = allDataRows.where((row) {
+          String rowContent = row.cells.map((cell) {
+            return cell.child is Text
+                ? (cell.child as Text).data!
+                : cell.child is InkWell
+                    ? ((cell.child as InkWell).child as Text).data!
+                    : '';
+          }).join('***'); // should change this
+          return rowContent.toLowerCase().contains(query.toLowerCase());
+        }).toList();
+      });
+    }
+  }
+
+  void _onSort(int columnIndex, bool ascending) {
+    setState(
+      () {
+        _sortColumnIndex = columnIndex;
+        _sortAscending = ascending;
+
+        // Sort the data based on the selected column and sorting direction
+        filteredRows.sort(
+          (a, b) {
+            final aValue = (a.cells[columnIndex].child as Text).data!;
+            final bValue = (b.cells[columnIndex].child as Text).data!;
+
+            bool isNumeric =
+                num.tryParse(aValue) != null && num.tryParse(bValue) != null;
+
+            if (isNumeric) {
+              double aNumber = double.parse(aValue);
+              double bNumber = double.parse(bValue);
+              return ascending
+                  ? aNumber.compareTo(bNumber)
+                  : bNumber.compareTo(aNumber);
+            } else {
+              return ascending
+                  ? Comparable.compare(aValue, bValue)
+                  : Comparable.compare(bValue, aValue);
+            }
+          },
+        );
       },
     );
   }
@@ -304,34 +326,15 @@ class StartNodeButton extends StatelessWidget {
   }
 }
 
-Future<http.Response> startNode(BuildContext context, node) async {
-  var txhash = node.txid;
-  var outidx = node.vout;
-
-  Map<String, dynamic> requestBody = {
-    'txhash': txhash,
-    'outidx': outidx,
-  };
-  var url = Uri.parse('http://localhost:4444/api/startnode');
-
-  final response = await http.post(
-    url,
-    body: jsonEncode(requestBody),
-    headers: {'Content-Type': 'application/json'},
-  );
-  return response;
-}
-
 class StartSelectedNodes extends StatelessWidget {
   final List<InactiveInfo> nodes;
-  List<FutureBuilder<http.Response>> responseList = [];
-  String fullResponse = '';
 
   StartSelectedNodes(this.nodes, {Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
-    print('displaying start selected nodes button');
+    String fullResponse = '';
+
     return ElevatedButton(
       child: const Text('Start Selected Nodes'),
       onPressed: () {
@@ -355,9 +358,27 @@ class StartSelectedNodes extends StatelessWidget {
               );
             },
           );
-          fullResponse = '';
+          fullResponse = ''; // Reset after clicking button
         });
       },
     );
   }
+}
+
+Future<http.Response> startNode(BuildContext context, node) async {
+  var txhash = node.txid;
+  var outidx = node.vout;
+
+  Map<String, dynamic> requestBody = {
+    'txhash': txhash,
+    'outidx': outidx,
+  };
+  var url = Uri.parse('http://localhost:4444/api/startnode');
+
+  final response = await http.post(
+    url,
+    body: jsonEncode(requestBody),
+    headers: {'Content-Type': 'application/json'},
+  );
+  return response;
 }

@@ -1,12 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:flutter_base/ui/widgets/simple_screen.dart';
-import 'package:flutter_base/ui/widgets/titled_card.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
-import 'package:testapp/api/model/nodeinfo.dart';
-import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/ui/screens/home/info_card.dart';
-import 'package:testapp/ui/screens/home/info_prop_card.dart';
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/screens/home/last_refresh_card.dart';
 
@@ -41,15 +37,6 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
           ],
         ),
         Container(
-          // Something is wrong with the spacing for the nodeinfocard
-          // height 660 makes it look normal but if anything is changed it'll look janky
-          height: 660,
-          // decoration: BoxDecoration(
-          //   border: Border.all(
-          //     color: Colors.grey,
-          //     width: 3,
-          //   ),
-          // ),
           child: NodeInfoCard(),
         ),
         LastRefresh(),
