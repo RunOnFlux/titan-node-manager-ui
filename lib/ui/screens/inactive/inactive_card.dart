@@ -6,6 +6,7 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/inactiveInfo.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:http/http.dart' as http;
+import 'package:testapp/ui/screens/home/save_card.dart';
 
 import 'package:data_table_2/data_table_2.dart';
 
@@ -51,16 +52,34 @@ class _MyDataTableState extends State<_MyDataTable> {
       const Color.fromARGB(255, 14, 16, 33); // changed when selected
 
   // contains attributes to be displayed in the table
-  List<Map<String, dynamic Function(dynamic)>> attributes = [
-    {'Txhash': (node) => node.txid},
-    {'Amount': (node) => node.amount.toString()},
-    {'Vout': (node) => node.vout.toString()},
-    {'': (node) => ''},
-  ];
+
+  void initNullFields() {
+    nodeinfo.forEach((node) => {
+          if (node.name == null)
+            {
+              node.name = 'NOT SET',
+            },
+          if (node.provider == null)
+            {
+              node.provider = 'NOT SET',
+            },
+          if (node.price == null)
+            {
+              node.price = -1,
+            }
+        });
+  }
+
+  // rebuild the table after editing nodes
+  void updateState() {
+    loadData();
+    setState(() {});
+  }
 
   @override
   void initState() {
     super.initState();
+    initNullFields();
     loadData();
     showButton = false;
     rowColor = scaffoldBackgroundDark;
@@ -129,6 +148,17 @@ class _MyDataTableState extends State<_MyDataTable> {
     );
   }
 
+  List<Map<String, dynamic Function(dynamic)>> attributes = [
+    {'Name': (node) => node.name},
+    {'Provider': (node) => node.provider},
+    {'Price': (node) => node.price.toString()},
+    {'Txhash': (node) => node.txid},
+    {'Amount': (node) => node.amount.toString()},
+    {'Vout': (node) => node.vout.toString()},
+    {'': (node) => ''},
+    {'Save': (node) => ''},
+  ];
+
   DataTable2 buildDataTable() {
     return DataTable2(
         // decoration:
@@ -142,14 +172,14 @@ class _MyDataTableState extends State<_MyDataTable> {
           // Headerless column
           if (attribute.keys.first == '') {
             return DataColumn2(size: ColumnSize.M, label: Text(''));
+          } else if (attribute.keys.first == 'Save') {
+            return DataColumn2(size: ColumnSize.M, label: Text(''));
           } else {
             if (attribute.keys.first == 'Txhash') {
               // Make the txhash column longer than the others.
               return DataColumn2(
                 size: ColumnSize.L,
                 label: Text(attribute.keys.first),
-                // onSort: (columnIndex, ascending) =>
-                //     _onSort(columnIndex, ascending),
               );
             }
             return DataColumn2(
@@ -166,14 +196,38 @@ class _MyDataTableState extends State<_MyDataTable> {
   Map<String, Color> rowColors = {};
 
   DataRow buildDataRow(node, attributes) {
-    // print('building data row');
+    DataCell getTextDataCell(String text, Color color) {
+      return DataCell(
+        Text(
+          text,
+          style: TextStyle(color: color),
+        ),
+      );
+    }
+
     var startCell = DataCell(StartNodeButton(node));
+
+    const keysToCheck = ['Name', 'Provider', 'Price'];
     List<DataCell> cells = attributes.map<DataCell>((attribute) {
+      String featureValue = attribute.values.first(node);
+
       // Headerless column contains startnode button
       if (attribute.keys.first == '') {
         return startCell;
+      } else if (attribute.keys.first == 'Save') {
+        return DataCell(SaveNodeButton(node, reset: (() {
+          print('in reset');
+          updateState();
+        })));
+      } else if (keysToCheck.contains(attribute.keys.first)) {
+        if (featureValue == '-1') {
+          featureValue = 'NOT SET';
+        }
+
+        Color textColor =
+            (featureValue == 'NOT SET') ? Colors.red : Colors.green;
+        return getTextDataCell(featureValue, textColor);
       } else {
-        if (attribute.keys.first == 'Txhash') {}
         return DataCell(
           Text(attribute.values.first(node),
               style: const TextStyle(color: Colors.red)),

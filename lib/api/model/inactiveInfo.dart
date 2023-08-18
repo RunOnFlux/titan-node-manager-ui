@@ -4,6 +4,10 @@ part 'inactiveInfo.g.dart';
 
 @JsonSerializable()
 class InactiveInfo {
+  String? name;
+  String? provider;
+  int? price;
+
   String address;
   String txid;
   int vout;

@@ -1,10 +1,7 @@
-import 'dart:html';
-
 import 'package:auto_size_text/auto_size_text.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_base/ui/app/loading_notifier.dart';
 import 'package:flutter_base/ui/app/minimal_app.dart';
-import 'package:flutter_base/ui/widgets/sidemenu/menu_item.dart';
 import 'package:provider/provider.dart';
 import 'package:testapp/api/model/info.dart';
 import 'package:testapp/api/model/nodeinfo.dart';

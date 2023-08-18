@@ -3,6 +3,7 @@ import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
 import 'package:testapp/ui/app/app.dart';
+import 'package:testapp/ui/screens/home/save_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:data_table_2/data_table_2.dart';
 
@@ -11,6 +12,7 @@ class NodeInfoCard extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
     var nodeinfo = watchOnly((NodeManagerInfo nodeinfo) => nodeinfo.nodeinfo);
+    var tempchange = nodeinfo;
     return Container(
       padding: const EdgeInsets.all(16),
       child: _MyDataTable(nodeinfo),
@@ -39,25 +41,37 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   // contains attributes to be displayed in the table
   List<Map<String, dynamic Function(dynamic)>> attributes = [
+    {'Name': (node) => node.name},
+    {'Provider': (node) => node.provider},
+    {'Price': (node) => node.price.toString()},
     {'IP Address': (node) => node.ip},
     {'Txhash': (node) => node.txhash},
     {'Tier': (node) => node.tier},
     {'Rank': (node) => node.rank.toString()},
-    {'Added Height': (node) => node.added_height.toString()},
+    // {'Added Height': (node) => node.added_height.toString()},
     {'Confirmed Height': (node) => node.confirmed_height.toString()},
+    {'': (node) => ''},
   ];
 
   @override
   void initState() {
     super.initState();
+    initNullFields();
     loadData();
   }
 
   void loadData() {
+    print('loading data');
     allDataRows = nodeinfo
         .map<DataRow>((node) => buildDataRow(context, node, attributes))
         .toList();
     filteredRows = List.from(allDataRows);
+  }
+
+  // rebuild the table after editing nodes
+  void updateState() {
+    loadData();
+    setState(() {});
   }
 
   @override
@@ -124,19 +138,42 @@ class _MyDataTableState extends State<_MyDataTable> {
             .values.first; // function that retrieves an attribute of the node
 
         // Create ip hyperlink
+        String featureValue = extractFeature(node);
+
+        DataCell getTextDataCell(String text, Color color) {
+          return DataCell(
+            Text(
+              text,
+              style: TextStyle(color: color),
+            ),
+          );
+        }
+
+        var saveCell = DataCell(SaveNodeButton(
+          node,
+          reset: (() {
+            updateState();
+          }),
+        ));
+
+        if (attribute.keys.first == '') {
+          return saveCell;
+        }
+
         if (attribute.keys.first == 'IP Address') {
           return DataCell(
             InkWell(
               child: Text(
-                extractFeature(node),
+                featureValue,
                 style: const TextStyle(color: Colors.lightBlue),
               ),
               onTap: () async {
-                String ip = extractFeature(node);
-                String port = ip.contains(':') ? ip.split(':')[0] : ip;
+                String port = featureValue.contains(':')
+                    ? featureValue.split(':')[0]
+                    : featureValue;
                 String url = 'http://$port:16126/';
 
-                if (await canLaunchUrl((Uri.parse(url)))) {
+                if (await canLaunchUrl(Uri.parse(url))) {
                   await launchUrl(Uri.parse(url));
                 } else {
                   throw 'Could not launch $url';
@@ -144,14 +181,21 @@ class _MyDataTableState extends State<_MyDataTable> {
               },
             ),
           );
-        } else {
-          return DataCell(
-            Text(
-              extractFeature(node),
-              style: const TextStyle(color: Colors.green),
-            ),
-          );
         }
+
+        const keysToCheck = ['Name', 'Provider', 'Price'];
+        if (keysToCheck.contains(attribute.keys.first)) {
+          if (featureValue == '-1') {
+            featureValue = 'NOT SET';
+          }
+
+          Color textColor = (featureValue == 'NOT SET' || featureValue == '--')
+              ? Colors.red
+              : Colors.green;
+          return getTextDataCell(featureValue, textColor);
+        }
+
+        return getTextDataCell(featureValue, Colors.green);
       }).toList(),
       onSelectChanged: (bool? selected) => displayPopout(node),
     );
@@ -208,12 +252,33 @@ class _MyDataTableState extends State<_MyDataTable> {
     }
   }
 
+  void initNullFields() {
+    nodeinfo.forEach((node) => {
+          if (node.name == null)
+            {
+              node.name = 'NOT SET',
+            },
+          if (node.provider == null)
+            {
+              node.provider = '--',
+            },
+          if (node.price == null)
+            {
+              node.price = -1,
+            }
+        });
+  }
+
   void displayPopout(node) {
     try {
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return PopoutCard(node: node);
+            // return Container(
+            //   decoration: BoxDecoration(
+            //       border: Border.all(color: Colors.white, width: 4)),
+            // );
           });
       // return true;
     } catch (err) {
@@ -245,7 +310,7 @@ class PopoutCard extends StatelessWidget {
       },
       {'Outidx': (node) => node.outidx},
       {'Network': (node) => node.network},
-      {'Last Paid Height': (node) => node.tier.toString()},
+      {'Last Paid Height': (node) => node.last_paid_height.toString()},
       {'Payment Address': (node) => node.payment_address},
       // {'Pubkey': (node) => node.pubkey},
       {'Active Since': (node) => node.activesince},
@@ -258,45 +323,47 @@ class PopoutCard extends StatelessWidget {
     ];
 
     return BootstrapContainer(
-      // decoration: BoxDecoration(color: Color.fromARGB(255, 42, 67, 84)),
+      padding: const EdgeInsets.all(100.0),
       fluid: false,
       children: [
         BootstrapRow(
-            height: 560,
             children: attributes.map((attribute) {
-              var extractFeature = attribute.values.first;
-              // Card for an attribute
-              return BootstrapCol(
-                sizes: 'col-12 col-sm-3 col-md-4 col-lg-4 col-xl-4',
-                absoluteSizes: true,
-                child: Card(
-                  color: Colors.grey[600],
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(10.0),
-                  ),
-                  child: Padding(
-                    padding: EdgeInsets.all(8.0),
-                    child: ListTile(
-                      title: Text(
-                        attribute.keys.first,
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 18,
-                          fontWeight: FontWeight.bold,
-                        ),
+          var extractFeature = attribute.values.first;
+          return BootstrapCol(
+            sizes: 'col-12 col-sm-3 col-md-4 col-lg-4 col-xl-4',
+            absoluteSizes: false,
+            child: Container(
+              margin:
+                  const EdgeInsets.symmetric(vertical: 8.0), // Add margin here
+              child: Card(
+                color: Colors.grey[600],
+                shape: RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(10.0),
+                ),
+                child: Padding(
+                  padding: const EdgeInsets.all(15.0),
+                  child: ListTile(
+                    title: Text(
+                      attribute.keys.first,
+                      style: const TextStyle(
+                        color: Colors.black,
+                        fontSize: 18,
+                        fontWeight: FontWeight.bold,
                       ),
-                      subtitle: Text(
-                        extractFeature(node).toString(),
-                        style: TextStyle(
-                          fontSize: 16,
-                          color: Colors.grey[900],
-                        ),
+                    ),
+                    subtitle: Text(
+                      extractFeature(node).toString(),
+                      style: TextStyle(
+                        fontSize: 16,
+                        color: Colors.grey[900],
                       ),
                     ),
                   ),
                 ),
-              );
-            }).toList()),
+              ),
+            ),
+          );
+        }).toList()),
       ],
     );
   }

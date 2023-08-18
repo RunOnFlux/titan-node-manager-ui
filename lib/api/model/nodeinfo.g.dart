@@ -20,6 +20,9 @@ NodeInfo _$NodeInfoFromJson(Map<String, dynamic> json) => NodeInfo(
       amount: json['amount'] as String,
       scriptPubKey: json['scriptPubKey'] as String,
     )
+      ..name = json['name'] as String?
+      ..provider = json['provider'] as String?
+      ..price = json['price'] as int?
       ..added_height = json['added_height'] as int?
       ..confirmed_height = json['confirmed_height'] as int?
       ..last_confirmed_height = json['last_confirmed_height'] as int?
@@ -30,6 +33,9 @@ NodeInfo _$NodeInfoFromJson(Map<String, dynamic> json) => NodeInfo(
       ..confirmations = json['confirmations'] as int?;
 
 Map<String, dynamic> _$NodeInfoToJson(NodeInfo instance) => <String, dynamic>{
+      'name': instance.name,
+      'provider': instance.provider,
+      'price': instance.price,
       'collateral': instance.collateral,
       'txhash': instance.txhash,
       'outidx': instance.outidx,
