@@ -1,38 +1,31 @@
-// ignore_for_file: avoid_print
-
-import 'dart:convert';
 import 'package:get_it/get_it.dart';
-import 'package:http/http.dart' as http;
 
 import 'package:flutter/material.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/utils/settings.dart';
 
-// - * Create a table item for the inactive transactions.
+// Backend
 
-// - * This can be its own list item from the menu on the right.
+// - Create a new file and preload it with the nodes, name, provider, and price
 
-// - The table will look simlar to the current table except the first column will be a button that says start fluxnode.
+// - Create a new api endpoint that allows us to modify these values through the UI.
 
-// - When clicked this will send the command to the backend server api for starting a fluxnode.
+// - Once the new file is ready, when a user requests the nodeinfo (api). Lets combine the new files data (name, provider, price) into the existing result if it exists.
 
-// - Lets also get the response from the server add display it to the user with a pop up message card.
+// Frontend
 
-// - On the homepage, lets add a last refeshed time (that shows that time from when this data was fetched)
+// - Add the name, provider, and price to the table headers. It the valus are set in the data. SHow the updated values, if not. Show a red text saying NOT SET.
 
-// - * Can we make the ip addresses clickable and if clicked they would open a tab to the fluxnode server on that ip address. example = http://ipaddresshere:16126/
+// - Create the ability to modify the name, provider, and price, and when it is Saved. The update call when get sent to the backend server.
 
-// - * Can we make the text on inactive nodes red
+// Feature ideas
+// - Hover effect on info cards
+// - It rebuilds the datatable from scratch anytime something happens.
+// - Sorting by ip doesn't work
+// - No timestamp on inactive table.
+// - Authentication for secure features
+// - Secure features?
 
-// - * Can we make the text on active nodes green
-
-// - * Change the named of Running Flux to - Collateralized Total
-
-// - * Lets add a label to next payment number that says blocks or minutes depending on what the number means. If it is an estimated use a ~
-
-// - See if you can create filters on the table headers. For example. If I was to click Tier it would sort by the other Tiers
-
-// - See if you can add a search bar to the table(s) that allow you to search for IP Address, Tier, Collateral.
 void main() async {
   GetIt.I.registerSingleton<NodeManagerInfo>(NodeManagerInfo());
   await NodeManagerSettings().initialize();

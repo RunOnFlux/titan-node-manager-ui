@@ -4,6 +4,10 @@ part 'inactiveInfo.g.dart';
 
 @JsonSerializable()
 class InactiveInfo {
+  String? name;
+  String? provider;
+  int? price;
+
   String address;
   String txid;
   int vout;
@@ -23,6 +27,17 @@ class InactiveInfo {
     required this.height,
     required this.confirmations,
   });
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+
+    return other is InactiveInfo &&
+        other.txid == txid; // compare other properties if needed
+  }
+
+  @override
+  int get hashCode => txid.hashCode; // include other properties if needed
 
   factory InactiveInfo.fromJson(Map<String, dynamic> json) =>
       _$InactiveInfoFromJson(json);

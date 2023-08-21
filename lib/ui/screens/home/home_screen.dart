@@ -1,13 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:flutter_base/ui/widgets/simple_screen.dart';
-import 'package:flutter_base/ui/widgets/titled_card.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
-import 'package:testapp/api/model/nodeinfo.dart';
-import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/ui/screens/home/info_card.dart';
-import 'package:testapp/ui/screens/home/info_prop_card.dart';
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
+import 'package:testapp/ui/screens/home/last_refresh_card.dart';
 
 class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {
   HomeScreen({Key? key}) : super(key: key, title: 'Home');
@@ -39,10 +36,10 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
             ),
           ],
         ),
-        SizedBox(
-          height: 600, // Replace with desired height
+        Container(
           child: NodeInfoCard(),
         ),
+        LastRefresh(),
       ],
     );
   }

@@ -13,6 +13,9 @@ part 'nodeinfo.g.dart';
 
 @JsonSerializable()
 class NodeInfo {
+  String? name;
+  String? provider;
+  int? price;
   String collateral;
   String txhash;
   String outidx;
@@ -35,6 +38,9 @@ class NodeInfo {
   String scriptPubKey;
 
   NodeInfo({
+    // required this.name,
+    // required this.provider,
+    // required this.price,
     required this.collateral,
     required this.txhash,
     required this.outidx,

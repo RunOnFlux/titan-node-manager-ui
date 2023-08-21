@@ -41,4 +41,16 @@ class InfoService {
         values.map((model) => InactiveInfo.fromJson(model)));
     return inactiveList;
   }
+
+  // Future<List<DeepInfo>> fetchDeepNodes() async {
+  //   List<DeepInfo> deepList = [];
+  //   final response =
+  //       await http.get(Uri.parse('http://localhost:4444/api/deepnode'));
+  //   final data = response.body;
+  //   final jsonData = jsonDecode(data);
+  //   var values = jsonData.values;
+  //   deepList =
+  //       List<DeepInfo>.from(values.map((model) => DeepInfo.fromJson(model)));
+  //   return deepList;
+  // }
 }

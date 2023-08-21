@@ -6,6 +6,7 @@ import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/screens/home/home_screen.dart';
 
 import '../screens/inactive/inactive_screen.dart';
+import '../screens/test/test_screen.dart';
 
 class NodeManagerRouter extends AppRouter {
   NodeManagerRouter._p() {
@@ -28,7 +29,14 @@ class NodeManagerRouter extends AppRouter {
         route: '/inactive',
         body: InactiveScreen(),
         title: 'Inactive',
-        icon: Icons.home,
+        icon: Icons.build_sharp,
+        includeInMenu: true,
+      ),
+      NavigationRoute(
+        route: '/test',
+        body: TestScreen(),
+        title: 'test',
+        icon: Icons.battery_3_bar_sharp,
         includeInMenu: true,
       ),
     ];
