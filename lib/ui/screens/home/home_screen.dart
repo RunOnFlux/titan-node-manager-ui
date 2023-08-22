@@ -24,7 +24,7 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
   @override
   Widget buildChild(BuildContext context) {
     return BootstrapContainer(
-      fluid: true,
+      fluid: false,
       padding: mainPadding(),
       children: [
         BootstrapRow(
@@ -36,7 +36,7 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
             ),
           ],
         ),
-        Container(
+        BootstrapCol(
           child: NodeInfoCard(),
         ),
         LastRefresh(),

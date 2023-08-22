@@ -39,6 +39,9 @@ class _MyDataTableState extends State<_MyDataTable> {
   int? _sortColumnIndex;
   bool _sortAscending = true;
 
+  final verticalScrollController = ScrollController();
+  final horizontalScrollController = ScrollController();
+
   // contains attributes to be displayed in the table
   List<Map<String, dynamic Function(dynamic)>> attributes = [
     {'Name': (node) => node.name},
@@ -76,54 +79,123 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   @override
   Widget build(BuildContext context) {
-    return BootstrapContainer(
-        // decoration:
-        //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
-        fluid: true,
-        children: [
-          BootstrapCol(
-            //  White space
-            child: SizedBox(),
-            sizes: 'col-12 col-sm-6 col-md-9 col-lg-9 col-xl-9',
-          ),
+    return Container(
+      width: MediaQuery.of(context).size.width, // match the window width
+      height: 200,
+      decoration: BoxDecoration(
+        border: Border.all(
+          color: Colors.black,
+          width: 3,
+        ),
+      ),
+      margin: const EdgeInsets.all(15.0),
 
-          BootstrapCol(
-            // Search box
-            sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
-            child: Align(
-              alignment: Alignment.centerRight,
-              child: SizedBox(
-                  width: 200,
-                  child: TextField(
-                    onSubmitted: filterData,
-                    onChanged: (query) {
-                      if (query.isEmpty) {
-                        setState(() => filteredRows = allDataRows);
-                      }
-                    },
-                    decoration: const InputDecoration(
-                      labelText: "Search",
-                      suffixIcon: Icon(Icons.search),
-                    ),
-                  )),
+      child: Scrollbar(
+        thumbVisibility: true,
+        trackVisibility: true, // make the scrollbar easy to see
+        controller: verticalScrollController,
+        child: Scrollbar(
+          thumbVisibility: true,
+          trackVisibility: true,
+          controller: horizontalScrollController,
+          notificationPredicate: (notif) => notif.depth == 1,
+          child: SingleChildScrollView(
+            controller: verticalScrollController,
+            scrollDirection: Axis.vertical,
+            child: SingleChildScrollView(
+              controller: horizontalScrollController,
+              scrollDirection: Axis.horizontal,
+              child: buildDataTable(),
+              // child: BootstrapContainer(
+
+              //     // decoration:
+              //     //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
+              //     fluid: true,
+              //     children: [
+              //       BootstrapCol(
+              //         //  White space
+              //         child: SizedBox(),
+              //         sizes: 'col-12 col-sm-6 col-md-9 col-lg-9 col-xl-9',
+              //       ),
+
+              //       BootstrapCol(
+              //         // Search box
+              //         sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
+              //         child: Align(
+              //           alignment: Alignment.centerRight,
+              //           child: SizedBox(
+              //               width: 200,
+              //               child: TextField(
+              //                 onSubmitted: filterData,
+              //                 onChanged: (query) {
+              //                   if (query.isEmpty) {
+              //                     setState(() => filteredRows = allDataRows);
+              //                   }
+              //                 },
+              //                 decoration: const InputDecoration(
+              //                   labelText: "Search",
+              //                   suffixIcon: Icon(Icons.search),
+              //                 ),
+              //               )),
+              //         ),
+              //       ),
+              //       // builds table
+              //       SizedBox(height: 600, child: buildDataTable())
+              //     ]), // DataTable creation
             ),
           ),
-          // builds table
-          SizedBox(height: 600, child: buildDataTable())
-        ]);
+        ),
+      ),
+    );
   }
+
+  double columnWidth = 200;
+  double initX = 0;
+  final minimumColumnWidth = 50.0;
 
   DataTable2 buildDataTable() {
     return DataTable2(
-        // decoration:
-        //     BoxDecoration(border: Border.all(color: Colors.green, width: 4)),
         showCheckboxColumn: false,
         showBottomBorder: true,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
         columns: attributes
             .map((attribute) => DataColumn2(
-                  label: Text(attribute.keys.first),
+                  label: Stack(
+                    children: [
+                      Container(
+                        child: Text(attribute.keys.first),
+                        width: columnWidth,
+                        constraints: BoxConstraints(minWidth: 0),
+                      ),
+                      Positioned(
+                          child: GestureDetector(
+                        onPanStart: (details) {
+                          setState(() {
+                            initX = details.globalPosition.dx;
+                          });
+                        },
+                        onPanUpdate: (details) {
+                          final increment = details.globalPosition.dx - initX;
+                          final newWidth = columnWidth + increment;
+                          setState(() {
+                            initX = details.globalPosition.dx;
+                            columnWidth = newWidth > minimumColumnWidth
+                                ? newWidth
+                                : minimumColumnWidth;
+                          });
+                        },
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(1),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ))
+                    ],
+                  ),
                   onSort: (columnIndex, ascending) =>
                       _onSort(columnIndex, ascending),
                 ))
@@ -142,18 +214,28 @@ class _MyDataTableState extends State<_MyDataTable> {
 
         DataCell getTextDataCell(String text, Color color) {
           return DataCell(
-            Text(
-              text,
-              style: TextStyle(color: color),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: columnWidth,
+              ),
+              child: Text(
+                text,
+                style: TextStyle(color: color),
+              ),
             ),
           );
         }
 
-        var saveCell = DataCell(SaveNodeButton(
-          node,
-          reset: (() {
-            updateState();
-          }),
+        var saveCell = DataCell(ConstrainedBox(
+          constraints: BoxConstraints(
+            maxWidth: columnWidth,
+          ),
+          child: SaveNodeButton(
+            node,
+            reset: (() {
+              updateState();
+            }),
+          ),
         ));
 
         if (attribute.keys.first == '') {
@@ -162,23 +244,28 @@ class _MyDataTableState extends State<_MyDataTable> {
 
         if (attribute.keys.first == 'IP Address') {
           return DataCell(
-            InkWell(
-              child: Text(
-                featureValue,
-                style: const TextStyle(color: Colors.lightBlue),
+            ConstrainedBox(
+              constraints: BoxConstraints(
+                maxWidth: columnWidth,
               ),
-              onTap: () async {
-                String port = featureValue.contains(':')
-                    ? featureValue.split(':')[0]
-                    : featureValue;
-                String url = 'http://$port:16126/';
+              child: InkWell(
+                child: Text(
+                  featureValue,
+                  style: const TextStyle(color: Colors.lightBlue),
+                ),
+                onTap: () async {
+                  String port = featureValue.contains(':')
+                      ? featureValue.split(':')[0]
+                      : featureValue;
+                  String url = 'http://$port:16126/';
 
-                if (await canLaunchUrl(Uri.parse(url))) {
-                  await launchUrl(Uri.parse(url));
-                } else {
-                  throw 'Could not launch $url';
-                }
-              },
+                  if (await canLaunchUrl(Uri.parse(url))) {
+                    await launchUrl(Uri.parse(url));
+                  } else {
+                    throw 'Could not launch $url';
+                  }
+                },
+              ),
             ),
           );
         }
