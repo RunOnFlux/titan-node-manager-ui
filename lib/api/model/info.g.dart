@@ -18,6 +18,7 @@ Info _$InfoFromJson(Map<String, dynamic> json) => Info(
       time: json['time'] as int,
       providers:
           (json['providers'] as List<dynamic>).map((e) => e as String).toList(),
+      cost: Cost.fromJson(json['cost'] as Map<String, dynamic>),
     );
 
 Map<String, dynamic> _$InfoToJson(Info instance) => <String, dynamic>{
@@ -30,5 +31,20 @@ Map<String, dynamic> _$InfoToJson(Info instance) => <String, dynamic>{
       'stratus': instance.stratus,
       'nextPaymentWindow': instance.nextPaymentWindow,
       'time': instance.time,
+      'cost': instance.cost,
       'providers': instance.providers,
+    };
+
+Cost _$CostFromJson(Map<String, dynamic> json) => Cost(
+      total: json['total'] as int,
+      stratus: json['stratus'] as int,
+      nimbus: json['nimbus'] as int,
+      cumulus: json['cumulus'] as int,
+    );
+
+Map<String, dynamic> _$CostToJson(Cost instance) => <String, dynamic>{
+      'total': instance.total,
+      'stratus': instance.stratus,
+      'nimbus': instance.nimbus,
+      'cumulus': instance.cumulus,
     };

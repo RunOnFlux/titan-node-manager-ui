@@ -13,6 +13,8 @@ class Info {
   int stratus;
   int nextPaymentWindow;
   int time;
+  Cost cost;
+
   List<String> providers;
 
   Info({
@@ -26,8 +28,26 @@ class Info {
     required this.nextPaymentWindow,
     required this.time,
     required this.providers,
+    required this.cost,
   });
 
   factory Info.fromJson(Map<String, dynamic> json) => _$InfoFromJson(json);
   Map<String, dynamic> toJson() => _$InfoToJson(this);
+}
+
+@JsonSerializable()
+class Cost {
+  int total;
+  int stratus;
+  int nimbus;
+  int cumulus;
+
+  Cost(
+      {required this.total,
+      required this.stratus,
+      required this.nimbus,
+      required this.cumulus});
+
+  factory Cost.fromJson(Map<String, dynamic> json) => _$CostFromJson(json);
+  Map<String, dynamic> toJson() => _$CostToJson(this);
 }
