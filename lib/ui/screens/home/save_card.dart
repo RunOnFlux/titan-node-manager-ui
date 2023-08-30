@@ -24,10 +24,10 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
   void initDefaultVals() {
     nameController.text = node.name;
     providerController.text = node.provider;
-    if (node.price == -1) {
+    if (node.price == 0) {
       priceController.text = 'NOT SET';
     } else {
-      priceController.text = node.price.toString();
+      priceController.text = node.price.toStringAsFixed(2);
     }
   }
 
@@ -62,10 +62,10 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                   ),
                   const SizedBox(height: 10),
                   DropdownButtonFormField<String>(
-                      value: '--',
+                      value: '-',
                       items: providers,
                       onChanged: ((String? x) {
-                        if (x == 'Add new') {
+                        if (x == 'ADD NEW') {
                           // Display popup to add new provider
                           showDialog(
                               context: context,
@@ -81,7 +81,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                                             builder: (BuildContext context) {
                                               return AlertDialog(
                                                 content: Text(
-                                                    'Add new provider: ${provider}'),
+                                                    'Add new provider: ${provider.toUpperCase()}'),
                                                 actions: [
                                                   TextButton(
                                                       onPressed: () {
@@ -94,7 +94,8 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                                                         // call api here
                                                         print('1');
                                                         await addProvider(
-                                                            provider);
+                                                            provider
+                                                                .toUpperCase());
                                                         print('2');
                                                         // print(
                                                         // 'tempProvider: $tempProvider');
@@ -104,7 +105,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                                                         //     .text = x!;
                                                         print('x after: $x');
                                                         print(
-                                                            'Submitted new provider: $provider');
+                                                            'Submitted new provider: ${provider.toUpperCase()}');
                                                         // tempProvider = provider;
                                                         Navigator.of(context)
                                                             .pop();
@@ -131,8 +132,9 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                     keyboardType: TextInputType.number,
                     controller: priceController,
                     decoration: const InputDecoration(hintText: "Price"),
-                    inputFormatters: <TextInputFormatter>[
-                      FilteringTextInputFormatter.digitsOnly
+                    inputFormatters: [
+                      FilteringTextInputFormatter.allow(
+                          RegExp(r'^\d+\.?\d{0,2}')),
                     ],
                   ),
                 ],
@@ -150,11 +152,11 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                     print('namecontroller.text: ${nameController.text}');
                     print(
                         'providercontroller.text: ${providerController.text}');
-                    print('pricecontroller.text: ${nameController.text}');
+                    print('pricecontroller.text: ${priceController.text}');
 
-                    if (providerController.text == 'Add new') {
-                      print('text is Add new');
-                      providerController.text = '--';
+                    if (providerController.text == 'ADD NEW') {
+                      print('text is ADD NEW');
+                      providerController.text = '-';
                     }
 
                     var inputs = {
@@ -163,7 +165,6 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                       'price': priceController.text
                     };
 
-                    ;
                     saveNode(context, node, inputs);
 
                     Navigator.of(context).pop();
@@ -191,6 +192,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
     } else if (node is InactiveInfo) {
       outidx = node.vout;
     }
+    print('typeof price: ${node.price.runtimeType}');
 
     Map<String, dynamic> requestBody = {
       'txhash': txhash,
@@ -213,7 +215,10 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
     if (response.body == 'Update successful') {
       node.name = inputs['name'];
       node.provider = inputs['provider'];
+      print('typeof price: ${node.price.runtimeType}');
       node.price = double.parse(inputs['price']);
+      print('typeof price?: ${double.parse(inputs['price']).runtimeType}');
+      print('typeof price: ${node.price.runtimeType}');
       reset();
     } else {
       print('UPDATE FAILED');

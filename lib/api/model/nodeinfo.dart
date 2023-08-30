@@ -15,7 +15,7 @@ part 'nodeinfo.g.dart';
 class NodeInfo {
   String? name;
   String? provider;
-  int? price;
+  double? price;
   String collateral;
   String txhash;
   String outidx;

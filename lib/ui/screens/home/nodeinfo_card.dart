@@ -6,6 +6,7 @@ import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/ui/screens/home/save_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:data_table_2/data_table_2.dart';
+import 'dart:async';
 
 class NodeInfoCard extends StatelessWidget with GetItMixin {
   NodeInfoCard({super.key});
@@ -38,6 +39,7 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   int? _sortColumnIndex;
   bool _sortAscending = true;
+  Timer? _searchDebounce;
 
   // contains attributes to be displayed in the table
   List<Map<String, dynamic Function(dynamic)>> attributes = [
@@ -93,19 +95,18 @@ class _MyDataTableState extends State<_MyDataTable> {
             child: Align(
               alignment: Alignment.centerRight,
               child: SizedBox(
-                  width: 200,
-                  child: TextField(
-                    onSubmitted: filterData,
-                    onChanged: (query) {
-                      if (query.isEmpty) {
-                        setState(() => filteredRows = allDataRows);
-                      }
-                    },
-                    decoration: const InputDecoration(
-                      labelText: "Search",
-                      suffixIcon: Icon(Icons.search),
-                    ),
-                  )),
+                width: 200,
+                child: TextField(
+                  onSubmitted: filterData,
+                  onChanged: (query) {
+                    _debounceSearch(query);
+                  },
+                  decoration: const InputDecoration(
+                    labelText: "Search",
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                ),
+              ),
             ),
           ),
           // builds table
@@ -113,21 +114,26 @@ class _MyDataTableState extends State<_MyDataTable> {
         ]);
   }
 
+  void _debounceSearch(String query) {
+    _searchDebounce?.cancel();
+    _searchDebounce = Timer(const Duration(milliseconds: 700), () {
+      filterData(query);
+    });
+  }
+
   DataTable2 buildDataTable() {
     return DataTable2(
-        // decoration:
-        //     BoxDecoration(border: Border.all(color: Colors.green, width: 4)),
         showCheckboxColumn: false,
         showBottomBorder: true,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
-        columns: attributes
-            .map((attribute) => DataColumn2(
-                  label: Text(attribute.keys.first),
-                  onSort: (columnIndex, ascending) =>
-                      _onSort(columnIndex, ascending),
-                ))
-            .toList(),
+        columns: attributes.map((attribute) {
+          // if (attribute.keys.first == 'Price') {}
+          return DataColumn2(
+            label: Text(attribute.keys.first),
+            onSort: (columnIndex, ascending) => _onSort(columnIndex, ascending),
+          );
+        }).toList(),
         rows: filteredRows);
   }
 
@@ -140,7 +146,8 @@ class _MyDataTableState extends State<_MyDataTable> {
         // Create ip hyperlink
         String featureValue = extractFeature(node);
 
-        DataCell getTextDataCell(String text, Color color) {
+        DataCell getTextDataCell(
+            String text, Color color, String attributeKey) {
           return DataCell(
             Text(
               text,
@@ -185,17 +192,17 @@ class _MyDataTableState extends State<_MyDataTable> {
 
         const keysToCheck = ['Name', 'Provider', 'Price'];
         if (keysToCheck.contains(attribute.keys.first)) {
-          if (featureValue == '-1') {
-            featureValue = 'NOT SET';
+          if (attribute.keys.first == 'Price') {
+            featureValue = '\$' + featureValue + '.00';
           }
-
-          Color textColor = (featureValue == 'NOT SET' || featureValue == '--')
+          Color textColor = (featureValue == '-' || featureValue == '\$0.00')
               ? Colors.red
               : Colors.green;
-          return getTextDataCell(featureValue, textColor);
+          return getTextDataCell(featureValue, textColor, attribute.keys.first);
         }
 
-        return getTextDataCell(featureValue, Colors.green);
+        return getTextDataCell(
+            featureValue, Colors.green, attribute.keys.first);
       }).toList(),
       onSelectChanged: (bool? selected) => displayPopout(node),
     );
@@ -256,15 +263,15 @@ class _MyDataTableState extends State<_MyDataTable> {
     nodeinfo.forEach((node) => {
           if (node.name == null)
             {
-              node.name = 'NOT SET',
+              node.name = '-',
             },
           if (node.provider == null)
             {
-              node.provider = '--',
+              node.provider = '-',
             },
           if (node.price == null)
             {
-              node.price = -1,
+              node.price = 0.00,
             }
         });
   }
