@@ -24,10 +24,13 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
   @override
   Widget buildChild(BuildContext context) {
     return BootstrapContainer(
-      fluid: false,
-      padding: mainPadding(),
+      fluid: true,
+      decoration:
+          BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
       children: [
         BootstrapRow(
+          // decoration: BoxDecoration(
+          //     border: Border.all(color: Colors.blueGrey, width: 4)),
           children: [
             BootstrapCol(
               fit: FlexFit.tight,
@@ -36,11 +39,34 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
             ),
           ],
         ),
-        BootstrapCol(
+        SizedBox(
+          width: 4000,
+          height: 200,
           child: NodeInfoCard(),
-        ),
-        LastRefresh(),
+        )
       ],
     );
+    // return NodeInfoCard();
   }
+  // Widget buildChild(BuildContext context) {
+  //   return BootstrapContainer(
+  //     fluid: false,
+  //     padding: mainPadding(),
+  //     children: [
+  //       BootstrapRow(
+  //         children: [
+  //           BootstrapCol(
+  //             fit: FlexFit.tight,
+  //             sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
+  //             child: InfoCard(),
+  //           ),
+  //         ],
+  //       ),
+  //       BootstrapCol(
+  //         child: NodeInfoCard(),
+  //       ),
+  //       LastRefresh(),
+  //     ],
+  //   );
+  // }
 }

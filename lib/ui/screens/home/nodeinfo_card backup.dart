@@ -14,8 +14,11 @@ class NodeInfoCard extends StatelessWidget with GetItMixin {
   Widget build(BuildContext context) {
     var nodeinfo = watchOnly((NodeManagerInfo nodeinfo) => nodeinfo.nodeinfo);
     var tempchange = nodeinfo;
-
-    return _MyDataTable(nodeinfo);
+    return SizedBox(
+      width: 4000,
+      height: 1000,
+      child: _MyDataTable(nodeinfo),
+    );
   }
 }
 
@@ -42,29 +45,29 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   // contains attributes to be displayed in the table
   List<Map<String, dynamic Function(dynamic)>> attributes = [
-    // {'Name': (node) => node.name},
-    // {'Provider': (node) => node.provider},
-    // {'Price': (node) => node.price.toString()},
+    {'Name': (node) => node.name},
+    {'Provider': (node) => node.provider},
+    {'Price': (node) => node.price.toString()},
     // {'IP Address': (node) => node.ip},
-    {'Txhash': (node) => node.txhash},
-    {'Tier': (node) => node.tier},
-    {'Rank': (node) => node.rank.toString()},
+    // {'Txhash': (node) => node.txhash},
+    // {'Tier': (node) => node.tier},
+    // {'Rank': (node) => node.rank.toString()},
     // {'Added Height': (node) => node.added_height.toString()},
     // {'Confirmed Height': (node) => node.confirmed_height.toString()},
-    // {'': (node) => ''},
+    {'': (node) => ''},
   ];
 
   @override
   void initState() {
     super.initState();
     initNullFields();
-    initColWidth();
     loadData();
+    initColWidth();
   }
 
   void initColWidth() {
     for (var attribute in attributes) {
-      columnWidths[attribute.keys.first] = 1000;
+      columnWidths[attribute.keys.first] = 200;
     }
   }
 
@@ -82,150 +85,159 @@ class _MyDataTableState extends State<_MyDataTable> {
     setState(() {});
   }
 
+  @override
+  Widget build(BuildContext context) {
+    return TableColumnResize();
+    // return Scaffold(
+    //   appBar: AppBar(
+    //     title: const Text('Node Info'),
+    //   ),
+    //   body: Center(
+    //     child: Container(
+    //       width: MediaQuery.of(context).size.width, // match the window width
+    //       height: 200,
+    //       decoration: BoxDecoration(
+    //         border: Border.all(
+    //           color: Colors.black,
+    //           width: 3,
+    //         ),
+    //       ),
+    //       margin: const EdgeInsets.all(15.0),
+
+    //       child: Scrollbar(
+    //         thumbVisibility: true,
+    //         trackVisibility: true, // make the scrollbar easy to see
+    //         controller: verticalScrollController,
+    //         child: Scrollbar(
+    //           thumbVisibility: true,
+    //           trackVisibility: true,
+    //           controller: horizontalScrollController,
+    //           notificationPredicate: (notif) => notif.depth == 1,
+    //           child: SingleChildScrollView(
+    //             controller: verticalScrollController,
+    //             scrollDirection: Axis.vertical,
+    //             child: SingleChildScrollView(
+    //               controller: horizontalScrollController,
+    //               scrollDirection: Axis.horizontal,
+    //               child:
+
+    //               SizedBox(
+    //               width: 2000, height: 800, child: buildDataTable()),
+
+    //               // child: BootstrapContainer(
+
+    //               //     // decoration:
+    //               //     //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
+    //               //     fluid: true,
+    //               //     children: [
+    //               //       BootstrapCol(
+    //               //         //  White space
+    //               //         child: SizedBox(),
+    //               //         sizes: 'col-12 col-sm-6 col-md-9 col-lg-9 col-xl-9',
+    //               //       ),
+
+    //               //       BootstrapCol(
+    //               //         // Search box
+    //               //         sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
+    //               //         child: Align(
+    //               //           alignment: Alignment.centerRight,
+    //               //           child: SizedBox(
+    //               //               width: 200,
+    //               //               child: TextField(
+    //               //                 onSubmitted: filterData,
+    //               //                 onChanged: (query) {
+    //               //                   if (query.isEmpty) {
+    //               //                     setState(() => filteredRows = allDataRows);
+    //               //                   }
+    //               //                 },
+    //               //                 decoration: const InputDecoration(
+    //               //                   labelText: "Search",
+    //               //                   suffixIcon: Icon(Icons.search),
+    //               //                 ),
+    //               //               )),
+    //               //         ),
+    //               //       ),
+    //               //       // builds table
+    //               //       SizedBox(height: 600, child: buildDataTable())
+    //               //     ]), // DataTable creation
+    //             ),
+    //           ),
+    //         ),
+    //       ),
+    //     ),
+    //   ),
+    // );
+  }
+
   double columnWidth = 200;
+
   double initX = 0;
   final minimumColumnWidth = 10.0;
   final verticalScrollController = ScrollController();
   final horizontalScrollController = ScrollController();
 
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      body: Container(
-        width: MediaQuery.of(context).size.width, // match the window width
-        height: 2000,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.red,
-            width: 3,
-          ),
-        ),
-        margin: const EdgeInsets.all(15.0),
-
-        child: BootstrapContainer(
-            // decoration:
-            //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
-            fluid: true,
-            children: [
-              BootstrapCol(
-                //  White space
-                child: SizedBox(),
-                sizes: 'col-12 col-sm-6 col-md-9 col-lg-9 col-xl-9',
-              ),
-              BootstrapCol(
-                // Search box
-                sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: SizedBox(
-                      width: 200,
-                      child: TextField(
-                        onSubmitted: filterData,
-                        onChanged: (query) {
-                          if (query.isEmpty) {
-                            setState(() => filteredRows = allDataRows);
-                          }
-                        },
-                        decoration: const InputDecoration(
-                          labelText: "Search",
-                          suffixIcon: Icon(Icons.search),
-                        ),
-                      )),
-                ),
-              ),
-              ConstrainedBox(
-                  constraints: BoxConstraints.expand(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                  ),
-                  child: Row(// a dirty trick to make the DataTable fit width
-                      children: <Widget>[
-                    Expanded(
-                        child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Container(
-                        child: SizedBox.expand(child: buildDataTable()),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.green, width: 4)),
-                      ),
-                    ))
-                  ])),
-            ]),
-      ),
-    );
-  }
-
-  DataTable buildDataTable() {
-    return DataTable(
+  DataTable2 buildDataTable() {
+    return DataTable2(
         showCheckboxColumn: false,
         showBottomBorder: true,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
         dividerThickness: 5,
-        columns: attributes.map((attribute) {
-          // print('attribute.keys.first: ${attribute.keys.first}');
-          // print(
-          //     'columnWidths[attribute.keys.first]: ${columnWidths[attribute.keys.first]}');
-          return DataColumn(
-            label: Stack(
-              children: [
-                Container(
-                  child: Text(attribute.keys.first),
-                  width: columnWidths[attribute.keys.first],
-                  constraints: const BoxConstraints(minWidth: 100),
-                ),
-                Positioned(
-                    right: 0,
-                    child: GestureDetector(
-                      onPanStart: (details) {
-                        debugPrint(details.globalPosition.dx.toString());
-
-                        setState(() {
-                          initX = details.globalPosition.dx;
-                        });
-                      },
-                      onPanUpdate: (details) {
-                        final increment = details.globalPosition.dx - initX;
-                        String currentAttributeKey = attribute.keys.first;
-                        final newWidth =
-                            columnWidths[currentAttributeKey]! + increment;
-
-                        print('updating');
-                        initX = details.globalPosition.dx;
-                        columnWidths[currentAttributeKey] =
-                            newWidth > minimumColumnWidth
-                                ? newWidth
-                                : minimumColumnWidth;
-                        updateState();
-                      },
-                      child: Container(
-                        width: 10,
-                        height: 10,
-                        decoration: BoxDecoration(
-                          color: Colors.blue.withOpacity(1),
-                          shape: BoxShape.circle,
-                        ),
+        columns: attributes
+            .map((attribute) => DataColumn(
+                  label: Stack(
+                    children: [
+                      Container(
+                        child: Text(attribute.keys.first),
+                        width: columnWidths[attribute.keys.first],
+                        constraints: const BoxConstraints(minWidth: 100),
                       ),
-                    ))
-              ],
-            ),
-            // onSort: (columnIndex, ascending) =>
-            //     _onSort(columnIndex, ascending),
-          );
-        }).toList(),
+                      Positioned(
+                          right: 0,
+                          child: GestureDetector(
+                            onPanStart: (details) {
+                              debugPrint(details.globalPosition.dx.toString());
+
+                              setState(() {
+                                initX = details.globalPosition.dx;
+                              });
+                            },
+                            onPanUpdate: (details) {
+                              final increment =
+                                  details.globalPosition.dx - initX;
+                              String currentAttributeKey = attribute.keys.first;
+                              final newWidth =
+                                  columnWidths[currentAttributeKey]! +
+                                      increment;
+                              setState(() {
+                                initX = details.globalPosition.dx;
+                                columnWidths[currentAttributeKey] =
+                                    newWidth > minimumColumnWidth
+                                        ? newWidth
+                                        : minimumColumnWidth;
+                              });
+                            },
+                            child: Container(
+                              width: 5,
+                              height: 5,
+                              decoration: BoxDecoration(
+                                color: Colors.blue.withOpacity(1),
+                                shape: BoxShape.circle,
+                              ),
+                            ),
+                          ))
+                    ],
+                  ),
+                  // onSort: (columnIndex, ascending) =>
+                  //     _onSort(columnIndex, ascending),
+                ))
+            .toList(),
         rows: filteredRows);
   }
 
   DataRow buildDataRow(context, node, attributes) {
-    print('building data row');
     return DataRow(
       cells: attributes.map<DataCell>((attribute) {
-        // if (columnWidths[attribute.keys.first] == null) {
-        //   //   print('columnWidths[${attribute.keys.first}] is null');
-        //   // } else {
-        //   //   print(
-        //   //       'columnWidths[${attribute.keys.first}]: ${columnWidths[attribute.keys.first]}');
-        // }
         var extractFeature = attribute
             .values.first; // function that retrieves an attribute of the node
 
@@ -233,28 +245,25 @@ class _MyDataTableState extends State<_MyDataTable> {
         String featureValue = extractFeature(node);
 
         DataCell getTextDataCell(String text, Color color) {
-          // print(
-          //     'columnWidths[${attribute.keys.first}]: ${columnWidths[attribute.keys.first]}');
-          DataCell textDataCell = DataCell(
+          return DataCell(
             ConstrainedBox(
               constraints: BoxConstraints(
-                maxWidth: columnWidths[attribute.keys.first]!,
+                maxWidth: columnWidth,
               ),
               child: Text(
                 text,
                 style: TextStyle(color: color),
                 overflow: TextOverflow.ellipsis,
-                maxLines: 2,
+                maxLines: 1,
                 softWrap: false,
               ),
             ),
           );
-          return textDataCell;
         }
 
         var saveCell = DataCell(ConstrainedBox(
           constraints: BoxConstraints(
-            maxWidth: columnWidths[attribute.keys.first]!,
+            maxWidth: columnWidth,
           ),
           child: SaveNodeButton(
             node,
@@ -272,7 +281,7 @@ class _MyDataTableState extends State<_MyDataTable> {
           return DataCell(
             ConstrainedBox(
               constraints: BoxConstraints(
-                maxWidth: columnWidths[attribute.keys.first]!,
+                maxWidth: columnWidth,
               ),
               child: InkWell(
                 child: Text(
@@ -440,7 +449,7 @@ class PopoutCard extends StatelessWidget {
 
     return BootstrapContainer(
       padding: const EdgeInsets.all(100.0),
-      fluid: true,
+      fluid: false,
       children: [
         BootstrapRow(
             children: attributes.map((attribute) {

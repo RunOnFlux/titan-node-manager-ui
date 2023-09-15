@@ -7,6 +7,10 @@ class TableColumnResize extends StatefulWidget {
 
 class _TableColumnResize extends State<TableColumnResize> {
   double columnWidth = 200;
+  Map<String, double> colWidths = {
+    'Column 1': 200,
+    'Column yeet': 200,
+  };
   double initX = 0;
   final minimumColumnWidth = 50.0;
   final verticalScrollController = ScrollController();
@@ -63,13 +67,14 @@ class _TableColumnResize extends State<TableColumnResize> {
 
   Widget _resizableColumnWidth() {
     return DataTable(
+        dividerThickness: 5,
         columns: [
           DataColumn(
             label: Stack(
               children: [
                 Container(
                   child: Text('Column 1'),
-                  width: columnWidth,
+                  width: colWidths['Column 1']!,
                   constraints: BoxConstraints(minWidth: 100),
                 ),
                 Positioned(
@@ -84,10 +89,10 @@ class _TableColumnResize extends State<TableColumnResize> {
                     onPanUpdate: (details) {
                       final increment = details.globalPosition.dx - initX;
                       // debugPrint(newWidth.toString());
-                      final newWidth = columnWidth + increment;
+                      final newWidth = colWidths['Column 1']! + increment;
                       setState(() {
                         initX = details.globalPosition.dx;
-                        columnWidth = newWidth > minimumColumnWidth
+                        colWidths['Column 1'] = newWidth > minimumColumnWidth
                             ? newWidth
                             : minimumColumnWidth;
                       });
@@ -105,16 +110,57 @@ class _TableColumnResize extends State<TableColumnResize> {
               ],
             ),
           ),
-          DataColumn(label: Text("Column 2")),
+          DataColumn(
+            label: Stack(
+              children: [
+                Container(
+                  child: Text('Column yeet'),
+                  width: colWidths['Column yeet']!,
+                  constraints: BoxConstraints(minWidth: 100),
+                ),
+                Positioned(
+                  right: 0,
+                  child: GestureDetector(
+                    onPanStart: (details) {
+                      // debugPrint(details.globalPosition.dx.toString());
+                      setState(() {
+                        initX = details.globalPosition.dx;
+                      });
+                    },
+                    onPanUpdate: (details) {
+                      final increment = details.globalPosition.dx - initX;
+                      // debugPrint(newWidth.toString());
+                      final newWidth = colWidths['Column yeet']! + increment;
+                      setState(() {
+                        initX = details.globalPosition.dx;
+                        colWidths['Column yeet'] = newWidth > minimumColumnWidth
+                            ? newWidth
+                            : minimumColumnWidth;
+                      });
+                    },
+                    child: Container(
+                      width: 10,
+                      height: 10,
+                      decoration: BoxDecoration(
+                        color: Colors.blue.withOpacity(1),
+                        shape: BoxShape.circle,
+                      ),
+                    ),
+                  ),
+                )
+              ],
+            ),
+          ),
           DataColumn(label: Text("Column 3")),
         ],
-        rows: List.generate(
-          20,
-          (index) => DataRow(
+        rows: List.generate(20, (index) {
+          return DataRow(
             cells: [
               DataCell(
                 ConstrainedBox(
-                  constraints: BoxConstraints(maxWidth: columnWidth),
+                  constraints: BoxConstraints(maxWidth: colWidths['Column 1']!),
+                  // constraints: BoxConstraints(maxWidth: colWidths['Column 1']!),
+
                   child: Text(
                     "Column1: Row index $index: long text 1234567890 1234567890 1234567890 1234567890",
                     overflow: TextOverflow.ellipsis,
@@ -126,7 +172,7 @@ class _TableColumnResize extends State<TableColumnResize> {
               DataCell(Text("Column2: Row index $index")),
               DataCell(Text("Column3: Row index $index")),
             ],
-          ),
-        ));
+          );
+        }));
   }
 }
