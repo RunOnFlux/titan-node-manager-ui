@@ -35,38 +35,49 @@ class _MyDataTableState extends State<_MyDataTable> {
   List<DataRow> allDataRows = [];
   List<DataRow> filteredRows = [];
 
-  Map<String, double> columnWidths = {};
+  Map<String, double> columnWidths = {
+    'Name': 100,
+    'Provider': 100,
+    'Price': 100,
+    'IP Address': 100,
+    'Txhash': 510,
+    'Tier': 100,
+    'Rank': 100,
+    'Added Height': 100,
+    'Confirmed Height': 100,
+    '': 100,
+  };
 
   int? _sortColumnIndex;
   bool _sortAscending = true;
 
   // contains attributes to be displayed in the table
   List<Map<String, dynamic Function(dynamic)>> attributes = [
-    // {'Name': (node) => node.name},
-    // {'Provider': (node) => node.provider},
-    // {'Price': (node) => node.price.toString()},
-    // {'IP Address': (node) => node.ip},
+    {'Name': (node) => node.name},
+    {'Provider': (node) => node.provider},
+    {'Price': (node) => node.price.toString()},
+    {'IP Address': (node) => node.ip},
     {'Txhash': (node) => node.txhash},
     {'Tier': (node) => node.tier},
     {'Rank': (node) => node.rank.toString()},
-    // {'Added Height': (node) => node.added_height.toString()},
-    // {'Confirmed Height': (node) => node.confirmed_height.toString()},
-    // {'': (node) => ''},
+    {'Added Height': (node) => node.added_height.toString()},
+    {'Confirmed Height': (node) => node.confirmed_height.toString()},
+    {'': (node) => ''},
   ];
 
   @override
   void initState() {
     super.initState();
     initNullFields();
-    initColWidth();
+    // initColWidth();
     loadData();
   }
 
-  void initColWidth() {
-    for (var attribute in attributes) {
-      columnWidths[attribute.keys.first] = 1000;
-    }
-  }
+  // void initColWidth() {
+  //   for (var attribute in attributes) {
+  //     columnWidths[attribute.keys.first] = 100;
+  //   }
+  // }
 
   void loadData() {
     print('loading data');
@@ -84,74 +95,60 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   double columnWidth = 200;
   double initX = 0;
-  final minimumColumnWidth = 10.0;
+  final minimumColumnWidth = 50.0;
   final verticalScrollController = ScrollController();
   final horizontalScrollController = ScrollController();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Container(
-        width: MediaQuery.of(context).size.width, // match the window width
-        height: 2000,
-        decoration: BoxDecoration(
-          border: Border.all(
-            color: Colors.red,
-            width: 3,
+      body: BootstrapContainer(fluid: true, children: [
+        BootstrapCol(
+          //  White space
+          child: SizedBox(
+            height: 50,
+          ),
+          sizes: 'col-12 col-sm-6 col-md-9 col-lg-9 col-xl-9',
+        ),
+        BootstrapCol(
+          // Search box
+          sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+                width: 200,
+                height: 50,
+                child: TextField(
+                  onSubmitted: filterData,
+                  onChanged: (query) {
+                    if (query.isEmpty) {
+                      setState(() => filteredRows = allDataRows);
+                    }
+                  },
+                  decoration: const InputDecoration(
+                    labelText: "Search",
+                    suffixIcon: Icon(Icons.search),
+                  ),
+                )),
           ),
         ),
-        margin: const EdgeInsets.all(15.0),
-
-        child: BootstrapContainer(
-            // decoration:
-            //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
-            fluid: true,
-            children: [
-              BootstrapCol(
-                //  White space
-                child: SizedBox(),
-                sizes: 'col-12 col-sm-6 col-md-9 col-lg-9 col-xl-9',
-              ),
-              BootstrapCol(
-                // Search box
-                sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
-                child: Align(
-                  alignment: Alignment.centerRight,
-                  child: SizedBox(
-                      width: 200,
-                      child: TextField(
-                        onSubmitted: filterData,
-                        onChanged: (query) {
-                          if (query.isEmpty) {
-                            setState(() => filteredRows = allDataRows);
-                          }
-                        },
-                        decoration: const InputDecoration(
-                          labelText: "Search",
-                          suffixIcon: Icon(Icons.search),
-                        ),
-                      )),
+        ConstrainedBox(
+            constraints: BoxConstraints.expand(
+              width: MediaQuery.of(context).size.width,
+              height: 640,
+            ),
+            child: Row(children: <Widget>[
+              Expanded(
+                  child: SingleChildScrollView(
+                scrollDirection: Axis.vertical,
+                child: Container(
+                  child: buildDataTable(),
+                  // decoration: BoxDecoration(
+                  //     border: Border.all(color: Colors.green, width: 4)),
                 ),
-              ),
-              ConstrainedBox(
-                  constraints: BoxConstraints.expand(
-                    width: MediaQuery.of(context).size.width,
-                    height: MediaQuery.of(context).size.height,
-                  ),
-                  child: Row(// a dirty trick to make the DataTable fit width
-                      children: <Widget>[
-                    Expanded(
-                        child: SingleChildScrollView(
-                      scrollDirection: Axis.vertical,
-                      child: Container(
-                        child: SizedBox.expand(child: buildDataTable()),
-                        decoration: BoxDecoration(
-                            border: Border.all(color: Colors.green, width: 4)),
-                      ),
-                    ))
-                  ])),
-            ]),
-      ),
+              ))
+            ])),
+      ]),
     );
   }
 
@@ -189,18 +186,27 @@ class _MyDataTableState extends State<_MyDataTable> {
                         String currentAttributeKey = attribute.keys.first;
                         final newWidth =
                             columnWidths[currentAttributeKey]! + increment;
-
-                        print('updating');
                         initX = details.globalPosition.dx;
+
+                        print('columnwidth[$currentAttributeKey]: ' +
+                            columnWidths[currentAttributeKey].toString());
+
                         columnWidths[currentAttributeKey] =
                             newWidth > minimumColumnWidth
                                 ? newWidth
                                 : minimumColumnWidth;
                         updateState();
+
+                        // setState(() {
+                        //   columnWidths[currentAttributeKey] =
+                        //       newWidth > minimumColumnWidth
+                        //           ? newWidth
+                        //           : minimumColumnWidth;
+                        // });
                       },
                       child: Container(
-                        width: 10,
-                        height: 10,
+                        width: 12,
+                        height: 12,
                         decoration: BoxDecoration(
                           color: Colors.blue.withOpacity(1),
                           shape: BoxShape.circle,
@@ -244,7 +250,7 @@ class _MyDataTableState extends State<_MyDataTable> {
                 text,
                 style: TextStyle(color: color),
                 overflow: TextOverflow.ellipsis,
-                maxLines: 2,
+                maxLines: 1,
                 softWrap: false,
               ),
             ),

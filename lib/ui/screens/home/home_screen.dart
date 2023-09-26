@@ -25,8 +25,8 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
   Widget buildChild(BuildContext context) {
     return BootstrapContainer(
       fluid: true,
-      decoration:
-          BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
+      // decoration:
+      //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
       children: [
         BootstrapRow(
           // decoration: BoxDecoration(
@@ -39,11 +39,16 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
             ),
           ],
         ),
-        SizedBox(
-          width: 4000,
-          height: 200,
-          child: NodeInfoCard(),
-        )
+        Container(
+          // decoration:
+          //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
+          child: SizedBox(
+            width: 4000,
+            height: 700,
+            child: NodeInfoCard(),
+          ),
+        ),
+        LastRefresh(),
       ],
     );
     // return NodeInfoCard();
