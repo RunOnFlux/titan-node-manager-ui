@@ -67,116 +67,6 @@ class _MyDataTableState extends State<_MyDataTable> {
   void initState() {
     super.initState();
     initNullFields();
-    loadData();
-  }
-
-  void updateState() {
-    // loadData();
-    print('UPDATING STATE');
-    setState(() {});
-  }
-
-  void loadData() {
-    print('loading data');
-    allDataRows = nodeinfo
-        .map<DataRow>((node) => buildDataRow(context, node, attributes))
-        .toList();
-    filteredRows = List.from(allDataRows);
-  }
-
-  void modData() {}
-
-  DataRow buildDataRow(context, node, attributes) {
-    print('building data row');
-    return DataRow(
-      cells: attributes.map<DataCell>((attribute) {
-        var extractFeature = attribute.values.first;
-
-        String featureValue = extractFeature(node);
-
-        // general function to generate a data cell with colored text
-        DataCell getTextDataCell(String text, Color color) {
-          return DataCell(
-            ConstrainedBox(
-              constraints:
-                  BoxConstraints(maxWidth: columnWidths[attribute.keys.first]!),
-              child: Text(
-                text,
-                style: TextStyle(color: color),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-                softWrap: false,
-              ),
-            ),
-          );
-        }
-
-        // Save button
-        if (attribute.keys.first == '') {
-          return DataCell(ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: columnWidths[attribute.keys.first]!,
-            ),
-            child: SaveNodeButton(
-              node,
-              // Ensure that the table is updated when the save button is pressed
-              reset: (() {
-                updateState();
-              }),
-            ),
-          ));
-        }
-
-        // ip hyperlink
-        if (attribute.keys.first == 'IP Address') {
-          return DataCell(
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: columnWidths[attribute.keys.first]!,
-              ),
-              child: InkWell(
-                child: Text(
-                  featureValue,
-                  style: const TextStyle(color: Colors.lightBlue),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-                onTap: () async {
-                  String port = featureValue.contains(':')
-                      ? featureValue.split(':')[0]
-                      : featureValue;
-                  String url = 'http://$port:16126/';
-
-                  if (await canLaunchUrl(Uri.parse(url))) {
-                    await launchUrl(Uri.parse(url));
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                },
-              ),
-            ),
-          );
-        }
-
-        // Color text red if the value is not set
-        const keysToCheck = ['Name', 'Provider', 'Price'];
-        if (keysToCheck.contains(attribute.keys.first)) {
-          if (featureValue == '-1') {
-            featureValue = 'NOT SET';
-          }
-
-          Color textColor = (featureValue == 'NOT SET' || featureValue == '--')
-              ? Colors.red
-              : Colors.green;
-          return getTextDataCell(featureValue, textColor);
-        }
-
-        // else case: return normal text
-        return getTextDataCell(featureValue, Colors.green);
-      }).toList(),
-      onSelectChanged: (bool? selected) => displayPopout(node),
-    );
   }
 
   double initX = 0;
@@ -280,19 +170,16 @@ class _MyDataTableState extends State<_MyDataTable> {
                     )
                   ],
                 ),
-                onSort: ((columnIndex, ascending) =>
-                    _onSort(columnIndex, ascending)),
               ))
           .toList(),
-      rows: filteredRows,
-      // nodeinfo.map<DataRow>((node) {
-      //   return DataRow(
-      //       cells: attributes.entries
-      //           .map<DataCell>(
-      //             (e) => _buildCell(e, node),
-      //           )
-      //           .toList());
-      // }).toList(),
+      rows: nodeinfo.map<DataRow>((node) {
+        return DataRow(
+            cells: attributes.entries
+                .map<DataCell>(
+                  (e) => _buildCell(e, node),
+                )
+                .toList());
+      }).toList(),
     );
   }
 
@@ -307,7 +194,7 @@ class _MyDataTableState extends State<_MyDataTable> {
           child: SaveNodeButton(
             node,
             reset: (() {
-              updateState();
+              //updateState();
             }),
           ),
         ),
@@ -362,9 +249,7 @@ class _MyDataTableState extends State<_MyDataTable> {
   }
 
   void _onSort(int columnIndex, bool ascending) {
-    print('running onSort');
     setState(() {
-      print('setting state in onSort');
       _sortColumnIndex = columnIndex;
       _sortAscending = ascending;
 
@@ -393,7 +278,6 @@ class _MyDataTableState extends State<_MyDataTable> {
   }
 
   void filterData(String query) {
-    print('FILTERING DATA');
     if (query.isEmpty) {
       setState(() => filteredRows = allDataRows);
     } else {
@@ -483,7 +367,6 @@ class PopoutCard extends StatelessWidget {
       {'Scriptpubkey': (node) => node.scriptPubKey},
     ];
 
-    // Shows extra info about the node if you click on the node row
     return BootstrapContainer(
       padding: const EdgeInsets.all(100.0),
       fluid: true,
