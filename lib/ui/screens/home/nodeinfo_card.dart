@@ -63,9 +63,12 @@ class _MyDataTableState extends State<_MyDataTable> {
     '': (node) => ''
   };
 
+  List<NodeInfo> filteredlist = [];
+
   @override
   void initState() {
     super.initState();
+    filteredlist = List.from(nodeinfo);
     initNullFields();
     loadData();
   }
@@ -89,8 +92,8 @@ class _MyDataTableState extends State<_MyDataTable> {
   DataRow buildDataRow(context, node, attributes) {
     print('building data row');
     return DataRow(
-      cells: attributes.map<DataCell>((attribute) {
-        var extractFeature = attribute.values.first;
+      cells: attributes.entries.map<DataCell>((e) {
+        var extractFeature = e.value;
 
         String featureValue = extractFeature(node);
 
@@ -98,8 +101,7 @@ class _MyDataTableState extends State<_MyDataTable> {
         DataCell getTextDataCell(String text, Color color) {
           return DataCell(
             ConstrainedBox(
-              constraints:
-                  BoxConstraints(maxWidth: columnWidths[attribute.keys.first]!),
+              constraints: BoxConstraints(maxWidth: columnWidths[e.key]!),
               child: Text(
                 text,
                 style: TextStyle(color: color),
@@ -112,14 +114,14 @@ class _MyDataTableState extends State<_MyDataTable> {
         }
 
         // Save button
-        if (attribute.keys.first == '') {
+        if (e.key == '') {
           return DataCell(ConstrainedBox(
             constraints: BoxConstraints(
-              maxWidth: columnWidths[attribute.keys.first]!,
+              maxWidth: columnWidths[e.key]!,
             ),
             child: SaveNodeButton(
               node,
-              // Ensure that the table is updated when the save button is pressed
+              // update table with new values after edit
               reset: (() {
                 updateState();
               }),
@@ -128,11 +130,11 @@ class _MyDataTableState extends State<_MyDataTable> {
         }
 
         // ip hyperlink
-        if (attribute.keys.first == 'IP Address') {
+        if (e.key == 'IP Address') {
           return DataCell(
             ConstrainedBox(
               constraints: BoxConstraints(
-                maxWidth: columnWidths[attribute.keys.first]!,
+                maxWidth: columnWidths[e.key]!,
               ),
               child: InkWell(
                 child: Text(
@@ -161,7 +163,7 @@ class _MyDataTableState extends State<_MyDataTable> {
 
         // Color text red if the value is not set
         const keysToCheck = ['Name', 'Provider', 'Price'];
-        if (keysToCheck.contains(attribute.keys.first)) {
+        if (keysToCheck.contains(e.key)) {
           if (featureValue == '-1') {
             featureValue = 'NOT SET';
           }
@@ -284,15 +286,17 @@ class _MyDataTableState extends State<_MyDataTable> {
                     _onSort(columnIndex, ascending)),
               ))
           .toList(),
-      rows: filteredRows,
-      // nodeinfo.map<DataRow>((node) {
-      //   return DataRow(
-      //       cells: attributes.entries
-      //           .map<DataCell>(
-      //             (e) => _buildCell(e, node),
-      //           )
-      //           .toList());
-      // }).toList(),
+      rows:
+          // filteredRows,
+          filteredlist.map<DataRow>((node) {
+        return DataRow(
+            onLongPress: () => displayPopout(node),
+            cells: attributes.entries
+                .map<DataCell>(
+                  (e) => _buildCell(e, node),
+                )
+                .toList());
+      }).toList(),
     );
   }
 
@@ -361,6 +365,29 @@ class _MyDataTableState extends State<_MyDataTable> {
     );
   }
 
+  dynamic indexNodeMap(int index, NodeInfo node) {
+    switch (index) {
+      case 0:
+        return node.name;
+      case 1:
+        return node.provider;
+      case 2:
+        return node.price;
+      case 3:
+        return node.ip;
+      case 4:
+        return node.txhash;
+      case 5:
+        return node.tier;
+      case 6:
+        return node.rank;
+      case 7:
+        return node.added_height;
+      case 8:
+        return node.confirmed_height;
+    }
+  }
+
   void _onSort(int columnIndex, bool ascending) {
     print('running onSort');
     setState(() {
@@ -369,9 +396,9 @@ class _MyDataTableState extends State<_MyDataTable> {
       _sortAscending = ascending;
 
       // Sort the data based on the selected column and sorting direction
-      filteredRows.sort((a, b) {
-        final aValue = (a.cells[columnIndex].child as Text).data!;
-        final bValue = (b.cells[columnIndex].child as Text).data!;
+      filteredlist.sort((a, b) {
+        final aValue = indexNodeMap(columnIndex, a);
+        final bValue = indexNodeMap(columnIndex, b);
 
         // Make sure it doesn't sort numerically
         bool isNumeric =
@@ -395,18 +422,19 @@ class _MyDataTableState extends State<_MyDataTable> {
   void filterData(String query) {
     print('FILTERING DATA');
     if (query.isEmpty) {
-      setState(() => filteredRows = allDataRows);
+      setState(() => filteredlist = nodeinfo);
     } else {
       setState(() {
         // Filter based on search query
-        filteredRows = allDataRows.where((row) {
-          String rowContent = row.cells.map((cell) {
-            return cell.child is Text
-                ? (cell.child as Text).data!
-                : cell.child is InkWell
-                    ? ((cell.child as InkWell).child as Text).data!
-                    : '';
-          }).join('***'); // should change this
+        filteredlist = nodeinfo.where((row) {
+          String rowContent = row.txhash;
+          // .map((cell) {
+          //   return cell.child is Text
+          //       ? (cell.child as Text).data!
+          //       : cell.child is InkWell
+          //           ? ((cell.child as InkWell).child as Text).data!
+          //           : '';
+          // }).join('***'); // should change this
           return rowContent.toLowerCase().contains(query.toLowerCase());
         }).toList();
       });
@@ -482,6 +510,27 @@ class PopoutCard extends StatelessWidget {
       {'Confirmations': (node) => node.confirmations.toString()},
       {'Scriptpubkey': (node) => node.scriptPubKey},
     ];
+    // Map<String, String Function(NodeInfo)> attributes = {
+    //   'IP Address': (node) => node.ip,
+    //   'Txhash': (node) => node.txhash,
+    //   'Tier': (node) => node.tier,
+    //   'Rank': (node) => node.rank.toString(),
+    //   'Added Height': (node) => node.added_height.toString(),
+    //   'Confirmed Height': (node) => node.confirmed_height.toString(),
+    //   'Last Confirmed Height': (node) => node.last_confirmed_height.toString(),
+    //   'Outidx': (node) => node.outidx,
+    //   'Network': (node) => node.network,
+    //   'Last Paid Height': (node) => node.last_paid_height.toString(),
+    //   'Payment Address': (node) => node.payment_address,
+    //   // 'Pubkey': (node) => node.pubkey,
+    //   'Active Since': (node) => node.activesince,
+    //   'Last Paid': (node) => node.lastpaid,
+    //   'Amount': (node) => node.amount,
+    //   'Satoshis': (node) => node.satoshis.toString(),
+    //   'Height': (node) => node.height.toString(),
+    //   'Confirmations': (node) => node.confirmations.toString(),
+    //   'Scriptpubkey': (node) => node.scriptPubKey,
+    // };
 
     // Shows extra info about the node if you click on the node row
     return BootstrapContainer(

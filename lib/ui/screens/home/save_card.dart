@@ -23,6 +23,11 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
 
   void initDefaultVals() {
     nameController.text = node.name;
+    if (node.provider == '') {
+      providerController.text = '--';
+    } else {
+      providerController.text = node.provider;
+    }
     providerController.text = node.provider;
     if (node.price == -1) {
       priceController.text = 'NOT SET';
