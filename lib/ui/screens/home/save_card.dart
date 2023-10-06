@@ -78,8 +78,6 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                                 return AlertDialog(
                                   content: TextField(
                                       onSubmitted: (provider) {
-                                        print('');
-                                        print('before');
                                         Navigator.of(context).pop();
                                         showDialog(
                                             context: context,
@@ -96,21 +94,11 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                                                       child: Text('No')),
                                                   TextButton(
                                                       onPressed: () async {
-                                                        // call api here
-                                                        print('1');
                                                         await addProvider(
                                                             provider);
-                                                        print('2');
-                                                        // print(
-                                                        // 'tempProvider: $tempProvider');
-                                                        print('x before: $x');
-                                                        // x = tempProvider;
-                                                        // providerController
-                                                        //     .text = x!;
-                                                        print('x after: $x');
                                                         print(
                                                             'Submitted new provider: $provider');
-                                                        // tempProvider = provider;
+
                                                         Navigator.of(context)
                                                             .pop();
                                                       },
@@ -128,7 +116,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                                 );
                               });
                         }
-                        print('3');
+
                         providerController.text = x!;
                       })),
                   const SizedBox(height: 10),
@@ -152,13 +140,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                 ElevatedButton(
                   child: const Text('Submit'),
                   onPressed: () {
-                    print('namecontroller.text: ${nameController.text}');
-                    print(
-                        'providercontroller.text: ${providerController.text}');
-                    print('pricecontroller.text: ${nameController.text}');
-
                     if (providerController.text == 'Add new') {
-                      print('text is Add new');
                       providerController.text = '--';
                     }
 
@@ -183,7 +165,6 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
   }
 
   Future<http.Response> saveNode(BuildContext context, node, inputs) async {
-    print('inside savenode inputs: ${inputs}');
     var txhash = (node is NodeInfo)
         ? node.txhash
         : (node is InactiveInfo)
@@ -204,9 +185,6 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
       'provider': inputs['provider'],
       'price': inputs['price'],
     };
-
-    // print('outidx is number ${isNumber(requestBody['outidx'])}');
-    print('past requestbody assigning');
     var url = Uri.parse('http://localhost:4444/api/update');
 
     final response = await http.post(
@@ -237,11 +215,9 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
         body: jsonEncode(requestBody),
         headers: {'Content-Type': 'application/json'});
     if (response.body == '') {
-      print('in success block');
       providers.add(DropdownMenuItem(value: provider, child: Text(provider)));
       reset();
     }
-    print('response.body${response.body}');
     return response.body;
   }
 }

@@ -11,16 +11,14 @@ class NodeInfoCard extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
     var nodeinfo = watchOnly((NodeManagerInfo nodeinfo) => nodeinfo.nodeinfo);
-    //var tempchange = nodeinfo;
-
     return _MyDataTable(nodeinfo);
   }
 }
 
 class _MyDataTable extends StatefulWidget {
-  final List<NodeInfo> nodeinfo; // Add this line to receive nodeinfo
+  final List<NodeInfo> nodeinfo;
 
-  const _MyDataTable(this.nodeinfo); // Constructor to receive nodeinfo;
+  const _MyDataTable(this.nodeinfo);
   @override
   _MyDataTableState createState() => _MyDataTableState(nodeinfo);
 }
@@ -30,9 +28,6 @@ class _MyDataTableState extends State<_MyDataTable> {
   _MyDataTableState(this.nodeinfo);
   List<NodeInfo> nodeinfo;
 
-  List<DataRow> allDataRows = [];
-  List<DataRow> filteredRows = [];
-
   Map<String, double> columnWidths = {
     'Name': 100,
     'Provider': 100,
@@ -41,8 +36,8 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Txhash': 510,
     'Tier': 100,
     'Rank': 100,
-    'Added Height': 100,
-    'Confirmed Height': 100,
+    // 'Added Height': 100,
+    // 'Confirmed Height': 100,
     '': 100,
   };
 
@@ -58,133 +53,45 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Txhash': (node) => node.txhash,
     'Tier': (node) => node.tier,
     'Rank': (node) => node.rank.toString(),
-    'Added Height': (node) => node.added_height.toString(),
-    'Confirmed Height': (node) => node.confirmed_height.toString(),
+    // 'Added Height': (node) => node.added_height.toString(),
+    // 'Confirmed Height': (node) => node.confirmed_height.toString(),
     '': (node) => ''
   };
 
-  List<NodeInfo> filteredlist = [];
+  List<NodeInfo> filteredList = [];
 
   @override
   void initState() {
     super.initState();
-    filteredlist = List.from(nodeinfo);
+    filteredList = List.from(nodeinfo);
     initNullFields();
-    loadData();
   }
 
   void updateState() {
-    // loadData();
-    print('UPDATING STATE');
     setState(() {});
-  }
-
-  void loadData() {
-    print('loading data');
-    allDataRows = nodeinfo
-        .map<DataRow>((node) => buildDataRow(context, node, attributes))
-        .toList();
-    filteredRows = List.from(allDataRows);
-  }
-
-  void modData() {}
-
-  DataRow buildDataRow(context, node, attributes) {
-    print('building data row');
-    return DataRow(
-      cells: attributes.entries.map<DataCell>((e) {
-        var extractFeature = e.value;
-
-        String featureValue = extractFeature(node);
-
-        // general function to generate a data cell with colored text
-        DataCell getTextDataCell(String text, Color color) {
-          return DataCell(
-            ConstrainedBox(
-              constraints: BoxConstraints(maxWidth: columnWidths[e.key]!),
-              child: Text(
-                text,
-                style: TextStyle(color: color),
-                overflow: TextOverflow.ellipsis,
-                maxLines: 2,
-                softWrap: false,
-              ),
-            ),
-          );
-        }
-
-        // Save button
-        if (e.key == '') {
-          return DataCell(ConstrainedBox(
-            constraints: BoxConstraints(
-              maxWidth: columnWidths[e.key]!,
-            ),
-            child: SaveNodeButton(
-              node,
-              // update table with new values after edit
-              reset: (() {
-                updateState();
-              }),
-            ),
-          ));
-        }
-
-        // ip hyperlink
-        if (e.key == 'IP Address') {
-          return DataCell(
-            ConstrainedBox(
-              constraints: BoxConstraints(
-                maxWidth: columnWidths[e.key]!,
-              ),
-              child: InkWell(
-                child: Text(
-                  featureValue,
-                  style: const TextStyle(color: Colors.lightBlue),
-                  overflow: TextOverflow.ellipsis,
-                  maxLines: 1,
-                  softWrap: false,
-                ),
-                onTap: () async {
-                  String port = featureValue.contains(':')
-                      ? featureValue.split(':')[0]
-                      : featureValue;
-                  String url = 'http://$port:16126/';
-
-                  if (await canLaunchUrl(Uri.parse(url))) {
-                    await launchUrl(Uri.parse(url));
-                  } else {
-                    throw 'Could not launch $url';
-                  }
-                },
-              ),
-            ),
-          );
-        }
-
-        // Color text red if the value is not set
-        const keysToCheck = ['Name', 'Provider', 'Price'];
-        if (keysToCheck.contains(e.key)) {
-          if (featureValue == '-1') {
-            featureValue = 'NOT SET';
-          }
-
-          Color textColor = (featureValue == 'NOT SET' || featureValue == '--')
-              ? Colors.red
-              : Colors.green;
-          return getTextDataCell(featureValue, textColor);
-        }
-
-        // else case: return normal text
-        return getTextDataCell(featureValue, Colors.green);
-      }).toList(),
-      onSelectChanged: (bool? selected) => displayPopout(node),
-    );
   }
 
   double initX = 0;
   final minimumColumnWidth = 50.0;
   final verticalScrollController = ScrollController();
   final horizontalScrollController = ScrollController();
+
+  void initNullFields() {
+    nodeinfo.forEach((node) => {
+          if (node.name == null)
+            {
+              node.name = 'NOT SET',
+            },
+          if (node.provider == null)
+            {
+              node.provider = '--',
+            },
+          if (node.price == null)
+            {
+              node.price = -1,
+            }
+        });
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -209,7 +116,7 @@ class _MyDataTableState extends State<_MyDataTable> {
                   onSubmitted: filterData,
                   onChanged: (query) {
                     if (query.isEmpty) {
-                      setState(() => filteredRows = allDataRows);
+                      setState(() => filteredList = nodeinfo);
                     }
                   },
                   decoration: const InputDecoration(
@@ -227,8 +134,6 @@ class _MyDataTableState extends State<_MyDataTable> {
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: _buildDataTable(),
-            // decoration: BoxDecoration(
-            //     border: Border.all(color: Colors.green, width: 4)),
           ),
         ),
       ],
@@ -241,56 +146,52 @@ class _MyDataTableState extends State<_MyDataTable> {
       showBottomBorder: true,
       sortColumnIndex: _sortColumnIndex,
       sortAscending: _sortAscending,
-      dividerThickness: 5,
-      columnSpacing: 5,
-      columns: attributes.entries
-          .map((e) => DataColumn(
-                label: Stack(
-                  children: [
-                    Container(
-                      width: columnWidths[e.key],
-                      constraints: const BoxConstraints(minWidth: 100),
-                      child: Text(e.key),
+      columnSpacing: 0,
+      columns: attributes.entries.map((e) {
+        return DataColumn(
+          label: Stack(
+            children: [
+              Container(
+                width: columnWidths[e.key],
+                constraints: const BoxConstraints(minWidth: 100),
+                child: Text(e.key),
+              ),
+              Positioned(
+                right: 0,
+                child: GestureDetector(
+                  onPanStart: (details) {
+                    setState(() {
+                      initX = details.globalPosition.dx;
+                    });
+                  },
+                  onPanUpdate: (details) {
+                    final increment = details.globalPosition.dx - initX;
+                    final newWidth = columnWidths[e.key]! + increment;
+                    setState(() {
+                      initX = details.globalPosition.dx;
+                      columnWidths[e.key] = newWidth > minimumColumnWidth
+                          ? newWidth
+                          : minimumColumnWidth;
+                    });
+                  },
+                  child: Container(
+                    width: 10,
+                    height: 10,
+                    decoration: BoxDecoration(
+                      color: Colors.blue.withOpacity(1),
+                      shape: BoxShape.circle,
                     ),
-                    Positioned(
-                      right: 0,
-                      child: GestureDetector(
-                        onPanStart: (details) {
-                          setState(() {
-                            initX = details.globalPosition.dx;
-                          });
-                        },
-                        onPanUpdate: (details) {
-                          final increment = details.globalPosition.dx - initX;
-                          final newWidth = columnWidths[e.key]! + increment;
-                          setState(() {
-                            initX = details.globalPosition.dx;
-                            columnWidths[e.key] = newWidth > minimumColumnWidth
-                                ? newWidth
-                                : minimumColumnWidth;
-                          });
-                        },
-                        child: Container(
-                          width: 10,
-                          height: 10,
-                          decoration: BoxDecoration(
-                            color: Colors.blue.withOpacity(1),
-                            shape: BoxShape.circle,
-                          ),
-                        ),
-                      ),
-                    )
-                  ],
+                  ),
                 ),
-                onSort: ((columnIndex, ascending) =>
-                    _onSort(columnIndex, ascending)),
-              ))
-          .toList(),
-      rows:
-          // filteredRows,
-          filteredlist.map<DataRow>((node) {
+              )
+            ],
+          ),
+          onSort: ((columnIndex, ascending) => _onSort(columnIndex, ascending)),
+        );
+      }).toList(),
+      rows: filteredList.map<DataRow>((node) {
         return DataRow(
-            onLongPress: () => displayPopout(node),
+            onSelectChanged: (t) => displayPopout(node),
             cells: attributes.entries
                 .map<DataCell>(
                   (e) => _buildCell(e, node),
@@ -389,87 +290,59 @@ class _MyDataTableState extends State<_MyDataTable> {
   }
 
   void _onSort(int columnIndex, bool ascending) {
-    print('running onSort');
     setState(() {
-      print('setting state in onSort');
       _sortColumnIndex = columnIndex;
       _sortAscending = ascending;
-
       // Sort the data based on the selected column and sorting direction
-      filteredlist.sort((a, b) {
+      filteredList.sort((a, b) {
+        print('inside filteredlist.sort');
         final aValue = indexNodeMap(columnIndex, a);
         final bValue = indexNodeMap(columnIndex, b);
-
-        // Make sure it doesn't sort numerically
-        bool isNumeric =
-            num.tryParse(aValue) != null && num.tryParse(bValue) != null;
-
-        if (isNumeric) {
-          double aNumber = double.parse(aValue);
-          double bNumber = double.parse(bValue);
-          return ascending
-              ? aNumber.compareTo(bNumber)
-              : bNumber.compareTo(aNumber);
-        } else {
-          return ascending
-              ? Comparable.compare(aValue, bValue)
-              : Comparable.compare(bValue, aValue);
-        }
+        return ascending
+            ? Comparable.compare(aValue, bValue)
+            : Comparable.compare(bValue, aValue);
       });
     });
+  }
+
+  List<dynamic> getRowData(NodeInfo node) {
+    return [
+      node.name,
+      node.provider,
+      node.price.toString(),
+      node.ip.toString(),
+      node.txhash,
+      node.tier,
+      node.rank.toString(),
+    ];
   }
 
   void filterData(String query) {
     print('FILTERING DATA');
     if (query.isEmpty) {
-      setState(() => filteredlist = nodeinfo);
+      setState(() => filteredList = nodeinfo);
     } else {
       setState(() {
         // Filter based on search query
-        filteredlist = nodeinfo.where((row) {
-          String rowContent = row.txhash;
-          // .map((cell) {
-          //   return cell.child is Text
-          //       ? (cell.child as Text).data!
-          //       : cell.child is InkWell
-          //           ? ((cell.child as InkWell).child as Text).data!
-          //           : '';
-          // }).join('***'); // should change this
+        filteredList = nodeinfo.where((row) {
+          String rowContent = "";
+          getRowData(row).forEach((cell) {
+            rowContent += cell.toString();
+          });
           return rowContent.toLowerCase().contains(query.toLowerCase());
         }).toList();
       });
     }
   }
 
-  void initNullFields() {
-    nodeinfo.forEach((node) => {
-          if (node.name == null)
-            {
-              node.name = 'NOT SET',
-            },
-          if (node.provider == null)
-            {
-              node.provider = '--',
-            },
-          if (node.price == null)
-            {
-              node.price = -1,
-            }
-        });
-  }
-
   void displayPopout(node) {
     try {
+      print('displaying popout');
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return PopoutCard(node: node);
-            // return Container(
-            //   decoration: BoxDecoration(
-            //       border: Border.all(color: Colors.white, width: 4)),
-            // );
           });
-      // return true;
     } catch (err) {
       rethrow;
     }
@@ -510,27 +383,6 @@ class PopoutCard extends StatelessWidget {
       {'Confirmations': (node) => node.confirmations.toString()},
       {'Scriptpubkey': (node) => node.scriptPubKey},
     ];
-    // Map<String, String Function(NodeInfo)> attributes = {
-    //   'IP Address': (node) => node.ip,
-    //   'Txhash': (node) => node.txhash,
-    //   'Tier': (node) => node.tier,
-    //   'Rank': (node) => node.rank.toString(),
-    //   'Added Height': (node) => node.added_height.toString(),
-    //   'Confirmed Height': (node) => node.confirmed_height.toString(),
-    //   'Last Confirmed Height': (node) => node.last_confirmed_height.toString(),
-    //   'Outidx': (node) => node.outidx,
-    //   'Network': (node) => node.network,
-    //   'Last Paid Height': (node) => node.last_paid_height.toString(),
-    //   'Payment Address': (node) => node.payment_address,
-    //   // 'Pubkey': (node) => node.pubkey,
-    //   'Active Since': (node) => node.activesince,
-    //   'Last Paid': (node) => node.lastpaid,
-    //   'Amount': (node) => node.amount,
-    //   'Satoshis': (node) => node.satoshis.toString(),
-    //   'Height': (node) => node.height.toString(),
-    //   'Confirmations': (node) => node.confirmations.toString(),
-    //   'Scriptpubkey': (node) => node.scriptPubKey,
-    // };
 
     // Shows extra info about the node if you click on the node row
     return BootstrapContainer(
@@ -544,8 +396,7 @@ class PopoutCard extends StatelessWidget {
             sizes: 'col-12 col-sm-3 col-md-4 col-lg-4 col-xl-4',
             absoluteSizes: false,
             child: Container(
-              margin:
-                  const EdgeInsets.symmetric(vertical: 8.0), // Add margin here
+              margin: const EdgeInsets.symmetric(vertical: 8.0),
               child: Card(
                 color: Colors.grey[600],
                 shape: RoundedRectangleBorder(
