@@ -28,9 +28,9 @@ class NodeInfo {
   String tier;
   String payment_address;
   String pubkey;
-  String activesince;
-  String lastpaid;
-  String amount;
+  int? activesince;
+  int? lastpaid;
+  int? amount;
   int? rank;
   int? satoshis;
   int? height;
