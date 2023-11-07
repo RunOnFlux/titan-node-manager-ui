@@ -22,7 +22,7 @@ NodeInfo _$NodeInfoFromJson(Map<String, dynamic> json) => NodeInfo(
     )
       ..name = json['name'] as String?
       ..provider = json['provider'] as String?
-      ..price = json['price'] as int?
+      ..price = (json['price'] as num?)?.toDouble()
       ..added_height = json['added_height'] as int?
       ..confirmed_height = json['confirmed_height'] as int?
       ..last_confirmed_height = json['last_confirmed_height'] as int?

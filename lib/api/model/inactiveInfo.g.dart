@@ -18,7 +18,7 @@ InactiveInfo _$InactiveInfoFromJson(Map<String, dynamic> json) => InactiveInfo(
     )
       ..name = json['name'] as String?
       ..provider = json['provider'] as String?
-      ..price = json['price'] as int?;
+      ..price = (json['price'] as num?)?.toDouble();
 
 Map<String, dynamic> _$InactiveInfoToJson(InactiveInfo instance) =>
     <String, dynamic>{

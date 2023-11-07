@@ -6,7 +6,7 @@ part 'inactiveInfo.g.dart';
 class InactiveInfo {
   String? name;
   String? provider;
-  int? price;
+  double? price;
 
   String address;
   String txid;
