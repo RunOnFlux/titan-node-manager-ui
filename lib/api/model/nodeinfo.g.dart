@@ -15,9 +15,9 @@ NodeInfo _$NodeInfoFromJson(Map<String, dynamic> json) => NodeInfo(
       tier: json['tier'] as String,
       payment_address: json['payment_address'] as String,
       pubkey: json['pubkey'] as String,
-      activesince: json['activesince'] as String,
-      lastpaid: json['lastpaid'] as String,
-      amount: json['amount'] as String,
+      activesince: json['activesince'] as int?,
+      lastpaid: json['lastpaid'] as int?,
+      amount: json['amount'] as int?,
       scriptPubKey: json['scriptPubKey'] as String,
     )
       ..name = json['name'] as String?

@@ -11,14 +11,16 @@ class NodeInfoCard extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
     var nodeinfo = watchOnly((NodeManagerInfo nodeinfo) => nodeinfo.nodeinfo);
+    //var tempchange = nodeinfo;
+
     return _MyDataTable(nodeinfo);
   }
 }
 
 class _MyDataTable extends StatefulWidget {
-  final List<NodeInfo> nodeinfo;
+  final List<NodeInfo> nodeinfo; // Add this line to receive nodeinfo
 
-  const _MyDataTable(this.nodeinfo);
+  const _MyDataTable(this.nodeinfo); // Constructor to receive nodeinfo;
   @override
   _MyDataTableState createState() => _MyDataTableState(nodeinfo);
 }
@@ -28,6 +30,9 @@ class _MyDataTableState extends State<_MyDataTable> {
   _MyDataTableState(this.nodeinfo);
   List<NodeInfo> nodeinfo;
 
+  List<DataRow> allDataRows = [];
+  List<DataRow> filteredRows = [];
+
   Map<String, double> columnWidths = {
     'Name': 100,
     'Provider': 100,
@@ -36,8 +41,8 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Txhash': 510,
     'Tier': 100,
     'Rank': 100,
-    // 'Added Height': 100,
-    // 'Confirmed Height': 100,
+    'Added Height': 100,
+    'Confirmed Height': 100,
     '': 100,
   };
 
@@ -53,45 +58,21 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Txhash': (node) => node.txhash,
     'Tier': (node) => node.tier,
     'Rank': (node) => node.rank.toString(),
-    // 'Added Height': (node) => node.added_height.toString(),
-    // 'Confirmed Height': (node) => node.confirmed_height.toString(),
+    'Added Height': (node) => node.added_height.toString(),
+    'Confirmed Height': (node) => node.confirmed_height.toString(),
     '': (node) => ''
   };
-
-  List<NodeInfo> filteredList = [];
 
   @override
   void initState() {
     super.initState();
-    filteredList = List.from(nodeinfo);
     initNullFields();
-  }
-
-  void updateState() {
-    setState(() {});
   }
 
   double initX = 0;
   final minimumColumnWidth = 50.0;
   final verticalScrollController = ScrollController();
   final horizontalScrollController = ScrollController();
-
-  void initNullFields() {
-    nodeinfo.forEach((node) => {
-          if (node.name == null)
-            {
-              node.name = 'NOT SET',
-            },
-          if (node.provider == null)
-            {
-              node.provider = '--',
-            },
-          if (node.price == null)
-            {
-              node.price = -1,
-            }
-        });
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -116,7 +97,7 @@ class _MyDataTableState extends State<_MyDataTable> {
                   onSubmitted: filterData,
                   onChanged: (query) {
                     if (query.isEmpty) {
-                      setState(() => filteredList = nodeinfo);
+                      setState(() => filteredRows = allDataRows);
                     }
                   },
                   decoration: const InputDecoration(
@@ -134,6 +115,8 @@ class _MyDataTableState extends State<_MyDataTable> {
           child: SingleChildScrollView(
             scrollDirection: Axis.vertical,
             child: _buildDataTable(),
+            // decoration: BoxDecoration(
+            //     border: Border.all(color: Colors.green, width: 4)),
           ),
         ),
       ],
@@ -146,52 +129,51 @@ class _MyDataTableState extends State<_MyDataTable> {
       showBottomBorder: true,
       sortColumnIndex: _sortColumnIndex,
       sortAscending: _sortAscending,
-      columnSpacing: 0,
-      columns: attributes.entries.map((e) {
-        return DataColumn(
-          label: Stack(
-            children: [
-              Container(
-                width: columnWidths[e.key],
-                constraints: const BoxConstraints(minWidth: 100),
-                child: Text(e.key),
-              ),
-              Positioned(
-                right: 0,
-                child: GestureDetector(
-                  onPanStart: (details) {
-                    setState(() {
-                      initX = details.globalPosition.dx;
-                    });
-                  },
-                  onPanUpdate: (details) {
-                    final increment = details.globalPosition.dx - initX;
-                    final newWidth = columnWidths[e.key]! + increment;
-                    setState(() {
-                      initX = details.globalPosition.dx;
-                      columnWidths[e.key] = newWidth > minimumColumnWidth
-                          ? newWidth
-                          : minimumColumnWidth;
-                    });
-                  },
-                  child: Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(1),
-                      shape: BoxShape.circle,
+      dividerThickness: 5,
+      columnSpacing: 5,
+      columns: attributes.entries
+          .map((e) => DataColumn(
+                label: Stack(
+                  children: [
+                    Container(
+                      width: columnWidths[e.key],
+                      constraints: const BoxConstraints(minWidth: 100),
+                      child: Text(e.key),
                     ),
-                  ),
+                    Positioned(
+                      right: 0,
+                      child: GestureDetector(
+                        onPanStart: (details) {
+                          setState(() {
+                            initX = details.globalPosition.dx;
+                          });
+                        },
+                        onPanUpdate: (details) {
+                          final increment = details.globalPosition.dx - initX;
+                          final newWidth = columnWidths[e.key]! + increment;
+                          setState(() {
+                            initX = details.globalPosition.dx;
+                            columnWidths[e.key] = newWidth > minimumColumnWidth
+                                ? newWidth
+                                : minimumColumnWidth;
+                          });
+                        },
+                        child: Container(
+                          width: 10,
+                          height: 10,
+                          decoration: BoxDecoration(
+                            color: Colors.blue.withOpacity(1),
+                            shape: BoxShape.circle,
+                          ),
+                        ),
+                      ),
+                    )
+                  ],
                 ),
-              )
-            ],
-          ),
-          onSort: ((columnIndex, ascending) => _onSort(columnIndex, ascending)),
-        );
-      }).toList(),
-      rows: filteredList.map<DataRow>((node) {
+              ))
+          .toList(),
+      rows: nodeinfo.map<DataRow>((node) {
         return DataRow(
-            onSelectChanged: (t) => displayPopout(node),
             cells: attributes.entries
                 .map<DataCell>(
                   (e) => _buildCell(e, node),
@@ -212,7 +194,7 @@ class _MyDataTableState extends State<_MyDataTable> {
           child: SaveNodeButton(
             node,
             reset: (() {
-              updateState();
+              //updateState();
             }),
           ),
         ),
@@ -266,83 +248,84 @@ class _MyDataTableState extends State<_MyDataTable> {
     );
   }
 
-  dynamic indexNodeMap(int index, NodeInfo node) {
-    switch (index) {
-      case 0:
-        return node.name;
-      case 1:
-        return node.provider;
-      case 2:
-        return node.price;
-      case 3:
-        return node.ip;
-      case 4:
-        return node.txhash;
-      case 5:
-        return node.tier;
-      case 6:
-        return node.rank;
-      case 7:
-        return node.added_height;
-      case 8:
-        return node.confirmed_height;
-    }
-  }
-
   void _onSort(int columnIndex, bool ascending) {
     setState(() {
       _sortColumnIndex = columnIndex;
       _sortAscending = ascending;
+
       // Sort the data based on the selected column and sorting direction
-      filteredList.sort((a, b) {
-        print('inside filteredlist.sort');
-        final aValue = indexNodeMap(columnIndex, a);
-        final bValue = indexNodeMap(columnIndex, b);
-        return ascending
-            ? Comparable.compare(aValue, bValue)
-            : Comparable.compare(bValue, aValue);
+      filteredRows.sort((a, b) {
+        final aValue = (a.cells[columnIndex].child as Text).data!;
+        final bValue = (b.cells[columnIndex].child as Text).data!;
+
+        // Make sure it doesn't sort numerically
+        bool isNumeric =
+            num.tryParse(aValue) != null && num.tryParse(bValue) != null;
+
+        if (isNumeric) {
+          double aNumber = double.parse(aValue);
+          double bNumber = double.parse(bValue);
+          return ascending
+              ? aNumber.compareTo(bNumber)
+              : bNumber.compareTo(aNumber);
+        } else {
+          return ascending
+              ? Comparable.compare(aValue, bValue)
+              : Comparable.compare(bValue, aValue);
+        }
       });
     });
   }
 
-  List<dynamic> getRowData(NodeInfo node) {
-    return [
-      node.name,
-      node.provider,
-      node.price.toString(),
-      node.ip.toString(),
-      node.txhash,
-      node.tier,
-      node.rank.toString(),
-    ];
-  }
-
   void filterData(String query) {
-    print('FILTERING DATA');
     if (query.isEmpty) {
-      setState(() => filteredList = nodeinfo);
+      setState(() => filteredRows = allDataRows);
     } else {
       setState(() {
         // Filter based on search query
-        filteredList = nodeinfo.where((row) {
-          String rowContent = "";
-          getRowData(row).forEach((cell) {
-            rowContent += cell.toString();
-          });
+        filteredRows = allDataRows.where((row) {
+          String rowContent = row.cells.map((cell) {
+            return cell.child is Text
+                ? (cell.child as Text).data!
+                : cell.child is InkWell
+                    ? ((cell.child as InkWell).child as Text).data!
+                    : '';
+          }).join('***'); // should change this
           return rowContent.toLowerCase().contains(query.toLowerCase());
         }).toList();
       });
     }
   }
 
+  void initNullFields() {
+    nodeinfo.forEach((node) => {
+          if (node.name == null)
+            {
+              node.name = 'NOT SET',
+            },
+          if (node.provider == null)
+            {
+              node.provider = '--',
+            },
+          if (node.price == null)
+            {
+              node.price = -1,
+            }
+        });
+  }
+
   void displayPopout(node) {
     try {
-      print('displaying popout');
       showDialog(
           context: context,
           builder: (BuildContext context) {
             return PopoutCard(node: node);
+            // return Container(
+            //   decoration: BoxDecoration(
+            //       border: Border.all(color: Colors.white, width: 4)),
+            // );
           });
+      // return true;
     } catch (err) {
       rethrow;
     }
@@ -384,7 +367,6 @@ class PopoutCard extends StatelessWidget {
       {'Scriptpubkey': (node) => node.scriptPubKey},
     ];
 
-    // Shows extra info about the node if you click on the node row
     return BootstrapContainer(
       padding: const EdgeInsets.all(100.0),
       fluid: true,
@@ -396,7 +378,8 @@ class PopoutCard extends StatelessWidget {
             sizes: 'col-12 col-sm-3 col-md-4 col-lg-4 col-xl-4',
             absoluteSizes: false,
             child: Container(
-              margin: const EdgeInsets.symmetric(vertical: 8.0),
+              margin:
+                  const EdgeInsets.symmetric(vertical: 8.0), // Add margin here
               child: Card(
                 color: Colors.grey[600],
                 shape: RoundedRectangleBorder(
