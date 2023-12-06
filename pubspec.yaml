@@ -32,6 +32,7 @@ dependencies:
   convert: ^3.0.0
   flutter:
     sdk: flutter
+  flutter_secure_storage: ^8.1.0
 
 
   flutter_base:

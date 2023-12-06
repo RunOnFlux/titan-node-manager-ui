@@ -295,7 +295,6 @@ class _MyDataTableState extends State<_MyDataTable> {
       _sortAscending = ascending;
       // Sort the data based on the selected column and sorting direction
       filteredList.sort((a, b) {
-        print('inside filteredlist.sort');
         final aValue = indexNodeMap(columnIndex, a);
         final bValue = indexNodeMap(columnIndex, b);
         return ascending

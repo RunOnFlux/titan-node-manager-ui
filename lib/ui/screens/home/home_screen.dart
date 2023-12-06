@@ -5,9 +5,27 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/ui/screens/home/info_card.dart';
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/screens/home/last_refresh_card.dart';
+import 'dart:convert';
+
 
 class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {
-  HomeScreen({Key? key}) : super(key: key, title: 'Home');
+  // final String jwt;
+  // final Map<String, dynamic> payload;
+  
+  // HomeScreen({Key? key, required this.jwt, required this.payload}) : super(key: key, title: 'Home');
+  HomeScreen({Key? key,}) : super(key: key, title: 'Home');
+
+  // factory HomeScreen.fromBase64(String jwt) =>
+  //   HomeScreen(
+  //     jwt: jwt,
+  //     payload: json.decode(
+  //       ascii.decode(
+  //         base64.decode(base64.normalize(jwt.split(".")[1]))
+  //       )
+  //     )
+  //   );
+
+
 
   @override
   State<HomeScreen> createState() => HomeScreenState();
@@ -48,7 +66,7 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
             child: NodeInfoCard(),
           ),
         ),
-        LastRefresh(),
+        // LastRefresh(),
       ],
     );
     // return NodeInfoCard();
