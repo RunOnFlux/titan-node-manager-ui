@@ -33,7 +33,7 @@ class NodeManagerRouter extends AppRouter {
         body: HomeScreen(),
         title: 'Home',
         icon: Icons.home,
-        includeInMenu: true,
+        includeInMenu: false,
       ),
       // NavigationRoute(
       //   route: '/inactive',
@@ -47,7 +47,7 @@ class NodeManagerRouter extends AppRouter {
       //   body: TestScreen(),
       //   title: 'test',
       //   icon: Icons.battery_3_bar_sharp,
-      //   includeInMenu: false,
+      //   includeInMenu: true,
       // ),
 
     ];

@@ -67,7 +67,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                   ),
                   const SizedBox(height: 10),
                   DropdownButtonFormField<String>(
-                      value: '-',
+                      value: '--',
                       items: providers,
                       onChanged: ((String? x) {
                         if (x == 'ADD NEW') {

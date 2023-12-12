@@ -76,6 +76,7 @@ class NodeManagerAppState extends MinimalAppState<NodeManagerApp>
 
 class NodeManagerInfo with ChangeNotifier {
   String _token = '';
+  bool isLoggedIn = false;
 
   String get token => _token;
 

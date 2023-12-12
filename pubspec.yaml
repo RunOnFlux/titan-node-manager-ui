@@ -33,6 +33,7 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_secure_storage: ^8.1.0
+  # go_router: ^1.0.0
 
 
   flutter_base:

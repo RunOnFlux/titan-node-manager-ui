@@ -13,6 +13,7 @@ import 'package:testapp/ui/screens/home/home_screen.dart';
 import 'package:testapp/ui/screens/home/info_card.dart';
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/screens/inactive/inactive_card.dart';
+import 'package:go_router/go_router.dart';
 
 
 import 'package:testapp/api/services/fetchInfo.dart';
@@ -37,8 +38,8 @@ class LoginPage extends StatelessWidget with GetItMixin{
   Future<String?> attemptLogIn(String username, String password) async {
 
     var uri = Uri.parse('http://localhost:4444/api/login');
-    print('username: $username');
-    print('password: $password');
+    // print('username: $username');
+    // print('password: $password');
     var res = await http.post(
       uri,
       headers: {
@@ -54,17 +55,22 @@ class LoginPage extends StatelessWidget with GetItMixin{
     print('token: $token');
     
     if(res.statusCode == 200) {
-      GetIt.I<NodeManagerInfo>().setToken(token);
+      print('attemptLogIn: $token');
+      GetIt.I<NodeManagerInfo>().isLoggedIn = true;
+      await storage.write(key: "jwt", value: token);
+
       // fetch data again
       var info = await InfoService().fetchInfo();
       var nodeinfo = await InfoService().fetchNodeInfo();
       // var inactiveInfo = await InfoService().fetchInactiveInfo();
       // print('getit info ${GetIt.I<NodeManagerInfo>().info}');
-
+      // print('info1: ${GetIt.I<NodeManagerInfo>().info}');
       GetIt.I<NodeManagerInfo>().info = info!;
+      // print('info2: ${GetIt.I<NodeManagerInfo>().info}');
+
       GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
       // GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
-      // GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
+      GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
       return res.body;}
     return null;
@@ -117,12 +123,7 @@ class LoginPage extends StatelessWidget with GetItMixin{
                 var jwt = await attemptLogIn(username, password);
                 if(jwt != null) {
                   storage.write(key: "jwt", value: jwt);
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => HomePage.fromBase64(jwt)
-                    )
-                  );
+                  context.push('/home');
                 } else {
                   displayDialog(context, "Incorrect Password", "Try again.");
                 }

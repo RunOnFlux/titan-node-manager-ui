@@ -6,49 +6,43 @@ import 'package:testapp/ui/screens/home/info_card.dart';
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/screens/home/last_refresh_card.dart';
 import 'dart:convert';
+import 'package:go_router/go_router.dart';
+import 'package:get_it/get_it.dart';
+import 'package:testapp/ui/app/app.dart';
 
 
-class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {
-  // final String jwt;
-  // final Map<String, dynamic> payload;
-  
-  // HomeScreen({Key? key, required this.jwt, required this.payload}) : super(key: key, title: 'Home');
+
+
+class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {  
   HomeScreen({Key? key,}) : super(key: key, title: 'Home');
-
-  // factory HomeScreen.fromBase64(String jwt) =>
-  //   HomeScreen(
-  //     jwt: jwt,
-  //     payload: json.decode(
-  //       ascii.decode(
-  //         base64.decode(base64.normalize(jwt.split(".")[1]))
-  //       )
-  //     )
-  //   );
-
-
-
   @override
   State<HomeScreen> createState() => HomeScreenState();
 }
 
 class HomeScreenState extends SimpleScreenState<HomeScreen>
     with GetItStateMixin {
+    final isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
   @override
   void initState() {
     super.initState();
     bootstrapGridParameters(gutterSize: 20);
   }
-
   @override
   Widget buildChild(BuildContext context) {
-    return BootstrapContainer(
+    if (isTokenValid){ 
+      return loggedInHomePage(context);
+    } else {
+      // context.push('/');
+      return notLoggedInPage(context);
+    }
+  }
+
+  BootstrapContainer loggedInHomePage(context) {
+      return BootstrapContainer(
       fluid: true,
-      // decoration:
-      //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
       children: [
         BootstrapRow(
-          // decoration: BoxDecoration(
-          //     border: Border.all(color: Colors.blueGrey, width: 4)),
+
           children: [
             BootstrapCol(
               fit: FlexFit.tight,
@@ -58,38 +52,35 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
           ],
         ),
         Container(
-          // decoration:
-          //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
+
           child: SizedBox(
             width: 4000,
             height: 700,
             child: NodeInfoCard(),
           ),
         ),
-        // LastRefresh(),
+        LastRefresh(),
       ],
     );
-    // return NodeInfoCard();
+    
   }
-  // Widget buildChild(BuildContext context) {
-  //   return BootstrapContainer(
-  //     fluid: false,
-  //     padding: mainPadding(),
-  //     children: [
-  //       BootstrapRow(
-  //         children: [
-  //           BootstrapCol(
-  //             fit: FlexFit.tight,
-  //             sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
-  //             child: InfoCard(),
-  //           ),
-  //         ],
-  //       ),
-  //       BootstrapCol(
-  //         child: NodeInfoCard(),
-  //       ),
-  //       LastRefresh(),
-  //     ],
-  //   );
-  // }
+
+  BootstrapContainer notLoggedInPage(BuildContext context) {
+    // this is the page that will be shown if the user is not logged in
+    return 
+    BootstrapContainer(children: [
+      ElevatedButton(
+  onPressed: () {
+    context.push('/');
+    // Navigator.of(context).pushReplacementNamed(
+    //   '/home',
+    // );
+  },
+  child: Text('Press to go to login page')
+)
+
+    ]);
+    
+  }
+
 }
