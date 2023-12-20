@@ -9,27 +9,23 @@ import 'package:testapp/ui/app/app.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/screens/login/login_card.dart';
 
-
-
-
-
 class InfoService {
   Future<String> get jwtOrEmpty async {
     final String? jwt = await storage.read(key: "jwt");
-    if(jwt == null) return "";
+    if (jwt == null) return "";
     return jwt;
   }
 
   Future<Info?> fetchInfo() async {
-    final url = Uri.parse('http://localhost:4444/api/info');
+    final url = Uri.parse('http://5.161.92.90:4444/api/info');
     // final token = GetIt.I<NodeManagerInfo>().token;
     final token = await jwtOrEmpty;
 
     try {
-      final response = await http.get(url,
-          headers: {
-            HttpHeaders.contentTypeHeader: "application/json", 
-          HttpHeaders.authorizationHeader: "Bearer $token"});
+      final response = await http.get(url, headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: "Bearer $token"
+      });
       if (response.statusCode == 200) {
         final data = response.body;
         final jsonData = jsonDecode(data);
@@ -49,14 +45,14 @@ class InfoService {
   }
 
   Future<List<NodeInfo>?> fetchNodeInfo() async {
-    final url = Uri.parse('http://localhost:4444/api/nodeinfo');
+    final url = Uri.parse('http://5.161.92.90:4444/api/nodeinfo');
     final token = await jwtOrEmpty;
 
     try {
-      final response = await http.get(url,
-          headers: {
-            HttpHeaders.contentTypeHeader: "application/json", 
-          HttpHeaders.authorizationHeader: "Bearer $token"});
+      final response = await http.get(url, headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: "Bearer $token"
+      });
       if (response.statusCode == 200) {
         final data = response.body;
         Iterable l = jsonDecode(data);
@@ -76,16 +72,14 @@ class InfoService {
     }
   }
 
-
-
   //   Future<List<InactiveInfo>?> fetchInactiveInfo() async {
-  //   final url = Uri.parse('http://localhost:4444/api/nodeinfo');
+  //   final url = Uri.parse('http://5.161.92.90:4444/api/nodeinfo');
   //   final token = GetIt.I<NodeManagerInfo>().token;
 
   //   try {
   //     final response = await http.get(url,
   //         headers: {
-  //           HttpHeaders.contentTypeHeader: "application/json", 
+  //           HttpHeaders.contentTypeHeader: "application/json",
   //         HttpHeaders.authorizationHeader: "Bearer $token"});
   //     if (response.statusCode == 200) {
   //       List<InactiveInfo> inactiveList = [];
