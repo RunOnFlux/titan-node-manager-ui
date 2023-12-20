@@ -17,7 +17,7 @@ class InfoService {
   }
 
   Future<Info?> fetchInfo() async {
-    final url = Uri.parse('http://5.161.92.90:4444/api/info');
+    final url = Uri.parse('https://managerbackend/api/info');
     // final token = GetIt.I<NodeManagerInfo>().token;
     final token = await jwtOrEmpty;
 
@@ -45,7 +45,7 @@ class InfoService {
   }
 
   Future<List<NodeInfo>?> fetchNodeInfo() async {
-    final url = Uri.parse('http://5.161.92.90:4444/api/nodeinfo');
+    final url = Uri.parse('https://managerbackend/api/nodeinfo');
     final token = await jwtOrEmpty;
 
     try {
@@ -73,7 +73,7 @@ class InfoService {
   }
 
   //   Future<List<InactiveInfo>?> fetchInactiveInfo() async {
-  //   final url = Uri.parse('http://5.161.92.90:4444/api/nodeinfo');
+  //   final url = Uri.parse('https://managerbackend/api/nodeinfo');
   //   final token = GetIt.I<NodeManagerInfo>().token;
 
   //   try {
