@@ -427,7 +427,7 @@ Future<http.Response> startNode(BuildContext context, node) async {
     'txhash': txhash,
     'outidx': outidx,
   };
-  var url = Uri.parse('http://localhost:4444/api/startnode');
+  var url = Uri.parse('http://5.161.92.90:4444/api/startnode');
 
   final response = await http.post(
     url,

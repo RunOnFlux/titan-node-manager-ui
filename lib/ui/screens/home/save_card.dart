@@ -99,7 +99,6 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                                                         print(
                                                             'Submitted new provider: $provider');
 
-
                                                         Navigator.of(context)
                                                             .pop();
                                                       },
@@ -144,7 +143,6 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                   onPressed: () {
                     if (providerController.text == 'Add new') {
                       providerController.text = '--';
-
                     }
 
                     var inputs = {
@@ -188,7 +186,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
       'provider': inputs['provider'],
       'price': inputs['price'],
     };
-    var url = Uri.parse('http://localhost:4444/api/update');
+    var url = Uri.parse('http://5.161.92.90:4444/api/update');
 
     final response = await http.post(
       url,
@@ -215,7 +213,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
     Map<String, String> requestBody = {
       'provider': provider,
     };
-    var url = Uri.parse('http://localhost:4444/api/provider');
+    var url = Uri.parse('http://5.161.92.90:4444/api/provider');
     print('provider added: ${provider}');
     final response = await http.post(url,
         body: jsonEncode(requestBody),
