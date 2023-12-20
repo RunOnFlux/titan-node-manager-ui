@@ -75,6 +75,16 @@ class NodeManagerAppState extends MinimalAppState<NodeManagerApp>
 }
 
 class NodeManagerInfo with ChangeNotifier {
+  String _token = '';
+  bool isLoggedIn = false;
+
+  String get token => _token;
+
+  void setToken(String newToken) {
+    print('new token: $newToken');
+    _token = newToken;
+    notifyListeners();
+  }
   late Info info;
   late List<NodeInfo> nodeinfo;
   late List<InactiveInfo> inactiveInfo;
