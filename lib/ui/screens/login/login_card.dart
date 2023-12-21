@@ -30,7 +30,7 @@ class LoginPage extends StatelessWidget with GetItMixin {
       );
 
   Future<String?> attemptLogIn(String username, String password) async {
-    var uri = Uri.parse('https://managerbackend/api/login');
+    var uri = Uri.parse('https://managerbackend.runonflux.io/api/login');
     // print('username: $username');
     // print('password: $password');
     var res = await http.post(uri,
@@ -66,7 +66,7 @@ class LoginPage extends StatelessWidget with GetItMixin {
   }
 
   Future<int> attemptSignUp(String username, String password) async {
-    var uri = Uri.parse('https://managerbackend/api/signup');
+    var uri = Uri.parse('https://managerbackend.runonflux.io/api/signup');
     print('username: $username');
     print('password: $password');
     var res = await http.post(uri, headers: {
@@ -163,7 +163,7 @@ class HomePage extends StatelessWidget {
         body: Center(
           child: HomeScreen(),
           // FutureBuilder(
-          //   future: http.read(Uri.parse('https://managerbackend/api/data'), headers: {"authorization": jwt}),
+          //   future: http.read(Uri.parse('https://managerbackend.runonflux.io/api/data'), headers: {"authorization": jwt}),
           //   builder: (context, snapshot) =>
           //     snapshot.hasData ?
           //     Column(children: <Widget>[

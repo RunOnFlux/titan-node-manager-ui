@@ -427,7 +427,7 @@ Future<http.Response> startNode(BuildContext context, node) async {
     'txhash': txhash,
     'outidx': outidx,
   };
-  var url = Uri.parse('https://managerbackend/api/startnode');
+  var url = Uri.parse('https://managerbackend.runonflux.io/api/startnode');
 
   final response = await http.post(
     url,

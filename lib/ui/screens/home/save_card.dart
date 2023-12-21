@@ -186,7 +186,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
       'provider': inputs['provider'],
       'price': inputs['price'],
     };
-    var url = Uri.parse('https://managerbackend/api/update');
+    var url = Uri.parse('https://managerbackend.runonflux.io/api/update');
 
     final response = await http.post(
       url,
@@ -213,7 +213,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
     Map<String, String> requestBody = {
       'provider': provider,
     };
-    var url = Uri.parse('https://managerbackend/api/provider');
+    var url = Uri.parse('https://managerbackend.runonflux.io/api/provider');
     print('provider added: ${provider}');
     final response = await http.post(url,
         body: jsonEncode(requestBody),
