@@ -430,7 +430,11 @@ Future<http.Response> startNode(BuildContext context, node) async {
     'txhash': txhash,
     'outidx': outidx,
   };
+<<<<<<< HEAD
   var url = Uri.parse('${AppConfig().apiEndpoint}/startnode');
+=======
+  var url = Uri.parse('https://managerbackend.runonflux.io/api/startnode');
+>>>>>>> Update backend route
 
   final response = await http.post(
     url,

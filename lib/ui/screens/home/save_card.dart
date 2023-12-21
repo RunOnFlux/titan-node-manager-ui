@@ -191,6 +191,10 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
       'provider': inputs['provider'],
       'price': inputs['price'],
     };
+<<<<<<< HEAD
+=======
+    var url = Uri.parse('https://managerbackend.runonflux.io/api/update');
+>>>>>>> Update backend route
 
     final String? jwt = await storage.read(key: "jwt");
     var url = Uri.parse('${AppConfig().apiEndpoint}/update');
@@ -219,8 +223,13 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
     Map<String, String> requestBody = {
       'provider': provider,
     };
+<<<<<<< HEAD
     var url = Uri.parse('${AppConfig().apiEndpoint}/provider');
     print('Provider added: ${provider}');
+=======
+    var url = Uri.parse('https://managerbackend.runonflux.io/api/provider');
+    print('provider added: ${provider}');
+>>>>>>> Update backend route
     final response = await http.post(url,
         body: jsonEncode(requestBody),
         headers: {'Content-Type': 'application/json'});
