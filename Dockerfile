@@ -18,7 +18,7 @@ COPY . /app/
 WORKDIR /app/
 RUN flutter build web
 # Stage 2 - Create the run-time image
-FROM nginx:1.21.1-alpine
+FROM nginx:stable-alpine-slim
 EXPOSE 443
 COPY --from=build-env /app/build/web /usr/share/nginx/html
 CMD ["nginx", "-g", "daemon off;"]
