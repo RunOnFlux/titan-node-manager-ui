@@ -85,6 +85,7 @@ class NodeManagerInfo with ChangeNotifier {
     _token = newToken;
     notifyListeners();
   }
+
   late Info info;
   late List<NodeInfo> nodeinfo;
   late List<InactiveInfo> inactiveInfo;

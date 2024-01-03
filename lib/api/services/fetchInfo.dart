@@ -1,5 +1,6 @@
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter/foundation.dart';
 import 'package:testapp/api/model/info.dart';
 import 'package:http/http.dart' as http;
 import 'package:testapp/api/model/nodeinfo.dart';
@@ -8,6 +9,7 @@ import 'package:testapp/ui/screens/inactive/inactive_screen.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/screens/login/login_card.dart';
+import 'package:testapp/utils/config.dart';
 
 class InfoService {
   Future<String> get jwtOrEmpty async {
@@ -17,7 +19,7 @@ class InfoService {
   }
 
   Future<Info?> fetchInfo() async {
-    final url = Uri.parse('https://managerbackend/api/info');
+    final url = Uri.parse('${AppConfig().apiEndpoint}/info');
     // final token = GetIt.I<NodeManagerInfo>().token;
     final token = await jwtOrEmpty;
 
@@ -45,7 +47,7 @@ class InfoService {
   }
 
   Future<List<NodeInfo>?> fetchNodeInfo() async {
-    final url = Uri.parse('https://managerbackend/api/nodeinfo');
+    final url = Uri.parse('${AppConfig().apiEndpoint}/nodeinfo');
     final token = await jwtOrEmpty;
 
     try {

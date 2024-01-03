@@ -7,6 +7,7 @@ import 'package:testapp/api/model/nodeinfo.dart';
 import 'package:http/http.dart' as http;
 import 'package:flutter/services.dart';
 import 'package:testapp/ui/app/app.dart';
+import 'package:testapp/utils/config.dart';
 
 class SaveNodeButton extends StatelessWidget with GetItMixin {
   final dynamic node;
@@ -186,8 +187,8 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
       'provider': inputs['provider'],
       'price': inputs['price'],
     };
-    var url = Uri.parse('https://managerbackend/api/update');
 
+    var url = Uri.parse('${AppConfig().apiEndpoint}/update');
     final response = await http.post(
       url,
       body: jsonEncode(requestBody),
@@ -213,7 +214,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
     Map<String, String> requestBody = {
       'provider': provider,
     };
-    var url = Uri.parse('https://managerbackend/api/provider');
+    var url = Uri.parse('${AppConfig().apiEndpoint}/provider');
     print('provider added: ${provider}');
     final response = await http.post(url,
         body: jsonEncode(requestBody),

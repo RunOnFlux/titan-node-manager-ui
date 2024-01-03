@@ -14,6 +14,7 @@ import 'package:testapp/ui/screens/home/info_card.dart';
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/screens/inactive/inactive_card.dart';
 import 'package:go_router/go_router.dart';
+import 'package:testapp/utils/config.dart';
 
 import 'package:testapp/api/services/fetchInfo.dart';
 
@@ -30,10 +31,10 @@ class LoginPage extends StatelessWidget with GetItMixin {
       );
 
   Future<String?> attemptLogIn(String username, String password) async {
-    var uri = Uri.parse('https://managerbackend/api/login');
+    var url = Uri.parse('${AppConfig().apiEndpoint}/login');
     // print('username: $username');
     // print('password: $password');
-    var res = await http.post(uri,
+    var res = await http.post(url,
         headers: {
           // "Accept": "application/json",
           "content-type": "application/json"
@@ -66,10 +67,10 @@ class LoginPage extends StatelessWidget with GetItMixin {
   }
 
   Future<int> attemptSignUp(String username, String password) async {
-    var uri = Uri.parse('https://managerbackend/api/signup');
+    var url = Uri.parse('${AppConfig().apiEndpoint}/signup');
     print('username: $username');
     print('password: $password');
-    var res = await http.post(uri, headers: {
+    var res = await http.post(url, headers: {
       "Accept": "application/json",
       "content-type": "application/json"
     }, body: {
@@ -144,35 +145,4 @@ class LoginPage extends StatelessWidget with GetItMixin {
           ),
         ));
   }
-}
-
-class HomePage extends StatelessWidget {
-  HomePage(this.jwt, this.payload);
-
-  factory HomePage.fromBase64(String jwt) => HomePage(
-      jwt,
-      json.decode(
-          ascii.decode(base64.decode(base64.normalize(jwt.split(".")[1])))));
-
-  final String jwt;
-  final Map<String, dynamic> payload;
-
-  @override
-  Widget build(BuildContext context) => Scaffold(
-        appBar: AppBar(title: Text("Secret Data Screen")),
-        body: Center(
-          child: HomeScreen(),
-          // FutureBuilder(
-          //   future: http.read(Uri.parse('https://managerbackend/api/data'), headers: {"authorization": jwt}),
-          //   builder: (context, snapshot) =>
-          //     snapshot.hasData ?
-          //     Column(children: <Widget>[
-          //       Text("${payload['username']}, here's the data:"),
-          //       Text(snapshot.data!, style: Theme.of(context).textTheme.headlineMedium)
-          //     ],)
-          //     :
-          //     snapshot.hasError ? Text("An error occurred") : CircularProgressIndicator()
-          // ),
-        ),
-      );
 }
