@@ -10,26 +10,26 @@ import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/app/app.dart';
 
-
-
-
-class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {  
-  HomeScreen({Key? key,}) : super(key: key, title: 'Home');
+class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {
+  HomeScreen({
+    Key? key,
+  }) : super(key: key, title: 'Home');
   @override
   State<HomeScreen> createState() => HomeScreenState();
 }
 
 class HomeScreenState extends SimpleScreenState<HomeScreen>
     with GetItStateMixin {
-    final isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
+  final isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
   @override
   void initState() {
     super.initState();
     bootstrapGridParameters(gutterSize: 20);
   }
+
   @override
   Widget buildChild(BuildContext context) {
-    if (isTokenValid){ 
+    if (isTokenValid) {
       return loggedInHomePage(context);
     } else {
       // context.push('/');
@@ -38,11 +38,10 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
   }
 
   BootstrapContainer loggedInHomePage(context) {
-      return BootstrapContainer(
+    return BootstrapContainer(
       fluid: true,
       children: [
         BootstrapRow(
-
           children: [
             BootstrapCol(
               fit: FlexFit.tight,
@@ -52,7 +51,6 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
           ],
         ),
         Container(
-
           child: SizedBox(
             width: 4000,
             height: 700,
@@ -62,25 +60,19 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
         LastRefresh(),
       ],
     );
-    
   }
 
   BootstrapContainer notLoggedInPage(BuildContext context) {
     // this is the page that will be shown if the user is not logged in
-    return 
-    BootstrapContainer(children: [
+    return BootstrapContainer(children: [
       ElevatedButton(
-  onPressed: () {
-    context.push('/');
-    // Navigator.of(context).pushReplacementNamed(
-    //   '/home',
-    // );
-  },
-  child: Text('Press to go to login page')
-)
-
+          onPressed: () {
+            context.push('/');
+            // Navigator.of(context).pushReplacementNamed(
+            //   '/home',
+            // );
+          },
+          child: Text('Press to go to login page'))
     ]);
-    
   }
-
 }

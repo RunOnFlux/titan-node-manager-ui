@@ -20,6 +20,7 @@ class InfoService {
 
   Future<Info?> fetchInfo() async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/info');
+    print('Fetching from ${AppConfig().apiEndpoint}');
     // final token = GetIt.I<NodeManagerInfo>().token;
     final token = await jwtOrEmpty;
 
