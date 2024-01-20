@@ -32,8 +32,6 @@ class LoginPage extends StatelessWidget with GetItMixin {
 
   Future<String?> attemptLogIn(String username, String password) async {
     var url = Uri.parse('${AppConfig().apiEndpoint}/login');
-    // print('username: $username');
-    // print('password: $password');
     var res = await http.post(url,
         headers: {
           // "Accept": "application/json",
@@ -41,24 +39,19 @@ class LoginPage extends StatelessWidget with GetItMixin {
         },
         body: json.encode({"username": username, "password": password}));
     var token = res.body;
-    print('token: $token');
 
     if (res.statusCode == 200) {
-      print('attemptLogIn: $token');
       GetIt.I<NodeManagerInfo>().isLoggedIn = true;
       await storage.write(key: "jwt", value: token);
 
       // fetch data again
       var info = await InfoService().fetchInfo();
       var nodeinfo = await InfoService().fetchNodeInfo();
-      // var inactiveInfo = await InfoService().fetchInactiveInfo();
-      // print('getit info ${GetIt.I<NodeManagerInfo>().info}');
-      // print('info1: ${GetIt.I<NodeManagerInfo>().info}');
+      var inactiveInfo = await InfoService().fetchInactiveInfo();
       GetIt.I<NodeManagerInfo>().info = info!;
-      // print('info2: ${GetIt.I<NodeManagerInfo>().info}');
 
       GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
-      // GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
+      GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
       GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
       return res.body;
@@ -68,8 +61,6 @@ class LoginPage extends StatelessWidget with GetItMixin {
 
   Future<int> attemptSignUp(String username, String password) async {
     var url = Uri.parse('${AppConfig().apiEndpoint}/signup');
-    print('username: $username');
-    print('password: $password');
     var res = await http.post(url, headers: {
       "Accept": "application/json",
       "content-type": "application/json"
@@ -99,48 +90,52 @@ class LoginPage extends StatelessWidget with GetItMixin {
                 obscureText: true,
                 decoration: const InputDecoration(labelText: 'Password'),
               ),
-              ElevatedButton(
-                  onPressed: () async {
-                    var username = _usernameController.text;
-                    var password = _passwordController.text;
-                    var jwt = await attemptLogIn(username, password);
-                    if (jwt != null) {
-                      storage.write(key: "jwt", value: jwt);
-                      context.push('/home');
-                    } else {
-                      displayDialog(
-                          context, "Incorrect Password", "Try again.");
-                    }
-                  },
-                  child: Text("Log In")),
-              ElevatedButton(
-                  onPressed: () async {
-                    var username = _usernameController.text;
-                    var password = _passwordController.text;
-
-                    if (username.length < 4)
-                      displayDialog(context, "Invalid Username",
-                          "The username should be at least 4 characters long");
-                    else if (password.length < 4)
-                      displayDialog(context, "Invalid Password",
-                          "The password should be at least 4 characters long");
-                    else {
-                      var res = await attemptSignUp(username, password);
-                      if (res == 201)
-                        displayDialog(context, "Success",
-                            "The user was created. Log in now.");
-                      else if (res == 409)
+              // Login button
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                    onPressed: () async {
+                      var username = _usernameController.text;
+                      var password = _passwordController.text;
+                      var jwt = await attemptLogIn(username, password);
+                      if (jwt != null) {
+                        storage.write(key: "jwt", value: jwt);
+                        context.push('/home');
+                      } else {
                         displayDialog(
-                            context,
-                            "That username is already registered",
-                            "Please try to sign up using another username or log in if you already have an account.");
-                      else {
-                        displayDialog(
-                            context, "Error", "An unknown error occurred.");
+                            context, "Incorrect Password", "Try again.");
                       }
-                    }
-                  },
-                  child: const Text("Sign Up"))
+                    },
+                    child: Text("Log In")),
+              ),
+              // ElevatedButton(
+              //     onPressed: () async {
+              //       var username = _usernameController.text;
+              //       var password = _passwordController.text;
+
+              //       if (username.length < 4)
+              //         displayDialog(context, "Invalid Username",
+              //             "The username should be at least 4 characters long");
+              //       else if (password.length < 4)
+              //         displayDialog(context, "Invalid Password",
+              //             "The password should be at least 4 characters long");
+              //       else {
+              //         var res = await attemptSignUp(username, password);
+              //         if (res == 201)
+              //           displayDialog(context, "Success",
+              //               "The user was created. Log in now.");
+              //         else if (res == 409)
+              //           displayDialog(
+              //               context,
+              //               "That username is already registered",
+              //               "Please try to sign up using another username or log in if you already have an account.");
+              //         else {
+              //           displayDialog(
+              //               context, "Error", "An unknown error occurred.");
+              //         }
+              //       }
+              //     },
+              //     child: const Text("Sign Up"))
             ],
           ),
         ));

@@ -81,14 +81,12 @@ class _TableColumnResize extends State<TableColumnResize> {
                   right: 0,
                   child: GestureDetector(
                     onPanStart: (details) {
-                      // debugPrint(details.globalPosition.dx.toString());
                       setState(() {
                         initX = details.globalPosition.dx;
                       });
                     },
                     onPanUpdate: (details) {
                       final increment = details.globalPosition.dx - initX;
-                      // debugPrint(newWidth.toString());
                       final newWidth = colWidths['Column 1']! + increment;
                       setState(() {
                         initX = details.globalPosition.dx;
@@ -122,14 +120,12 @@ class _TableColumnResize extends State<TableColumnResize> {
                   right: 0,
                   child: GestureDetector(
                     onPanStart: (details) {
-                      // debugPrint(details.globalPosition.dx.toString());
                       setState(() {
                         initX = details.globalPosition.dx;
                       });
                     },
                     onPanUpdate: (details) {
                       final increment = details.globalPosition.dx - initX;
-                      // debugPrint(newWidth.toString());
                       final newWidth = colWidths['Column yeet']! + increment;
                       setState(() {
                         initX = details.globalPosition.dx;

@@ -134,10 +134,7 @@ class _MyDataTableState extends State<_MyDataTable> {
               height: 640,
             ),
             child: SingleChildScrollView(
-              scrollDirection: Axis.vertical,
-              child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal, child: _buildDataTable()),
-            ),
+                scrollDirection: Axis.vertical, child: _buildDataTable()),
           ),
         ),
       ],
@@ -321,7 +318,6 @@ class _MyDataTableState extends State<_MyDataTable> {
   }
 
   void filterData(String query) {
-    print('FILTERING DATA');
     if (query.isEmpty) {
       setState(() => filteredList = nodeinfo);
     } else {
@@ -340,7 +336,6 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   void displayPopout(node) {
     try {
-      print('displaying popout');
       showDialog(
           context: context,
           builder: (BuildContext context) {

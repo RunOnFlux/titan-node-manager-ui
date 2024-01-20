@@ -81,7 +81,6 @@ class NodeManagerInfo with ChangeNotifier {
   String get token => _token;
 
   void setToken(String newToken) {
-    print('new token: $newToken');
     _token = newToken;
     notifyListeners();
   }

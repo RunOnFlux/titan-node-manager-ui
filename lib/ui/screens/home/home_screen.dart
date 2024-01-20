@@ -30,14 +30,14 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
   @override
   Widget buildChild(BuildContext context) {
     if (isTokenValid) {
-      return loggedInHomePage(context);
+      return homePage(context);
     } else {
       // context.push('/');
-      return notLoggedInPage(context);
+      return redirectPage(context);
     }
   }
 
-  BootstrapContainer loggedInHomePage(context) {
+  BootstrapContainer homePage(context) {
     return BootstrapContainer(
       fluid: true,
       children: [
@@ -53,7 +53,7 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
         Container(
           child: SizedBox(
             width: 4000,
-            height: 700,
+            height: 600,
             child: NodeInfoCard(),
           ),
         ),
@@ -62,7 +62,7 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
     );
   }
 
-  BootstrapContainer notLoggedInPage(BuildContext context) {
+  BootstrapContainer redirectPage(BuildContext context) {
     // this is the page that will be shown if the user is not logged in
     return BootstrapContainer(children: [
       ElevatedButton(
