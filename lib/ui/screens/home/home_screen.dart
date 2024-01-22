@@ -10,39 +10,38 @@ import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/app/app.dart';
 
-
-
-
-class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {  
-  HomeScreen({Key? key,}) : super(key: key, title: 'Home');
+class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {
+  HomeScreen({
+    Key? key,
+  }) : super(key: key, title: 'Home');
   @override
   State<HomeScreen> createState() => HomeScreenState();
 }
 
 class HomeScreenState extends SimpleScreenState<HomeScreen>
     with GetItStateMixin {
-    final isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
+  final isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
   @override
   void initState() {
     super.initState();
     bootstrapGridParameters(gutterSize: 20);
   }
+
   @override
   Widget buildChild(BuildContext context) {
-    if (isTokenValid){ 
-      return loggedInHomePage(context);
+    if (isTokenValid) {
+      return homePage(context);
     } else {
       // context.push('/');
-      return notLoggedInPage(context);
+      return redirectPage(context);
     }
   }
 
-  BootstrapContainer loggedInHomePage(context) {
-      return BootstrapContainer(
+  BootstrapContainer homePage(context) {
+    return BootstrapContainer(
       fluid: true,
       children: [
         BootstrapRow(
-
           children: [
             BootstrapCol(
               fit: FlexFit.tight,
@@ -52,35 +51,28 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
           ],
         ),
         Container(
-
           child: SizedBox(
             width: 4000,
-            height: 700,
+            height: 600,
             child: NodeInfoCard(),
           ),
         ),
         LastRefresh(),
       ],
     );
-    
   }
 
-  BootstrapContainer notLoggedInPage(BuildContext context) {
+  BootstrapContainer redirectPage(BuildContext context) {
     // this is the page that will be shown if the user is not logged in
-    return 
-    BootstrapContainer(children: [
+    return BootstrapContainer(children: [
       ElevatedButton(
-  onPressed: () {
-    context.push('/');
-    // Navigator.of(context).pushReplacementNamed(
-    //   '/home',
-    // );
-  },
-  child: Text('Press to go to login page')
-)
-
+          onPressed: () {
+            context.push('/');
+            // Navigator.of(context).pushReplacementNamed(
+            //   '/home',
+            // );
+          },
+          child: Text('Press to go to login page'))
     ]);
-    
   }
-
 }

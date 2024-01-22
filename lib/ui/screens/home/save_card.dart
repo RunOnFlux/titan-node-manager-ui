@@ -1,12 +1,19 @@
 import 'dart:convert';
+import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:http/http.dart' as http;
+import 'package:testapp/utils/config.dart';
+
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/inactiveInfo.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
-import 'package:http/http.dart' as http;
+
+import 'package:testapp/ui/screens/login/login_card.dart';
+
 import 'package:flutter/services.dart';
 import 'package:testapp/ui/app/app.dart';
+import 'package:testapp/utils/config.dart';
 
 class SaveNodeButton extends StatelessWidget with GetItMixin {
   final dynamic node;
@@ -177,7 +184,6 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
     } else if (node is InactiveInfo) {
       outidx = node.vout;
     }
-    print('typeof price: ${node.price.runtimeType}');
 
     Map<String, dynamic> requestBody = {
       'txhash': txhash,
@@ -186,21 +192,22 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
       'provider': inputs['provider'],
       'price': inputs['price'],
     };
-    var url = Uri.parse('https://managerbackend.runonflux.io/api/update');
 
+    final String? jwt = await storage.read(key: "jwt");
+    var url = Uri.parse('${AppConfig().apiEndpoint}/update');
     final response = await http.post(
       url,
       body: jsonEncode(requestBody),
-      headers: {'Content-Type': 'application/json'},
+      headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: "Bearer $jwt"
+      },
     );
-
+    print('response: ${response.body}');
     if (response.body == 'Update successful') {
       node.name = inputs['name'];
       node.provider = inputs['provider'];
-      print('typeof price: ${node.price.runtimeType}');
       node.price = double.parse(inputs['price']);
-      print('typeof price?: ${double.parse(inputs['price']).runtimeType}');
-      print('typeof price: ${node.price.runtimeType}');
       reset();
     } else {
       print('UPDATE FAILED');
@@ -213,8 +220,8 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
     Map<String, String> requestBody = {
       'provider': provider,
     };
-    var url = Uri.parse('https://managerbackend.runonflux.io/api/provider');
-    print('provider added: ${provider}');
+    var url = Uri.parse('${AppConfig().apiEndpoint}/provider');
+    print('Provider added: ${provider}');
     final response = await http.post(url,
         body: jsonEncode(requestBody),
         headers: {'Content-Type': 'application/json'});

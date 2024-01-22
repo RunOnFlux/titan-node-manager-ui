@@ -7,7 +7,6 @@ import 'package:testapp/ui/screens/home/home_screen.dart';
 import 'package:testapp/ui/screens/login/login_screen.dart';
 import 'package:testapp/ui/screens/login/login_card.dart';
 
-
 import '../screens/inactive/inactive_screen.dart';
 import '../screens/test/test_screen.dart';
 
@@ -33,15 +32,15 @@ class NodeManagerRouter extends AppRouter {
         body: HomeScreen(),
         title: 'Home',
         icon: Icons.home,
-        includeInMenu: false,
+        includeInMenu: true,
       ),
-      // NavigationRoute(
-      //   route: '/inactive',
-      //   body: InactiveScreen(),
-      //   title: 'Inactive',
-      //   icon: Icons.build_sharp,
-      //   includeInMenu: false,
-      // ),
+      NavigationRoute(
+        route: '/inactive',
+        body: InactiveScreen(),
+        title: 'Inactive',
+        icon: Icons.build_sharp,
+        includeInMenu: true,
+      ),
       // NavigationRoute(
       //   route: '/test',
       //   body: TestScreen(),
@@ -49,7 +48,6 @@ class NodeManagerRouter extends AppRouter {
       //   icon: Icons.battery_3_bar_sharp,
       //   includeInMenu: true,
       // ),
-
     ];
     return routes;
   }

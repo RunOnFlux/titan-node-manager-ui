@@ -33,7 +33,7 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Provider': 100,
     'Price': 100,
     'IP Address': 100,
-    'Txhash': 510,
+    'Txhash': 400,
     'Tier': 100,
     'Rank': 100,
     // 'Added Height': 100,
@@ -101,11 +101,10 @@ class _MyDataTableState extends State<_MyDataTable> {
         BootstrapCol(
           //  White space
           sizes: 'col-12 col-sm-6 col-md-9 col-lg-9 col-xl-9',
-          //  White space
           child: const SizedBox(height: 50),
         ),
         BootstrapCol(
-          // Search box
+          // SEARCH BOX
           sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
           child: Align(
             alignment: Alignment.centerRight,
@@ -126,14 +125,16 @@ class _MyDataTableState extends State<_MyDataTable> {
                 )),
           ),
         ),
-        ConstrainedBox(
-          constraints: BoxConstraints.expand(
-            width: MediaQuery.of(context).size.width,
-            height: 640,
-          ),
-          child: SingleChildScrollView(
-            scrollDirection: Axis.vertical,
-            child: _buildDataTable(),
+        // DATATABLE
+        SizedBox(
+          height: 550,
+          child: ConstrainedBox(
+            constraints: BoxConstraints.expand(
+              width: MediaQuery.of(context).size.width,
+              height: 640,
+            ),
+            child: SingleChildScrollView(
+                scrollDirection: Axis.vertical, child: _buildDataTable()),
           ),
         ),
       ],
@@ -236,8 +237,8 @@ class _MyDataTableState extends State<_MyDataTable> {
       value,
       style: TextStyle(color: textColor),
       overflow: TextOverflow.ellipsis,
-      maxLines: 1,
-      softWrap: false,
+      maxLines: 2,
+      softWrap: true,
     );
 
     if (e.key == 'IP Address') {
@@ -317,7 +318,6 @@ class _MyDataTableState extends State<_MyDataTable> {
   }
 
   void filterData(String query) {
-    print('FILTERING DATA');
     if (query.isEmpty) {
       setState(() => filteredList = nodeinfo);
     } else {
@@ -336,7 +336,6 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   void displayPopout(node) {
     try {
-      print('displaying popout');
       showDialog(
           context: context,
           builder: (BuildContext context) {

@@ -1,5 +1,5 @@
 import 'dart:convert';
-
+import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
@@ -9,6 +9,8 @@ import 'package:http/http.dart' as http;
 import 'package:testapp/ui/screens/home/save_card.dart';
 
 import 'package:data_table_2/data_table_2.dart';
+import 'package:testapp/utils/config.dart';
+import 'package:testapp/ui/screens/login/login_card.dart';
 
 class InactiveCard extends StatelessWidget with GetItMixin {
   InactiveCard({super.key});
@@ -16,10 +18,7 @@ class InactiveCard extends StatelessWidget with GetItMixin {
   Widget build(BuildContext context) {
     var inactiveInfo =
         watchOnly((NodeManagerInfo inactiveInfo) => inactiveInfo.inactiveInfo);
-    return Padding(
-      padding: const EdgeInsets.all(16),
-      child: _MyDataTable(inactiveInfo),
-    );
+    return _MyDataTable(inactiveInfo);
   }
 }
 
@@ -97,53 +96,63 @@ class _MyDataTableState extends State<_MyDataTable> {
     allDataRows =
         nodeinfo.map((node) => buildDataRow(node, attributes)).toList();
     return BootstrapContainer(
-      // decoration:
-      //     BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
       fluid: true,
       children: [
-        BootstrapRow(
-          children: [
-            BootstrapCol(
-              // Start all selected nodes button
-              sizes: 'col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2',
-              child: Visibility(
-                maintainSize: true,
-                maintainAnimation: true,
-                maintainState: true,
-                visible: showButton,
-                child: StartSelectedNodes(selectedRows.values.toList()),
-              ),
+        BootstrapCol(
+          // Start all selected nodes button
+          sizes: 'col-12 col-sm-2 col-md-2 col-lg-2 col-xl-2',
+          child: SizedBox(
+            width: 200,
+            height: 50,
+            child: Visibility(
+              maintainSize: true,
+              maintainAnimation: true,
+              maintainState: true,
+              visible: showButton,
+              child: StartSelectedNodes(selectedRows.values.toList()),
             ),
-            BootstrapCol(
-              // White space
-              child: SizedBox(),
-              sizes: 'col-12 col-sm-7 col-md-7 col-lg-7 col-xl-7',
-            ),
-            BootstrapCol(
-              // Search bar
-              sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
-              child: Align(
-                alignment: Alignment.centerRight,
-                child: SizedBox(
-                  width: 200,
-                  child: TextField(
-                    onSubmitted: filterData,
-                    onChanged: (query) {
-                      if (query.isEmpty) {
-                        setState(() => filteredRows = allDataRows);
-                      }
-                    },
-                    decoration: const InputDecoration(
-                      labelText: "Search",
-                      suffixIcon: Icon(Icons.search),
-                    ),
-                  ),
+          ),
+        ),
+        BootstrapCol(
+          // White space
+          child: SizedBox(),
+          sizes: 'col-12 col-sm-7 col-md-7 col-lg-7 col-xl-7',
+        ),
+        BootstrapCol(
+          // Search bar
+          sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
+          child: Align(
+            alignment: Alignment.centerRight,
+            child: SizedBox(
+              width: 200,
+              child: TextField(
+                onSubmitted: filterData,
+                onChanged: (query) {
+                  if (query.isEmpty) {
+                    setState(() => filteredRows = allDataRows);
+                  }
+                },
+                decoration: const InputDecoration(
+                  labelText: "Search",
+                  suffixIcon: Icon(Icons.search),
                 ),
               ),
             ),
-          ],
+          ),
         ),
-        SizedBox(height: 600, child: buildDataTable()),
+        SizedBox(
+          height: 550,
+          child: ConstrainedBox(
+            constraints: BoxConstraints.expand(
+              height: 640,
+            ),
+            child: SingleChildScrollView(
+              scrollDirection: Axis.vertical,
+              child: SingleChildScrollView(
+                  scrollDirection: Axis.horizontal, child: buildDataTable()),
+            ),
+          ),
+        ),
       ],
     );
   }
@@ -159,15 +168,15 @@ class _MyDataTableState extends State<_MyDataTable> {
     {'Save': (node) => ''},
   ];
 
-  DataTable2 buildDataTable() {
-    return DataTable2(
+  DataTable buildDataTable() {
+    return DataTable(
         // decoration:
         //     BoxDecoration(border: Border.all(color: Colors.green, width: 4)),
         showCheckboxColumn: false,
-        smRatio: .5,
-        lmRatio: 2,
+        showBottomBorder: true,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
+        columnSpacing: 10,
         columns: attributes.map((attribute) {
           // Headerless column
           if (attribute.keys.first == '') {
@@ -177,13 +186,11 @@ class _MyDataTableState extends State<_MyDataTable> {
           } else {
             if (attribute.keys.first == 'Txhash') {
               // Make the txhash column longer than the others.
-              return DataColumn2(
-                size: ColumnSize.L,
+              return DataColumn(
                 label: Text(attribute.keys.first),
               );
             }
-            return DataColumn2(
-              size: ColumnSize.S,
+            return DataColumn(
               label: Text(attribute.keys.first),
               onSort: (columnIndex, ascending) =>
                   _onSort(columnIndex, ascending),
@@ -216,7 +223,6 @@ class _MyDataTableState extends State<_MyDataTable> {
         return startCell;
       } else if (attribute.keys.first == 'Save') {
         return DataCell(SaveNodeButton(node, reset: (() {
-          print('in reset');
           updateState();
         })));
       } else if (keysToCheck.contains(attribute.keys.first)) {
@@ -224,8 +230,9 @@ class _MyDataTableState extends State<_MyDataTable> {
           featureValue = 'NOT SET';
         }
 
-        Color textColor =
-            (featureValue == 'NOT SET') ? Colors.red : Colors.green;
+        Color textColor = (featureValue == 'NOT SET' || featureValue == '--')
+            ? Colors.red
+            : Colors.green;
         return getTextDataCell(featureValue, textColor);
       } else {
         return DataCell(
@@ -250,8 +257,6 @@ class _MyDataTableState extends State<_MyDataTable> {
             if (selected == false) {
               rowColors[myKey] = cardColorDark;
               selectedRows[myKey] = node;
-              print('Selectedrows Size: ${selectedRows.length}');
-              print('Node added');
               if (selectedRows.length > 1) {
                 showButton = true;
               }
@@ -259,10 +264,8 @@ class _MyDataTableState extends State<_MyDataTable> {
               rowColors[myKey] = scaffoldBackgroundDark;
               selectedRows.remove(myKey);
               if (selectedRows.length <= 1) {
-                print('removing selected rows button');
                 showButton = false;
               }
-              print('Node removed');
             }
           });
         }
@@ -392,7 +395,6 @@ class StartSelectedNodes extends StatelessWidget {
     return ElevatedButton(
       child: const Text('Start Selected Nodes'),
       onPressed: () {
-        print('button pressed');
         List<Future<http.Response>> nodeFutures = nodes.map((node) {
           return startNode(context, node);
         }).toList();
@@ -422,17 +424,22 @@ class StartSelectedNodes extends StatelessWidget {
 Future<http.Response> startNode(BuildContext context, node) async {
   var txhash = node.txid;
   var outidx = node.vout;
+  final String? token = await storage.read(key: "jwt");
 
   Map<String, dynamic> requestBody = {
     'txhash': txhash,
     'outidx': outidx,
   };
-  var url = Uri.parse('https://managerbackend.runonflux.io/api/startnode');
+  var url = Uri.parse('${AppConfig().apiEndpoint}/startnode');
 
   final response = await http.post(
     url,
     body: jsonEncode(requestBody),
-    headers: {'Content-Type': 'application/json'},
+    headers: {
+      HttpHeaders.contentTypeHeader: "application/json",
+      HttpHeaders.authorizationHeader: "Bearer $token"
+    },
   );
+
   return response;
 }

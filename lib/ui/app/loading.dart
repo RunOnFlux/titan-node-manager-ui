@@ -8,14 +8,10 @@ class NodeManagerLoadingNotifier extends LoadingNotifier {
 
   @override
   Future<void> fetchData() async {
-    print('loading now');
-
     var info = await InfoService().fetchInfo();
     // var nodeinfo = await InfoService().fetchNodeInfo();
     // var inactiveInfo = await InfoService().fetchInactiveInfo();
-    print('done loading');
     if (info != null) {
-      print('info is not null');
       GetIt.I<NodeManagerInfo>().info = info;
       GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
