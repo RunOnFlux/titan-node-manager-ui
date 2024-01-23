@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
+
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/inactiveInfo.dart';
@@ -234,6 +236,15 @@ class _MyDataTableState extends State<_MyDataTable> {
             ? Colors.red
             : Colors.green;
         return getTextDataCell(featureValue, textColor);
+      } else if (attribute.keys.first == 'Txhash') {
+        return DataCell(
+          InkWell(
+              onTap: () async {
+                await Clipboard.setData(ClipboardData(text: node.txid));
+              },
+              child:
+                  Text(node.txid, style: const TextStyle(color: Colors.red))),
+        );
       } else {
         return DataCell(
           Text(attribute.values.first(node),
