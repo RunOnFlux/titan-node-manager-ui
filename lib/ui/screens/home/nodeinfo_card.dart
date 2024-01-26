@@ -36,6 +36,8 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Txhash': 400,
     'Tier': 100,
     'Rank': 100,
+    'Status': 100,
+
     // 'Added Height': 100,
     // 'Confirmed Height': 100,
     '': 100,
@@ -53,6 +55,7 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Txhash': (node) => node.txhash,
     'Tier': (node) => node.tier,
     'Rank': (node) => node.rank.toString(),
+    'Status': (node) => node.status,
     // 'Added Height': (node) => node.added_height.toString(),
     // 'Confirmed Height': (node) => node.confirmed_height.toString(),
     '': (node) => ''

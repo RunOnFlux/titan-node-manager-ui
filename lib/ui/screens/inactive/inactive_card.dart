@@ -162,6 +162,7 @@ class _MyDataTableState extends State<_MyDataTable> {
     {'Provider': (node) => node.provider},
     {'Price': (node) => node.price.toString()},
     {'Txhash': (node) => node.txid},
+    {'Status': (node) => node.status},
     {'Amount': (node) => node.amount.toString()},
     {'Vout': (node) => node.vout.toString()},
     {'': (node) => ''},

@@ -16,6 +16,7 @@ class InactiveInfo {
   int satoshis;
   int height;
   int confirmations;
+  String status;
 
   InactiveInfo({
     required this.address,
@@ -26,6 +27,7 @@ class InactiveInfo {
     required this.satoshis,
     required this.height,
     required this.confirmations,
+    required this.status,
   });
 
   @override

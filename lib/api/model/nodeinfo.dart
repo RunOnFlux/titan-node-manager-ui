@@ -36,6 +36,7 @@ class NodeInfo {
   int? height;
   int? confirmations;
   String scriptPubKey;
+  String status;
 
   NodeInfo({
     // required this.name,
@@ -56,6 +57,7 @@ class NodeInfo {
     required this.activesince,
     required this.lastpaid,
     required this.amount,
+    required this.status,
     // required this.rank,
     // required this.satoshis,
     // required this.height,
