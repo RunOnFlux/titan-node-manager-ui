@@ -18,6 +18,7 @@ NodeInfo _$NodeInfoFromJson(Map<String, dynamic> json) => NodeInfo(
       activesince: json['activesince'] as int?,
       lastpaid: json['lastpaid'] as int?,
       amount: json['amount'] as int?,
+      status: json['status'] as String,
       scriptPubKey: json['scriptPubKey'] as String,
     )
       ..name = json['name'] as String?
@@ -56,4 +57,5 @@ Map<String, dynamic> _$NodeInfoToJson(NodeInfo instance) => <String, dynamic>{
       'height': instance.height,
       'confirmations': instance.confirmations,
       'scriptPubKey': instance.scriptPubKey,
+      'status': instance.status,
     };
