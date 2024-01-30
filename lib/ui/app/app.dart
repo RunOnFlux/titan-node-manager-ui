@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_base/ui/app/loading_notifier.dart';
 import 'package:flutter_base/ui/app/minimal_app.dart';
 import 'package:provider/provider.dart';
+import 'package:testapp/api/model/eventHistory.dart';
 import 'package:testapp/api/model/info.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
 import 'package:testapp/api/model/inactiveInfo.dart';
@@ -88,6 +89,8 @@ class NodeManagerInfo with ChangeNotifier {
   late Info info;
   late List<NodeInfo> nodeinfo;
   late List<InactiveInfo> inactiveInfo;
+  late EventHistory eventHistory;
+
   late int lastRefresh;
 }
 
