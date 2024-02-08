@@ -8,17 +8,17 @@ class NodeManagerLoadingNotifier extends LoadingNotifier {
 
   @override
   Future<void> fetchData() async {
-    var info = await InfoService().fetchInfo();
+    // var info = await InfoService().fetchInfo();
     // var nodeinfo = await InfoService().fetchNodeInfo();
     // var inactiveInfo = await InfoService().fetchInactiveInfo();
-    if (info != null) {
-      GetIt.I<NodeManagerInfo>().info = info;
-      GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
+    // if (info != null) {
+    //   GetIt.I<NodeManagerInfo>().info = info;
+    //   GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
-      // GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo;
-      // GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo;
-      // GetIt.I<NodeManagerInfo>().deepNodes = deepNodes;
-    }
+    //   // GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo;
+    //   // GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo;
+    //   // GetIt.I<NodeManagerInfo>().deepNodes = deepNodes;
+    // }
     loadingComplete = true;
     notifyListeners();
   }

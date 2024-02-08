@@ -49,10 +49,15 @@ class LoginPage extends StatelessWidget with GetItMixin {
       var info = await InfoService().fetchInfo();
       var nodeinfo = await InfoService().fetchNodeInfo();
       var inactiveInfo = await InfoService().fetchInactiveInfo();
+      var eventHistory = await InfoService().fetchEventHistory();
+      print('eventHistory: $eventHistory');
+
       GetIt.I<NodeManagerInfo>().info = info!;
 
       GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
       GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
+      // GetIt.I<NodeManagerInfo>().eventHistory = eventHistory!;
+
       GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
       return res.body;
