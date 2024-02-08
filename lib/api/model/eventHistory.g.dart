@@ -27,6 +27,8 @@ NodeEvent _$NodeEventFromJson(Map<String, dynamic> json) => NodeEvent(
       timestamp: json['timestamp'] as int,
       provider: json['provider'] as String,
       status: json['status'] as String,
+      ip: json['ip'] as String,
+      name: json['name'] as String,
     );
 
 Map<String, dynamic> _$NodeEventToJson(NodeEvent instance) => <String, dynamic>{
@@ -35,4 +37,6 @@ Map<String, dynamic> _$NodeEventToJson(NodeEvent instance) => <String, dynamic>{
       'timestamp': instance.timestamp,
       'provider': instance.provider,
       'status': instance.status,
+      'ip': instance.ip,
+      'name': instance.name,
     };

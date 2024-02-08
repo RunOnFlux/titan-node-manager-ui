@@ -24,6 +24,8 @@ class NodeEvent {
   int timestamp;
   String provider;
   String status;
+  String ip;
+  String name;
 
   NodeEvent({
     required this.txhash,
@@ -31,6 +33,8 @@ class NodeEvent {
     required this.timestamp,
     required this.provider,
     required this.status,
+    required this.ip,
+    required this.name,
   });
 
   factory NodeEvent.fromJson(Map<String, dynamic> json) =>
