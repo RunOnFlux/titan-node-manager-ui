@@ -5,10 +5,10 @@ import 'package:flutter_base/ui/routes/routes.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/screens/home/home_screen.dart';
 import 'package:testapp/ui/screens/login/login_screen.dart';
-import 'package:testapp/ui/screens/login/login_card.dart';
+import 'package:testapp/ui/screens/history/history_screen.dart';
 
 import '../screens/inactive/inactive_screen.dart';
-import '../screens/test/test_screen.dart';
+import '../screens/test/test_screen.dart'; 
 
 class NodeManagerRouter extends AppRouter {
   NodeManagerRouter._p() {
@@ -41,13 +41,13 @@ class NodeManagerRouter extends AppRouter {
         icon: Icons.build_sharp,
         includeInMenu: true,
       ),
-      // NavigationRoute(
-      //   route: '/test',
-      //   body: TestScreen(),
-      //   title: 'test',
-      //   icon: Icons.battery_3_bar_sharp,
-      //   includeInMenu: true,
-      // ),
+      NavigationRoute(
+        route: '/history',
+        body: HistoryScreen(),
+        title: 'history',
+        icon: Icons.history,
+        includeInMenu: true,
+      ),
     ];
     return routes;
   }

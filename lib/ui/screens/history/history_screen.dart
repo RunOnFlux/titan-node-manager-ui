@@ -3,22 +3,22 @@ import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:flutter_base/ui/widgets/simple_screen.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/ui/components/info_card.dart';
-import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
+import 'package:testapp/ui/screens/history/history_card.dart';
 import 'package:testapp/ui/components/last_refresh_card.dart';
 import 'dart:convert';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/app/app.dart';
 
-class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {
-  HomeScreen({
+class HistoryScreen extends SimpleScreen with GetItStatefulWidgetMixin {
+  HistoryScreen({
     Key? key,
   }) : super(key: key, title: 'Home');
   @override
-  State<HomeScreen> createState() => HomeScreenState();
+  State<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class HomeScreenState extends SimpleScreenState<HomeScreen>
+class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
     with GetItStateMixin {
   final isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
   @override
@@ -30,14 +30,14 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
   @override
   Widget buildChild(BuildContext context) {
     if (isTokenValid) {
-      return homePage(context);
+      return historyPage(context);
     } else {
       // context.push('/');
       return redirectPage(context);
     }
   }
 
-  BootstrapContainer homePage(context) {
+  BootstrapContainer historyPage(context) {
     return BootstrapContainer(
       fluid: true,
       children: [
@@ -51,11 +51,7 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
           ],
         ),
         Container(
-          child: SizedBox(
-            width: 4000,
-            height: 600,
-            child: NodeInfoCard(),
-          ),
+          child: HistoryCard(),
         ),
         LastRefresh(),
       ],
@@ -68,11 +64,8 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
       ElevatedButton(
           onPressed: () {
             context.push('/');
-            // Navigator.of(context).pushReplacementNamed(
-            //   '/home',
-            // );
           },
-          child: Text('Press to go to login page'))
+          child: Text('Redirect to Home')),
     ]);
   }
 }

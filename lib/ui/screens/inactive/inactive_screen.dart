@@ -2,10 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:flutter_base/ui/widgets/simple_screen.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
-import 'package:testapp/ui/screens/home/info_card.dart';
+import 'package:testapp/ui/components/info_card.dart';
 
 import 'package:testapp/ui/screens/inactive/inactive_card.dart';
-import 'package:testapp/ui/screens/home/last_refresh_card.dart';
+import 'package:testapp/ui/components/last_refresh_card.dart';
 
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';

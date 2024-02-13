@@ -203,7 +203,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
         HttpHeaders.authorizationHeader: "Bearer $jwt"
       },
     );
-    print('response: ${response.body}');
+
     if (response.body == 'Update successful') {
       node.name = inputs['name'];
       node.provider = inputs['provider'];

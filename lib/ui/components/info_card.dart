@@ -3,7 +3,7 @@ import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/ui/app/app.dart';
 
-import 'info_prop_card.dart';
+import 'generic_card.dart';
 
 class InfoCard extends StatelessWidget with GetItMixin {
   InfoCard({
