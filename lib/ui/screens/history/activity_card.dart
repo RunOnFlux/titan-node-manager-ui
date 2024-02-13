@@ -7,6 +7,7 @@ import 'package:testapp/ui/screens/home/save_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:testapp/api/model/history.dart';
 import 'package:testapp/ui/components/generic_card.dart';
+import 'package:intl/intl.dart';
 
 class NodeActivity extends StatelessWidget with GetItMixin {
   NodeActivity(this.nodeActivity);
@@ -58,7 +59,7 @@ class NodeEventCard extends StatelessWidget{
       rows: [
         DataRow(
           cells: [
-            DataCell(Text(nodeEvent.timestamp.toString())),
+            DataCell(Text(convertTimeStamp(nodeEvent.timestamp))),
             DataCell(Text(nodeEvent.provider)),
             DataCell(Text(nodeEvent.name)),
             DataCell(Text(nodeEvent.ip)),
@@ -66,5 +67,13 @@ class NodeEventCard extends StatelessWidget{
         ),
       ],
     );
+  }
+
+  // convert timestamp to date
+  String convertTimeStamp(int timestamp) {
+    DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+  // Format DateTime
+    String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
+    return formattedDate;
   }
 }

@@ -52,6 +52,7 @@ dependencies:
   get_it_mixin: ^3.1.4+2
   data_table_2: ^2.5.3
   url_launcher: ^6.0.12
+  intl: ^0.18.1
 
 dev_dependencies:
   flutter_test:

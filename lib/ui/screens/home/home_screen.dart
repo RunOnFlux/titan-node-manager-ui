@@ -32,8 +32,9 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
     if (isTokenValid) {
       return homePage(context);
     } else {
-      // context.push('/');
-      return redirectPage(context);
+      // Directly navigate to the login page if the token is not valid.
+      Future.microtask(() => context.go('/')); // Use context.push('/login') if you want to allow going back.
+      return Container(); // Return an empty container to avoid any temporary rendering issues.
     }
   }
 

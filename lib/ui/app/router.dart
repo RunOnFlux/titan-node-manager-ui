@@ -44,7 +44,7 @@ class NodeManagerRouter extends AppRouter {
       NavigationRoute(
         route: '/history',
         body: HistoryScreen(),
-        title: 'history',
+        title: 'History',
         icon: Icons.history,
         includeInMenu: true,
       ),

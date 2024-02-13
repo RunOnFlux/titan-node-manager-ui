@@ -32,8 +32,9 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
     if (isTokenValid) {
       return historyPage(context);
     } else {
-      // context.push('/');
-      return redirectPage(context);
+
+      Future.microtask(() => context.go('/'));
+      return Container(); // Return an empty container to avoid any temporary rendering issues.
     }
   }
 
@@ -51,8 +52,7 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
           ],
         ),
         Container(
-          child: HistoryCard(),
-        ),
+          child: HistoryCard()),
         LastRefresh(),
       ],
     );

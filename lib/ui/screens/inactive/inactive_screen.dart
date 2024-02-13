@@ -32,8 +32,9 @@ class InactiveScreenState extends SimpleScreenState<InactiveScreen>
     if (isTokenValid) {
       return inactivePage(context);
     } else {
-      // context.push('/');
-      return redirectPage(context);
+
+      Future.microtask(() => context.go('/')); 
+      return Container(); // Return an empty container to avoid any temporary rendering issues.
     }
   }
 
