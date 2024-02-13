@@ -11,12 +11,7 @@ class GenericCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Tooltip(
-      decoration: BoxDecoration(color: Color.fromARGB(255, 84, 101, 162)),
-      message: (hoverContent(propertyName)),
-      textStyle: TextStyle(color: Color.fromARGB(255, 16, 16, 130)),
-      textAlign: TextAlign.left,
-      child: Card(
+    return Card(
         child: ListTile(
           title: Text(
             propertyName,
@@ -31,8 +26,7 @@ class GenericCard extends StatelessWidget {
           ),
           subtitle: Text(propertyValue.toString()),
         ),
-      ),
-    );
+      );
   }
 
   String hoverContent(String propertyName) {

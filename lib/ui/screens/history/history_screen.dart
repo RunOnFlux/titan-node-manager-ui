@@ -9,6 +9,7 @@ import 'dart:convert';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/app/app.dart';
+import 'package:testapp/ui/screens/history/hist_info_card.dart';
 
 class HistoryScreen extends SimpleScreen with GetItStatefulWidgetMixin {
   HistoryScreen({
@@ -47,7 +48,7 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
             BootstrapCol(
               fit: FlexFit.tight,
               sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
-              child: InfoCard(),
+              child: HistInfoCard(),
             ),
           ],
         ),

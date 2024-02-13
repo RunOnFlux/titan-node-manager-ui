@@ -51,7 +51,7 @@ class NodeEventCard extends StatelessWidget{
   Widget build(BuildContext context) {
     return DataTable(
       columns: [
-        DataColumn(label: Text('Timestamp')),
+        DataColumn(label: Text('Time')),
         DataColumn(label: Text('Provider')),
         DataColumn(label: Text('Name')),
         DataColumn(label: Text('IP')),
@@ -59,21 +59,47 @@ class NodeEventCard extends StatelessWidget{
       rows: [
         DataRow(
           cells: [
-            DataCell(Text(convertTimeStamp(nodeEvent.timestamp))),
+            timeDataCell(nodeEvent.timestamp),
             DataCell(Text(nodeEvent.provider)),
             DataCell(Text(nodeEvent.name)),
-            DataCell(Text(nodeEvent.ip)),
+            ipDataCell(nodeEvent.ip),
           ],
         ),
       ],
     );
   }
 
-  // convert timestamp to date
-  String convertTimeStamp(int timestamp) {
+  DataCell timeDataCell(int timestamp) {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-  // Format DateTime
+    
+    // Format DateTime
     String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
-    return formattedDate;
+
+    bool isWithin24Hours = DateTime.now().difference(date).inHours < 24;
+    Color textColor = isWithin24Hours ? Colors.red : Colors.grey;
+    return
+        DataCell(Text(formattedDate, style: TextStyle(color: textColor)));
   }
+
+DataCell ipDataCell(String ip) {
+  return DataCell(
+    InkWell(
+      onTap: () async {
+        // Splitting the IP address and port, and handling the case where no port is specified
+        var parts = ip.split(':');
+        String ipPart = parts[0];
+        String port = parts.length > 1 ? parts[1] : '16126'; // Defaulting to port 16126 if not specified
+        String url = 'http://$ipPart:$port/';
+
+        if (await canLaunchUrl(Uri.parse(url))) {
+          await launchUrl(Uri.parse(url));
+        } else {
+          throw 'Could not launch $url';
+        }
+      },
+      child: Text(ip, style: TextStyle(color: Colors.blue)), // Styling the text to look clickable
+    ),
+  );
+}
+
 }

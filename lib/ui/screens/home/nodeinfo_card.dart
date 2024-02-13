@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
@@ -255,6 +256,23 @@ class _MyDataTableState extends State<_MyDataTable> {
           } else {
             throw 'Could not launch $url';
           }
+        },
+        child: text,
+      );
+    }
+
+    if (e.key == 'Txhash') {
+      text = InkWell(
+        onTap: () async {
+          await Clipboard.setData(ClipboardData(text: node.txhash));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Copied txhashto clipboard'),
+              duration: Duration(seconds: 1),
+            ),
+          );
+          
+          // copied successfully
         },
         child: text,
       );
