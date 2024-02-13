@@ -10,6 +10,7 @@ import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/ui/screens/history/hist_info_card.dart';
+import 'package:testapp/ui/screens/history/hist_graph_card.dart';
 
 class HistoryScreen extends SimpleScreen with GetItStatefulWidgetMixin {
   HistoryScreen({
@@ -52,21 +53,25 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
             ),
           ],
         ),
-        Container(
-          child: HistoryCard()),
-        LastRefresh(),
+        BootstrapRow(children: [
+          BootstrapCol(
+            fit: FlexFit.tight,
+            // chage the size to take up HALF the screen
+            sizes: 'col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
+            child: HistoryCard(),
+          ),
+          BootstrapCol(
+            fit: FlexFit.tight,
+            // chage the size to take up HALF the screen
+            sizes: 'col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: HistGraph(),
+            ),
+          ),
+        ],),
+      BootstrapCol(child: LastRefresh()),
       ],
     );
-  }
-
-  BootstrapContainer redirectPage(BuildContext context) {
-    // this is the page that will be shown if the user is not logged in
-    return BootstrapContainer(children: [
-      ElevatedButton(
-          onPressed: () {
-            context.push('/');
-          },
-          child: Text('Redirect to Home')),
-    ]);
   }
 }

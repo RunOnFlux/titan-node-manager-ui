@@ -247,6 +247,7 @@ class _MyDataTableState extends State<_MyDataTable> {
                     content: Text('Copied txash to clipboard'),
                     // make this only last 1 second
                     duration: Duration(seconds: 1),
+                    
 
                   ),
                 );

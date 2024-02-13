@@ -14,10 +14,10 @@ class HistInfoCard extends StatelessWidget with GetItMixin {
     var history = watchOnly((NodeManagerInfo nodeManagerInfo) => nodeManagerInfo.history);
 
     var infoMap = {
-      '24-Hour Cost': '0',
-      'Weekly Cost': '0',
+      'Daily Cost': 'Not implemented',
+      'Weekly Cost': 'Not implemented',
       'Monthly Cost': '0',
-      'Value 4': '',
+      'Payouts Received Today': 'Not implemented',
       'Value 5': '',
       'Value 6': '',
       'Value 7': '',

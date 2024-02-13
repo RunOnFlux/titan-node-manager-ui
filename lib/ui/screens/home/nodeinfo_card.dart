@@ -267,7 +267,7 @@ class _MyDataTableState extends State<_MyDataTable> {
           await Clipboard.setData(ClipboardData(text: node.txhash));
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
-              content: Text('Copied txhashto clipboard'),
+              content: Text('Copied txhash to clipboard'),
               duration: Duration(seconds: 1),
             ),
           );
