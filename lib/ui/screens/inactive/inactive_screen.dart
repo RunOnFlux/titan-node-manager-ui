@@ -53,8 +53,8 @@ class InactiveScreenState extends SimpleScreenState<InactiveScreen>
       ),
       Container(
         child: SizedBox(
-          width: 4000,
-          height: 600,
+            width: MediaQuery.of(context).size.width * 0.82,
+            height: MediaQuery.of(context).size.height * 0.68,
           child: InactiveCard(),
         ),
       ),

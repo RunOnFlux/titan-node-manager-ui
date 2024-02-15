@@ -33,7 +33,7 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
       return homePage(context);
     } else {
       // Directly navigate to the login page if the token is not valid.
-      Future.microtask(() => context.go('/')); // Use context.push('/login') if you want to allow going back.
+      Future.microtask(() => context.go('/')); 
       return Container(); // Return an empty container to avoid any temporary rendering issues.
     }
   }
@@ -53,27 +53,20 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
         ),
         Container(
           child: SizedBox(
-            width: 4000,
-            height: 600,
+            width: MediaQuery.of(context).size.width * 0.82,
+            height: MediaQuery.of(context).size.height * 0.68,
             child: NodeInfoCard(),
           ),
         ),
-        LastRefresh(),
+        BootstrapRow(
+          children: [
+            BootstrapCol(
+              sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
+              child: LastRefresh(),
+            ),
+          ],
+        ),
       ],
     );
-  }
-
-  BootstrapContainer redirectPage(BuildContext context) {
-    // this is the page that will be shown if the user is not logged in
-    return BootstrapContainer(children: [
-      ElevatedButton(
-          onPressed: () {
-            context.push('/');
-            // Navigator.of(context).pushReplacementNamed(
-            //   '/home',
-            // );
-          },
-          child: Text('Press to go to login page'))
-    ]);
   }
 }

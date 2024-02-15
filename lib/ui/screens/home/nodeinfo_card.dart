@@ -33,8 +33,8 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Name': 100,
     'Provider': 100,
     'Price': 100,
-    'IP Address': 100,
-    'Txhash': 400,
+    'IP Address': 110,
+    'Txhash': 300,
     'Tier': 100,
     'Rank': 100,
     'Status': 100,
@@ -131,11 +131,11 @@ class _MyDataTableState extends State<_MyDataTable> {
         ),
         // DATATABLE
         SizedBox(
-          height: 550,
+          height: MediaQuery.of(context).size.height * 0.60,
           child: ConstrainedBox(
             constraints: BoxConstraints.expand(
               width: MediaQuery.of(context).size.width,
-              height: 640,
+              height: MediaQuery.of(context).size.height * 0.60,
             ),
             child: SingleChildScrollView(
                 scrollDirection: Axis.vertical, child: _buildDataTable()),

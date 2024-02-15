@@ -142,16 +142,18 @@ class _MyDataTableState extends State<_MyDataTable> {
             ),
           ),
         ),
+        // DATATABLE
         SizedBox(
-          height: 550,
+          height: MediaQuery.of(context).size.height * 0.6,
           child: ConstrainedBox(
             constraints: BoxConstraints.expand(
-              height: 640,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.60,
             ),
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal, child: buildDataTable()),
+                  scrollDirection: Axis.horizontal, child: _buildDataTable()),
             ),
           ),
         ),
@@ -166,12 +168,12 @@ class _MyDataTableState extends State<_MyDataTable> {
     {'Txhash': (node) => node.txid},
     {'Status': (node) => node.status},
     {'Amount': (node) => node.amount.toString()},
-    {'Vout': (node) => node.vout.toString()},
+    // {'Vout': (node) => node.vout.toString()},
     {'': (node) => ''},
     {'Save': (node) => ''},
   ];
 
-  DataTable buildDataTable() {
+  DataTable _buildDataTable() {
     return DataTable(
         // decoration:
         //     BoxDecoration(border: Border.all(color: Colors.green, width: 4)),
@@ -179,11 +181,13 @@ class _MyDataTableState extends State<_MyDataTable> {
         showBottomBorder: true,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
-        columnSpacing: 10,
+        columnSpacing: 0,
         columns: attributes.map((attribute) {
           // Headerless column
           if (attribute.keys.first == '') {
+            // return DataColumn2(size: ColumnSize.M, label: Text(''));
             return DataColumn2(size: ColumnSize.M, label: Text(''));
+
           } else if (attribute.keys.first == 'Save') {
             return DataColumn2(size: ColumnSize.M, label: Text(''));
           } else {
