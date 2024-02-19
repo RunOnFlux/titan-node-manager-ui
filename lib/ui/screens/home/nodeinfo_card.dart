@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
@@ -33,8 +34,8 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Name': 100,
     'Provider': 100,
     'Price': 100,
-    'IP Address': 100,
-    'Txhash': 400,
+    'IP Address': 110,
+    'Txhash': 300,
     'Tier': 100,
     'Rank': 100,
     'Status': 100,
@@ -131,11 +132,11 @@ class _MyDataTableState extends State<_MyDataTable> {
         ),
         // DATATABLE
         SizedBox(
-          height: 550,
+          height: MediaQuery.of(context).size.height * 0.60,
           child: ConstrainedBox(
             constraints: BoxConstraints.expand(
               width: MediaQuery.of(context).size.width,
-              height: 640,
+              height: MediaQuery.of(context).size.height * 0.60,
             ),
             child: SingleChildScrollView(
                 scrollDirection: Axis.vertical, child: _buildDataTable()),
@@ -265,6 +266,13 @@ class _MyDataTableState extends State<_MyDataTable> {
       text = InkWell(
         onTap: () async {
           await Clipboard.setData(ClipboardData(text: node.txhash));
+          ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(
+              content: Text('Copied txhash to clipboard'),
+              duration: Duration(seconds: 1),
+            ),
+          );
+          
           // copied successfully
         },
         child: text,

@@ -3,22 +3,24 @@ import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:flutter_base/ui/widgets/simple_screen.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/ui/components/info_card.dart';
-import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
+import 'package:testapp/ui/screens/history/history_card.dart';
 import 'package:testapp/ui/components/last_refresh_card.dart';
 import 'dart:convert';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/app/app.dart';
+import 'package:testapp/ui/screens/history/hist_info_card.dart';
+import 'package:testapp/ui/screens/history/hist_graph_card.dart';
 
-class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {
-  HomeScreen({
+class HistoryScreen extends SimpleScreen with GetItStatefulWidgetMixin {
+  HistoryScreen({
     Key? key,
   }) : super(key: key, title: 'Home');
   @override
-  State<HomeScreen> createState() => HomeScreenState();
+  State<HistoryScreen> createState() => _HistoryScreenState();
 }
 
-class HomeScreenState extends SimpleScreenState<HomeScreen>
+class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
     with GetItStateMixin {
   final isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
   @override
@@ -30,15 +32,15 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
   @override
   Widget buildChild(BuildContext context) {
     if (isTokenValid) {
-      return homePage(context);
+      return historyPage(context);
     } else {
-      // Directly navigate to the login page if the token is not valid.
-      Future.microtask(() => context.go('/')); 
+
+      Future.microtask(() => context.go('/'));
       return Container(); // Return an empty container to avoid any temporary rendering issues.
     }
   }
 
-  BootstrapContainer homePage(context) {
+  BootstrapContainer historyPage(context) {
     return BootstrapContainer(
       fluid: true,
       children: [
@@ -47,25 +49,28 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
             BootstrapCol(
               fit: FlexFit.tight,
               sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
-              child: InfoCard(),
+              child: HistInfoCard(),
             ),
           ],
         ),
-        Container(
-          child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.82,
-            height: MediaQuery.of(context).size.height * 0.68,
-            child: NodeInfoCard(),
+        BootstrapRow(children: [
+          BootstrapCol(
+            fit: FlexFit.tight,
+            // chage the size to take up HALF the screen
+            sizes: 'col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
+            child: HistoryCard(),
           ),
-        ),
-        BootstrapRow(
-          children: [
-            BootstrapCol(
-              sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
-              child: LastRefresh(),
+          BootstrapCol(
+            fit: FlexFit.tight,
+            // chage the size to take up HALF the screen
+            sizes: 'col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
+            child: Padding(
+              padding: const EdgeInsets.all(16.0),
+              child: HistGraph(),
             ),
-          ],
-        ),
+          ),
+        ],),
+      BootstrapCol(child: LastRefresh()),
       ],
     );
   }

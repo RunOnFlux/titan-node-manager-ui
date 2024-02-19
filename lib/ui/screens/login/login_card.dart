@@ -10,7 +10,7 @@ import 'package:http/http.dart' as http;
 import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/ui/screens/home/home_screen.dart';
-import 'package:testapp/ui/screens/home/info_card.dart';
+import 'package:testapp/ui/components/info_card.dart';
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/screens/inactive/inactive_card.dart';
 import 'package:go_router/go_router.dart';
@@ -49,15 +49,13 @@ class LoginPage extends StatelessWidget with GetItMixin {
       var info = await InfoService().fetchInfo();
       var nodeinfo = await InfoService().fetchNodeInfo();
       var inactiveInfo = await InfoService().fetchInactiveInfo();
-      var eventHistory = await InfoService().fetchEventHistory();
-      print('eventHistory: $eventHistory');
+      var history = await InfoService().fetchHistory();
+
 
       GetIt.I<NodeManagerInfo>().info = info!;
-
       GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
       GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
-      // GetIt.I<NodeManagerInfo>().eventHistory = eventHistory!;
-
+      GetIt.I<NodeManagerInfo>().history = history!;
       GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
       return res.body;
@@ -114,6 +112,7 @@ class LoginPage extends StatelessWidget with GetItMixin {
                     },
                     child: Text("Log In")),
               ),
+              // Sign up button
               // ElevatedButton(
               //     onPressed: () async {
               //       var username = _usernameController.text;

@@ -2,7 +2,6 @@ import 'dart:convert';
 import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
-
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/inactiveInfo.dart';
@@ -13,6 +12,7 @@ import 'package:testapp/ui/screens/home/save_card.dart';
 import 'package:data_table_2/data_table_2.dart';
 import 'package:testapp/utils/config.dart';
 import 'package:testapp/ui/screens/login/login_card.dart';
+
 
 class InactiveCard extends StatelessWidget with GetItMixin {
   InactiveCard({super.key});
@@ -142,16 +142,18 @@ class _MyDataTableState extends State<_MyDataTable> {
             ),
           ),
         ),
+        // DATATABLE
         SizedBox(
-          height: 550,
+          height: MediaQuery.of(context).size.height * 0.6,
           child: ConstrainedBox(
             constraints: BoxConstraints.expand(
-              height: 640,
+              width: MediaQuery.of(context).size.width,
+              height: MediaQuery.of(context).size.height * 0.60,
             ),
             child: SingleChildScrollView(
               scrollDirection: Axis.vertical,
               child: SingleChildScrollView(
-                  scrollDirection: Axis.horizontal, child: buildDataTable()),
+                  scrollDirection: Axis.horizontal, child: _buildDataTable()),
             ),
           ),
         ),
@@ -166,12 +168,12 @@ class _MyDataTableState extends State<_MyDataTable> {
     {'Txhash': (node) => node.txid},
     {'Status': (node) => node.status},
     {'Amount': (node) => node.amount.toString()},
-    {'Vout': (node) => node.vout.toString()},
+    // {'Vout': (node) => node.vout.toString()},
     {'': (node) => ''},
     {'Save': (node) => ''},
   ];
 
-  DataTable buildDataTable() {
+  DataTable _buildDataTable() {
     return DataTable(
         // decoration:
         //     BoxDecoration(border: Border.all(color: Colors.green, width: 4)),
@@ -179,11 +181,13 @@ class _MyDataTableState extends State<_MyDataTable> {
         showBottomBorder: true,
         sortColumnIndex: _sortColumnIndex,
         sortAscending: _sortAscending,
-        columnSpacing: 10,
+        columnSpacing: 0,
         columns: attributes.map((attribute) {
           // Headerless column
           if (attribute.keys.first == '') {
+            // return DataColumn2(size: ColumnSize.M, label: Text(''));
             return DataColumn2(size: ColumnSize.M, label: Text(''));
+
           } else if (attribute.keys.first == 'Save') {
             return DataColumn2(size: ColumnSize.M, label: Text(''));
           } else {
@@ -242,6 +246,16 @@ class _MyDataTableState extends State<_MyDataTable> {
           InkWell(
               onTap: () async {
                 await Clipboard.setData(ClipboardData(text: node.txid));
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('Copied txash to clipboard'),
+                    // make this only last 1 second
+                    duration: Duration(seconds: 1),
+                    
+
+                  ),
+                );
+
               },
               child:
                   Text(node.txid, style: const TextStyle(color: Colors.red))),

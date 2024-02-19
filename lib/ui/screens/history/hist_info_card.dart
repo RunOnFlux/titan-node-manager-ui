@@ -2,28 +2,31 @@ import 'package:flutter/material.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/ui/app/app.dart';
+import 'package:testapp/ui/components/generic_card.dart';
 
-import 'info_prop_card.dart';
-
-class InfoCard extends StatelessWidget with GetItMixin {
-  InfoCard({
+class HistInfoCard extends StatelessWidget with GetItMixin {
+  HistInfoCard({
     super.key,
   });
 
   @override
   Widget build(BuildContext context) {
-    var info = watchOnly((NodeManagerInfo info) => info.info);
+    var history = watchOnly((NodeManagerInfo nodeManagerInfo) => nodeManagerInfo.history);
 
     var infoMap = {
-      'Collateralized Total': info.runningFlux,
-      'Inactive Flux': info.inactiveFlux,
-      'Active Nodes': info.active,
-      'Inactive Nodes': info.inactive,
-      'Cumulus': info.cumulus,
-      'Nimbus': info.nimbus,
-      'Stratus': info.stratus,
-      'Next Payment (min)': info.nextPaymentWindow,
+      'Daily Cost': 'Not implemented',
+      'Weekly Cost': 'Not implemented',
+      'Monthly Cost': '0',
+      'Payouts Received Today': 'Not implemented',
+      'Value 5': '',
+      'Value 6': '',
+      'Value 7': '',
+      'Value 8': '',
     };
+    
+    if (history.monthlyCost[0] != null) {
+      infoMap['Monthly Cost'] = history.monthlyCost[0]!.cost.toString();
+    }
 
     return BootstrapContainer(
       fluid: true,

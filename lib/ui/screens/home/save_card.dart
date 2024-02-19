@@ -44,6 +44,12 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
   }
 
   List<DropdownMenuItem<String>> processProviders(List<String> providers) {
+    // Add 'ADD NEW' to the front of the list of providers IF it's not already there
+    if (!providers.contains('ADD NEW')) {
+      providers.insert(0, 'ADD NEW');
+    }
+    // erase any potential duplicates
+    providers = providers.toSet().toList();
     return providers.map(
       (provider) {
         return DropdownMenuItem(value: provider, child: Text(provider));
@@ -55,6 +61,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
   Widget build(BuildContext context) {
     var strProviders = watchOnly((NodeManagerInfo info) => info.info.providers);
     providers = processProviders(strProviders);
+
 
     initDefaultVals();
     return IconButton(
@@ -91,7 +98,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                                             builder: (BuildContext context) {
                                               return AlertDialog(
                                                 content: Text(
-                                                    'Add new provider: ${provider.toUpperCase()}'),
+                                                    'Add new provider: ${provider}'),
                                                 actions: [
                                                   TextButton(
                                                       onPressed: () {
@@ -148,7 +155,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
                 ElevatedButton(
                   child: const Text('Submit'),
                   onPressed: () {
-                    if (providerController.text == 'Add new') {
+                    if (providerController.text == 'ADD NEW') {
                       providerController.text = '--';
                     }
 
@@ -203,7 +210,7 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
         HttpHeaders.authorizationHeader: "Bearer $jwt"
       },
     );
-    print('response: ${response.body}');
+
     if (response.body == 'Update successful') {
       node.name = inputs['name'];
       node.provider = inputs['provider'];
@@ -217,14 +224,35 @@ class SaveNodeButton extends StatelessWidget with GetItMixin {
   }
 
   Future<String> addProvider(String provider) async {
+      String? jwt = await storage.read(key: "jwt");
+      jwt ??= '';
+
+
+
+
     Map<String, String> requestBody = {
       'provider': provider,
     };
     var url = Uri.parse('${AppConfig().apiEndpoint}/provider');
-    print('Provider added: ${provider}');
-    final response = await http.post(url,
-        body: jsonEncode(requestBody),
-        headers: {'Content-Type': 'application/json'});
+
+
+    final response = await http.post(
+      url,
+      body: jsonEncode(requestBody),
+      headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: "Bearer $jwt"
+      },
+    );
+
+    print('Response: ${response.body}');
+
+    if (response.body == 'Provider added') {
+      if (!providers.contains(DropdownMenuItem(value: provider, child: Text(provider)))) {
+      providers.add(DropdownMenuItem(value: provider, child: Text(provider)));
+      reset();
+      }
+    }
     if (response.body == '') {
       providers.add(DropdownMenuItem(value: provider, child: Text(provider)));
       reset();
