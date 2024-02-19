@@ -6,6 +6,7 @@ import 'package:testapp/api/model/nodeinfo.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/ui/screens/home/save_card.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:flutter/services.dart';
 
 class NodeInfoCard extends StatelessWidget with GetItMixin {
   NodeInfoCard({super.key});

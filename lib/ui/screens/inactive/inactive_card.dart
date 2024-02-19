@@ -255,6 +255,7 @@ class _MyDataTableState extends State<_MyDataTable> {
 
                   ),
                 );
+
               },
               child:
                   Text(node.txid, style: const TextStyle(color: Colors.red))),
