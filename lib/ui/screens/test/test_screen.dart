@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:flutter_base/ui/widgets/simple_screen.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
-import 'package:testapp/ui/screens/home/resizable_table.dart';
 
 class TestScreen extends SimpleScreen with GetItStatefulWidgetMixin {
   TestScreen({Key? key}) : super(key: key, title: 'Home');
@@ -25,11 +24,11 @@ class TestScreenState extends SimpleScreenState<TestScreen>
       fluid: false,
       decoration:
           BoxDecoration(border: Border.all(color: Colors.white, width: 4)),
-      children: [
+      children: const [
         SizedBox(
           width: 4000,
           height: 1000,
-          child: TableColumnResize(),
+          child: Text('Test'),
         )
       ],
     );

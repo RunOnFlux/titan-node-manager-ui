@@ -16,6 +16,8 @@ InactiveInfo _$InactiveInfoFromJson(Map<String, dynamic> json) => InactiveInfo(
       height: json['height'] as int,
       confirmations: json['confirmations'] as int,
       status: json['status'] as String,
+      tier: json['tier'] as String,
+      ip: json['ip'] as String,
     )
       ..name = json['name'] as String?
       ..provider = json['provider'] as String?
@@ -35,4 +37,6 @@ Map<String, dynamic> _$InactiveInfoToJson(InactiveInfo instance) =>
       'height': instance.height,
       'confirmations': instance.confirmations,
       'status': instance.status,
+      'tier': instance.tier,
+      'ip': instance.ip,
     };
