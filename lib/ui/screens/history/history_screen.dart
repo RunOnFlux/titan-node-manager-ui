@@ -66,7 +66,7 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
             sizes: 'col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
             child: Padding(
               padding: const EdgeInsets.all(16.0),
-              child: HistGraph(),
+              child: HistGraphCard(),
             ),
           ),
         ],),

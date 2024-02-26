@@ -17,6 +17,8 @@ class InactiveInfo {
   int height;
   int confirmations;
   String status;
+  String tier;
+  String ip;
 
   InactiveInfo({
     required this.address,
@@ -28,6 +30,8 @@ class InactiveInfo {
     required this.height,
     required this.confirmations,
     required this.status,
+    required this.tier,
+    required this.ip,
   });
 
   @override
