@@ -21,7 +21,7 @@ class NodeActivity extends StatelessWidget with GetItMixin {
   }
 }
 
-class NodeActivityCard  extends StatelessWidget{
+class NodeActivityCard extends StatelessWidget {
   final List<NodeEvent> nodeActivity;
   NodeActivityCard(this.nodeActivity);
 
@@ -30,7 +30,9 @@ class NodeActivityCard  extends StatelessWidget{
 
     // reverse list so newest events are at the top
     for (var i = nodeActivity.length - 1; i >= 0; i--) {
-      rows.add(nodeEventRow(nodeActivity[i]),);
+      rows.add(
+        nodeEventRow(nodeActivity[i]),
+      );
     }
     return rows;
   }
@@ -49,20 +51,28 @@ class NodeActivityCard  extends StatelessWidget{
 
   @override
   Widget build(BuildContext context) {
-    return _buildDataTable();
+    return SizedBox(
+      height: MediaQuery.of(context).size.height * 0.60,
+      child: ConstrainedBox(
+        constraints: BoxConstraints.expand(
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.60,
+        ),
+        child: SingleChildScrollView(
+            scrollDirection: Axis.vertical, child: _buildDataTable()),
+      ),
+    );
   }
-
 
   DataCell timeDataCell(int timestamp) {
     DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    
+
     // Format DateTime
     String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
 
     bool isWithin24Hours = DateTime.now().difference(date).inHours < 24;
     Color textColor = isWithin24Hours ? Colors.red : Colors.grey;
-    return
-        DataCell(Text(formattedDate, style: TextStyle(color: textColor)));
+    return DataCell(Text(formattedDate, style: TextStyle(color: textColor)));
   }
 
   DataCell ipDataCell(String ip) {
@@ -72,7 +82,9 @@ class NodeActivityCard  extends StatelessWidget{
           // Splitting the IP address and port, and handling the case where no port is specified
           var parts = ip.split(':');
           String ipPart = parts[0];
-          String port = parts.length > 1 ? parts[1] : '16126'; // Defaulting to port 16126 if not specified
+          String port = parts.length > 1
+              ? parts[1]
+              : '16126'; // Defaulting to port 16126 if not specified
           String url = 'http://$ipPart:$port/';
 
           if (await canLaunchUrl(Uri.parse(url))) {
@@ -81,11 +93,13 @@ class NodeActivityCard  extends StatelessWidget{
             throw 'Could not launch $url';
           }
         },
-        child: Text(ip, style: TextStyle(color: Colors.blue)), // Styling the text to look clickable
+        child: Text(ip,
+            style: TextStyle(
+                color: Colors.blue)), // Styling the text to look clickable
       ),
     );
-
   }
+
   DataRow nodeEventRow(NodeEvent nodeEvent) {
     return DataRow(
       cells: [
@@ -97,104 +111,3 @@ class NodeActivityCard  extends StatelessWidget{
     );
   }
 }
-
-
-
-
-
-
-
-// class NodeActivity extends StatelessWidget with GetItMixin {
-//   NodeActivity(this.nodeActivity);
-
-//   final List<NodeEvent> nodeActivity;
-//   @override
-//   Widget build(BuildContext context) {
-//     final History history =
-//         watchOnly((NodeManagerInfo nodeManagerInfo) => nodeManagerInfo.history);
-//     return NodeActivityCard(nodeActivity);
-//   }
-// }
-
-// class NodeActivityCard  extends StatelessWidget{
-//   final List<NodeEvent> nodeActivity;
-//   NodeActivityCard(this.nodeActivity);
-
-//   List<Container> _buildRows() {
-//     List<Container> rows = [];
-//     for (var i = 0; i < nodeActivity.length; i++) {
-//       rows.add(Container(
-//         child: NodeEventCard(nodeActivity[i]),
-//       ));
-//     }
-//     return rows;
-//   }
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return Column(
-//       children: _buildRows(),
-//     );
-//   }
-// }
-
-// class NodeEventCard extends StatelessWidget{
-//   final NodeEvent nodeEvent;
-//   const NodeEventCard(this.nodeEvent, {super.key});
-
-//   @override
-//   Widget build(BuildContext context) {
-//     return DataTable(
-//       columns: [
-//         DataColumn(label: Text('Time')),
-//         DataColumn(label: Text('Provider')),
-//         DataColumn(label: Text('Name')),
-//         DataColumn(label: Text('IP')),
-//       ],
-//       rows: [
-//         DataRow(
-//           cells: [
-//             timeDataCell(nodeEvent.timestamp),
-//             DataCell(Text(nodeEvent.provider)),
-//             DataCell(Text(nodeEvent.name)),
-//             ipDataCell(nodeEvent.ip),
-//           ],
-//         ),
-//       ],
-//     );
-//   }
-
-//   DataCell timeDataCell(int timestamp) {
-//     DateTime date = DateTime.fromMillisecondsSinceEpoch(timestamp);
-    
-//     // Format DateTime
-//     String formattedDate = DateFormat('yyyy-MM-dd HH:mm:ss').format(date);
-
-//     bool isWithin24Hours = DateTime.now().difference(date).inHours < 24;
-//     Color textColor = isWithin24Hours ? Colors.red : Colors.grey;
-//     return
-//         DataCell(Text(formattedDate, style: TextStyle(color: textColor)));
-//   }
-
-// DataCell ipDataCell(String ip) {
-//   return DataCell(
-//     InkWell(
-//       onTap: () async {
-//         // Splitting the IP address and port, and handling the case where no port is specified
-//         var parts = ip.split(':');
-//         String ipPart = parts[0];
-//         String port = parts.length > 1 ? parts[1] : '16126'; // Defaulting to port 16126 if not specified
-//         String url = 'http://$ipPart:$port/';
-
-//         if (await canLaunchUrl(Uri.parse(url))) {
-//           await launchUrl(Uri.parse(url));
-//         } else {
-//           throw 'Could not launch $url';
-//         }
-//       },
-//       child: Text(ip, style: TextStyle(color: Colors.blue)), // Styling the text to look clickable
-//     ),
-//   );
-// }
-
-// }

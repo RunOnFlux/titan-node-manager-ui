@@ -11,7 +11,8 @@ class HistInfoCard extends StatelessWidget with GetItMixin {
 
   @override
   Widget build(BuildContext context) {
-    var history = watchOnly((NodeManagerInfo nodeManagerInfo) => nodeManagerInfo.history);
+    var history =
+        watchOnly((NodeManagerInfo nodeManagerInfo) => nodeManagerInfo.history);
 
     var infoMap = {
       'Daily Cost': 'Not implemented',
@@ -23,7 +24,7 @@ class HistInfoCard extends StatelessWidget with GetItMixin {
       'Value 7': '',
       'Value 8': '',
     };
-    
+
     if (history.monthlyCost[0] != null) {
       infoMap['Monthly Cost'] = history.monthlyCost[0]!.cost.toString();
     }
