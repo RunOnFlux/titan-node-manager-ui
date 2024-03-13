@@ -6,12 +6,17 @@ part 'history.g.dart';
 class History {
   List<MonthlyCost?> monthlyCost;
   List<NodeEvent?> nodeActivity;
+
+  // {mm/dd/yyyy: [earnings, timestamp]}
+  Map<String, List<double>?> dailyEarnings;
+
   String? _id;
 
   History({
 
     required this.monthlyCost,
     required this.nodeActivity,
+    required this.dailyEarnings,
   });
 
 

@@ -15,7 +15,7 @@ class HistInfoCard extends StatelessWidget with GetItMixin {
         watchOnly((NodeManagerInfo nodeManagerInfo) => nodeManagerInfo.history);
 
     var infoMap = {
-      'Daily Cost': 'Not implemented',
+      'Daily Earn': '0',
       'Weekly Cost': 'Not implemented',
       'Monthly Cost': '0',
       'Payouts Received Today': 'Not implemented',
@@ -26,8 +26,20 @@ class HistInfoCard extends StatelessWidget with GetItMixin {
     };
 
     if (history.monthlyCost[0] != null) {
-      infoMap['Monthly Cost'] = history.monthlyCost[0]!.cost.toString();
+      infoMap['Monthly Cost'] = history.monthlyCost.last!.cost.toString();
     }
+    
+    if (history.dailyEarnings.isNotEmpty) {
+      // round this value to the nearest 2 decimal places
+      var dailyEarningsLastValue = history.dailyEarnings.values.last![0];
+      String dailyEarningsLastValueString =
+          dailyEarningsLastValue.toStringAsFixed(2);
+      infoMap['Daily Earn'] = dailyEarningsLastValueString;
+
+
+    }
+
+
 
     return BootstrapContainer(
       fluid: true,

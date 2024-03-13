@@ -16,11 +16,16 @@ History _$HistoryFromJson(Map<String, dynamic> json) => History(
           .map((e) =>
               e == null ? null : NodeEvent.fromJson(e as Map<String, dynamic>))
           .toList(),
+      dailyEarnings: (json['dailyEarnings'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k,
+            (e as List<dynamic>?)?.map((e) => (e as num).toDouble()).toList()),
+      ),
     );
 
 Map<String, dynamic> _$HistoryToJson(History instance) => <String, dynamic>{
       'monthlyCost': instance.monthlyCost,
       'nodeActivity': instance.nodeActivity,
+      'dailyEarnings': instance.dailyEarnings,
     };
 
 NodeEvent _$NodeEventFromJson(Map<String, dynamic> json) => NodeEvent(

@@ -8,7 +8,7 @@ import 'package:fl_chart/fl_chart.dart';
 
 import 'package:testapp/api/model/history.dart';
 
-class HistGraph extends StatelessWidget with GetItMixin {
+class HistGraphNodes extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
     final History history =
@@ -18,8 +18,6 @@ class HistGraph extends StatelessWidget with GetItMixin {
     // sort the data map in alphabetical order
     final data = Map.fromEntries(unsortedData.entries.toList()
       ..sort((e1, e2) => e1.key.compareTo(e2.key)));
-
-    // return Container(child: Text('Drops by Month (Placeholder Data)'));
 
     return Container(
       child: Padding(
@@ -31,8 +29,7 @@ class HistGraph extends StatelessWidget with GetItMixin {
           // the child is a bar graph
           child: Column(
             children: [
-              Text('Drops by Month (Placeholder Data)',
-                  style: TextStyle(fontSize: 20)),
+              Text('Drops by Month', style: TextStyle(fontSize: 20)),
               Expanded(
                 child: BarChart(
                   BarChartData(
@@ -124,44 +121,6 @@ class HistGraph extends StatelessWidget with GetItMixin {
       ),
     );
   }
-
-  //   final List<Map<String, dynamic>> data = [
-  //   {
-  //     'name': 'Hetzner',
-  //     'color': Colors.red,
-  //     'drops': {0: 2, 1: 4, 2: 3}
-  //   },
-  //   {
-  //     'name': 'Hostnodes',
-  //     'color': Colors.green,
-  //     'drops': {0: 3, 1: 2, 2: 1}
-  //   },
-  //   {
-  //     'name': 'Jriggs',
-  //     'color': Colors.blue,
-  //     'drops': {0: 1, 1: 2, 2: 3}
-  //   },
-  //   {
-  //     'name': 'Terra Hosting',
-  //     'color': Colors.yellow,
-  //     'drops': {0: 0, 1: 1, 2: 1}
-  //   },
-  //   {
-  //     'name': 'wrench',
-  //     'color': Colors.purple,
-  //     'drops': {0: 3, 1: 1, 2: 2}
-  //   },
-  //   {
-  //     'name': 'OVH',
-  //     'color': Colors.orange,
-  //     'drops': {0: 2, 1: 3, 2: 0}
-  //   },
-  //   {
-  //     'name': 'Other',
-  //     'color': Colors.grey,
-  //     'drops': {0: 1, 1: 2, 2: 5}
-  //   }
-  // ];
 
   List<dynamic> monthInterval() {
     var now = DateTime.now();
@@ -311,7 +270,7 @@ class HistGraphCard extends StatelessWidget with GetItMixin {
                       // make the graph size dependent on the screen size
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height * 0.30,
-                      child: HistGraph(),
+                      child: HistGraphNodes(),
                     ),
                   ),
                 ),
@@ -333,7 +292,7 @@ class HistGraphCard extends StatelessWidget with GetItMixin {
                       // make the graph size dependent on the screen size
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height * 0.30,
-                      child: Text('Similar but with cost instead of drops'),
+                      child: Text('Graph that shows profit with daily data points'),
                     ),
                   ),
                 ),
