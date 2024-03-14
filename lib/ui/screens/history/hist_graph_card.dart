@@ -6,72 +6,20 @@ import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/ui/components/generic_card.dart';
 import 'package:fl_chart/fl_chart.dart';
 
-class HistGraphCard extends StatelessWidget with GetItMixin {
-  HistGraphCard({
-    super.key,
-  });
+import 'package:testapp/api/model/history.dart';
 
+class HistGraphNodes extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
-    return BootstrapContainer(
-      fluid: true,
-      children: [
-        BootstrapRow(
-            height: MediaQuery.of(context).size.height * 0.35,
-            children: [
-              BootstrapCol(
-                fit: FlexFit.tight,
-                sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red, width: 2),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      // make the graph size dependent on the screen size
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * 0.30,
-                      child: HistGraph(),
-                    ),
-                  ),
-                ),
-              ),
-            ]),
-        BootstrapRow(
-            height: MediaQuery.of(context).size.height * 0.35,
-            children: [
-              BootstrapCol(
-                fit: FlexFit.tight,
-                sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
-                child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red, width: 2),
-                  ),
-                  child: Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: SizedBox(
-                      // make the graph size dependent on the screen size
-                      width: MediaQuery.of(context).size.width,
-                      height: MediaQuery.of(context).size.height * 0.30,
-                      child: Text('Similar but with cost instead of drops'),
-                    ),
-                  ),
-                ),
-              ),
-            ]),
-      ],
-    );
-  }
-}
+    final History history =
+        watchOnly((NodeManagerInfo nodeManagerInfo) => nodeManagerInfo.history);
 
-class HistGraph extends StatelessWidget {
-  @override
-  Widget build(BuildContext context) {
+    final unsortedData = sumData(history.nodeActivity);
+    // sort the data map in alphabetical order
+    final data = Map.fromEntries(unsortedData.entries.toList()
+      ..sort((e1, e2) => e1.key.compareTo(e2.key)));
+
     return Container(
-      // decoration: BoxDecoration(
-      //   border: Border.all(color: Colors.red, width: 2),
-      // ),
       child: Padding(
         padding: const EdgeInsets.all(8.0),
         child: SizedBox(
@@ -81,16 +29,19 @@ class HistGraph extends StatelessWidget {
           // the child is a bar graph
           child: Column(
             children: [
-              Text('Drops by Month (Placeholder Data)',
-                  style: TextStyle(fontSize: 20)),
+              Text('Drops by Month', style: TextStyle(fontSize: 20)),
               Expanded(
                 child: BarChart(
                   BarChartData(
+                    borderData: FlBorderData(
+                      show: true,
+                      border: Border.all(color: Colors.white, width: 1),
+                    ),
+
                     minY: 0,
-                    maxY: 6,
+                    maxY: 10,
                     titlesData: FlTitlesData(
                       show: true,
-                      // make it so i dont see the top titles
                       topTitles:
                           AxisTitles(sideTitles: SideTitles(showTitles: false)),
                       bottomTitles: AxisTitles(
@@ -105,7 +56,6 @@ class HistGraph extends StatelessWidget {
                                 return Text('Feb');
                               case 2:
                                 return Text('Mar');
-                              // Continue for other months as needed
                               case 3:
                                 return Text('Apr');
                               case 4:
@@ -132,16 +82,23 @@ class HistGraph extends StatelessWidget {
                       ),
                       leftTitles: const AxisTitles(
                         sideTitles: SideTitles(
-                          interval: 1,
+                          reservedSize: 30,
+                          interval: 5,
                           showTitles:
                               true, // Adjust based on whether you want to show left axis titles
                         ),
                       ),
+                      rightTitles: const AxisTitles(
+                        sideTitles: SideTitles(
+                          showTitles: false,
+                        ),
+                      ),
                     ),
-                    barGroups: makeGroups(),
+                    barGroups: makeGroups(data),
                     // Additional BarChartData configurations...
                     gridData: FlGridData(
                       show: true,
+                      horizontalInterval: 2,
                       drawHorizontalLine: true,
                       drawVerticalLine: false,
                       getDrawingHorizontalLine: (value) {
@@ -165,66 +122,110 @@ class HistGraph extends StatelessWidget {
     );
   }
 
-  List<BarChartGroupData> makeGroups() {
-    List<BarChartGroupData> groups = [];
+  List<dynamic> monthInterval() {
+    var now = DateTime.now();
+    var month = now.month;
+    var year = now.year;
+    var interval = [];
     for (var i = 0; i < 3; i++) {
+      if (month == 0) {
+        month = 11;
+        year--;
+      } else {
+        month--;
+      }
+      interval.add(month);
+    }
+    // return the interval in reverse order
+    return interval.reversed.toList();
+  }
+
+  Map<String, dynamic> sumData(nodeActivity) {
+    Map<String, dynamic> data = {};
+
+    Color findColor(provider) {
+      switch (provider) {
+        case 'hetzner':
+          return Colors.red;
+        case 'hostnodes':
+          return Colors.green;
+        case 'jriggs':
+          return Colors.blue;
+        case 'terra hosting':
+          return Colors.yellow;
+        case 'wrench':
+          return Colors.purple;
+        case 'ovh':
+          return Colors.orange;
+        default:
+          return Colors.grey;
+      }
+    }
+
+    for (var i = 0; i < nodeActivity.length; i++) {
+      var event = nodeActivity[i];
+      var provider = event.provider.toLowerCase();
+      var timestamp = event.timestamp;
+      var date = DateTime.fromMillisecondsSinceEpoch(timestamp);
+      // adjust month to be 0-indexed
+      var month = date.month - 1;
+
+      // var year = date.year;
+
+      if (data[provider] == null) {
+        data[provider] = {
+          'provider': provider,
+          'drops': {
+            0: 0, // Jan
+            1: 0, // Feb
+            2: 0, // etc.
+            3: 0,
+            4: 0,
+            5: 0,
+            6: 0,
+            7: 0,
+            8: 0,
+            9: 0,
+            10: 0,
+            11: 0
+          },
+          'color': findColor(provider),
+        };
+      }
+      data[provider]['drops'][month]++;
+    }
+    return data;
+  }
+
+  List<BarChartGroupData> makeGroups(data) {
+    // function that returns an interval which represents the last 3 months
+
+    final providers = data.values.toList();
+    final lastThreemonths = monthInterval(); // ex. [4,5,6]
+    List<BarChartGroupData> groups = [];
+    // iterate through the last 3 months and create a group for each month
+    for (var monthIndex = 0; monthIndex < 3; monthIndex++) {
       List<BarChartRodData> bars = [];
-      for (var j = 0; j < data.length; j++) {
+      // iterate through the providers and create a bar for each provider
+      for (var provIndex = 0; provIndex < providers.length; provIndex++) {
         bars.add(BarChartRodData(
-          toY: data[j]['drops'][i].toDouble(),
-          color: data[j]['color'],
+          toY: providers[provIndex]['drops'][lastThreemonths[monthIndex]]
+              .toDouble(),
+          color: providers[provIndex]['color'],
           width: 13,
         ));
       }
       groups.add(BarChartGroupData(
-        x: i,
+        x: lastThreemonths[monthIndex],
         barRods: bars,
       ));
     }
     return groups;
   }
 
-  final List<Map<String, dynamic>> data = [
-    {
-      'name': 'Hetzner',
-      'color': Colors.red,
-      'drops': {0: 2, 1: 4, 2: 3}
-    },
-    {
-      'name': 'Hostnodes',
-      'color': Colors.green,
-      'drops': {0: 3, 1: 2, 2: 1}
-    },
-    {
-      'name': 'Jriggs',
-      'color': Colors.blue,
-      'drops': {0: 1, 1: 2, 2: 3}
-    },
-    {
-      'name': 'Terra Hosting',
-      'color': Colors.yellow,
-      'drops': {0: 0, 1: 1, 2: 1}
-    },
-    {
-      'name': 'wrench',
-      'color': Colors.purple,
-      'drops': {0: 3, 1: 1, 2: 2}
-    },
-    {
-      'name': 'OVH',
-      'color': Colors.orange,
-      'drops': {0: 2, 1: 3, 2: 0}
-    },
-    {
-      'name': 'Other',
-      'color': Colors.grey,
-      'drops': {0: 1, 1: 2, 2: 5}
-    }
-  ];
-
-  Widget buildLegend(List<Map<String, dynamic>> data) {
+  Widget buildLegend(Map<String, dynamic> data) {
     return Row(
-      children: data.map((data) {
+      children: data.values.map((value) {
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),
           child: Row(
@@ -232,14 +233,72 @@ class HistGraph extends StatelessWidget {
               Container(
                 width: 20,
                 height: 20,
-                color: data['color'],
+                color: value['color'],
               ),
               SizedBox(width: 8),
-              Text(data['name'], style: TextStyle(fontSize: 10)),
+              Text(value['provider'], style: TextStyle(fontSize: 10)),
             ],
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+class HistGraphCard extends StatelessWidget with GetItMixin {
+  HistGraphCard({
+    super.key,
+  });
+  @override
+  Widget build(BuildContext context) {
+    return BootstrapContainer(
+      fluid: true,
+      children: [
+        BootstrapRow(
+            height: MediaQuery.of(context).size.height * 0.35,
+            children: [
+              BootstrapCol(
+                fit: FlexFit.tight,
+                sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
+                child: Container(
+                  // decoration: BoxDecoration(
+                  //   border: Border.all(color: Colors.red, width: 2),
+                  // ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      // make the graph size dependent on the screen size
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.30,
+                      child: HistGraphNodes(),
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+        BootstrapRow(
+            height: MediaQuery.of(context).size.height * 0.35,
+            children: [
+              BootstrapCol(
+                fit: FlexFit.tight,
+                sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
+                child: Container(
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.red, width: 2),
+                  ),
+                  child: Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: SizedBox(
+                      // make the graph size dependent on the screen size
+                      width: MediaQuery.of(context).size.width,
+                      height: MediaQuery.of(context).size.height * 0.30,
+                      child: Text('Graph that shows profit with daily data points'),
+                    ),
+                  ),
+                ),
+              ),
+            ]),
+      ],
     );
   }
 }

@@ -272,7 +272,7 @@ class _MyDataTableState extends State<_MyDataTable> {
               duration: Duration(seconds: 1),
             ),
           );
-          
+
           // copied successfully
         },
         child: text,
