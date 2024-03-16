@@ -216,7 +216,7 @@ class _MyDataTableState extends State<_MyDataTable> {
             maxWidth: columnWidths[e.key]!,
           ),
           child: SaveNodeButton(
-            node,
+            node: node,
             reset: (() {
               updateState();
             }),

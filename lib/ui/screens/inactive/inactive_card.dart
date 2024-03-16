@@ -231,7 +231,7 @@ class _MyDataTableState extends State<_MyDataTable> {
       if (attribute.keys.first == '') {
         return startCell;
       } else if (attribute.keys.first == 'Save') {
-        return DataCell(SaveNodeButton(node, reset: (() {
+        return DataCell(SaveNodeButton(node: node, reset: (() {
           updateState();
         })));
       } else if (keysToCheck.contains(attribute.keys.first)) {
