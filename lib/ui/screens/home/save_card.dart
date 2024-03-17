@@ -78,7 +78,6 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
     }
     // erase any potential duplicates
     providers = providers.toSet().toList();
-    print('Providers: $providers');
 
     return providers.map(
       (provider) {

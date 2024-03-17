@@ -217,6 +217,7 @@ class _MyDataTableState extends State<_MyDataTable> {
         Text(
           text,
           style: TextStyle(color: color),
+          maxLines: 2
         ),
       );
     }

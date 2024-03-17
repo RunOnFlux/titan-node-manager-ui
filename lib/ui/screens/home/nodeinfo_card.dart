@@ -50,13 +50,13 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   // contains attributes to be displayed in the table
   Map<String, String Function(NodeInfo)> attributes = {
+    'Rank': (node) => node.rank.toString(),
     'Name': (node) => node.name ?? '',
     'Provider': (node) => node.provider ?? '',
     'Price': (node) => node.price.toString(),
     'IP Address': (node) => node.ip,
     'Txhash': (node) => node.txhash,
     'Tier': (node) => node.tier,
-    'Rank': (node) => node.rank.toString(),
     'Status': (node) => node.status,
     // 'Added Height': (node) => node.added_height.toString(),
     // 'Confirmed Height': (node) => node.confirmed_height.toString(),
@@ -162,34 +162,34 @@ class _MyDataTableState extends State<_MyDataTable> {
                 constraints: const BoxConstraints(minWidth: 100),
                 child: Text(e.key),
               ),
-              Positioned(
-                right: 0,
-                child: GestureDetector(
-                  onPanStart: (details) {
-                    setState(() {
-                      initX = details.globalPosition.dx;
-                    });
-                  },
-                  onPanUpdate: (details) {
-                    final increment = details.globalPosition.dx - initX;
-                    final newWidth = columnWidths[e.key]! + increment;
-                    setState(() {
-                      initX = details.globalPosition.dx;
-                      columnWidths[e.key] = newWidth > minimumColumnWidth
-                          ? newWidth
-                          : minimumColumnWidth;
-                    });
-                  },
-                  child: Container(
-                    width: 10,
-                    height: 10,
-                    decoration: BoxDecoration(
-                      color: Colors.blue.withOpacity(1),
-                      shape: BoxShape.circle,
-                    ),
-                  ),
-                ),
-              )
+              // Positioned(
+              //   right: 0,
+              //   child: GestureDetector(
+              //     onPanStart: (details) {
+              //       setState(() {
+              //         initX = details.globalPosition.dx;
+              //       });
+              //     },
+              //     onPanUpdate: (details) {
+              //       final increment = details.globalPosition.dx - initX;
+              //       final newWidth = columnWidths[e.key]! + increment;
+              //       setState(() {
+              //         initX = details.globalPosition.dx;
+              //         columnWidths[e.key] = newWidth > minimumColumnWidth
+              //             ? newWidth
+              //             : minimumColumnWidth;
+              //       });
+              //     },
+              //     child: Container(
+              //       width: 10,
+              //       height: 10,
+              //       decoration: BoxDecoration(
+              //         color: Colors.blue.withOpacity(1),
+              //         shape: BoxShape.circle,
+              //       ),
+              //     ),
+              //   ),
+              // )
             ],
           ),
           onSort: ((columnIndex, ascending) => _onSort(columnIndex, ascending)),
@@ -266,14 +266,7 @@ class _MyDataTableState extends State<_MyDataTable> {
       text = InkWell(
         onTap: () async {
           await Clipboard.setData(ClipboardData(text: node.txhash));
-          ScaffoldMessenger.of(context).showSnackBar(
-            SnackBar(
-              content: Text('Copied txhash to clipboard'),
-              duration: Duration(seconds: 1),
-            ),
-          );
-
-          // copied successfully
+          showSnackBarTop(context);
         },
         child: text,
       );
@@ -292,24 +285,45 @@ class _MyDataTableState extends State<_MyDataTable> {
   dynamic indexNodeMap(int index, NodeInfo node) {
     switch (index) {
       case 0:
-        return node.name;
-      case 1:
-        return node.provider;
-      case 2:
-        return node.price;
-      case 3:
-        return node.ip;
-      case 4:
-        return node.txhash;
-      case 5:
-        return node.tier;
-      case 6:
         return node.rank;
+      case 1:
+        return node.name;
+      case 2:
+        return node.provider;
+      case 3:
+        return node.price;
+      case 4:
+        return node.ip;
+      case 5:
+        return node.txhash;
+      case 6:
+        return node.tier;
       case 7:
         return node.added_height;
       case 8:
         return node.confirmed_height;
     }
+  }
+
+  showSnackBarTop(context) {
+    SnackBar snackBar = SnackBar(
+      content: const Text('Copied Txhash to clipboard',
+          style: TextStyle(fontSize: 20, color: Color.fromARGB(255, 12, 0, 150)),
+          ),
+      backgroundColor: Color.fromARGB(255, 204, 204, 204),
+      dismissDirection: DismissDirection.up,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(10.0),
+      ),
+      behavior: SnackBarBehavior.floating,
+      margin: EdgeInsets.only(
+          bottom: MediaQuery.of(context).size.height * 0.9,
+          left: 10,
+          right: 10),
+      duration: const Duration(seconds: 1),
+    );
+
+    ScaffoldMessenger.of(context).showSnackBar(snackBar);
   }
 
   void _onSort(int columnIndex, bool ascending) {
@@ -329,13 +343,13 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   List<dynamic> getRowData(NodeInfo node) {
     return [
+      node.rank.toString(),
       node.name,
       node.provider,
       node.price.toString(),
       node.ip.toString(),
       node.txhash,
       node.tier,
-      node.rank.toString(),
     ];
   }
 
