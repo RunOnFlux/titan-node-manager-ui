@@ -86,6 +86,12 @@ class NodeManagerInfo with ChangeNotifier {
     notifyListeners();
   }
 
+  void logout() {
+    _token = '';
+    isLoggedIn = false;
+    notifyListeners();
+  }
+
   late Info info;
   late List<NodeInfo> nodeinfo;
   late List<InactiveInfo> inactiveInfo;

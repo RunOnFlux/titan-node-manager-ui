@@ -15,7 +15,6 @@ import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/screens/inactive/inactive_card.dart';
 import 'package:go_router/go_router.dart';
 import 'package:testapp/utils/config.dart';
-import 'package:testapp/utils/config.dart';
 
 import 'package:testapp/api/services/fetchInfo.dart';
 

@@ -4,7 +4,8 @@ import 'package:flutter_base/ui/widgets/simple_screen.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/ui/components/info_card.dart';
 import 'package:testapp/ui/screens/history/history_card.dart';
-import 'package:testapp/ui/components/last_refresh_card.dart';
+import 'package:testapp/ui/components/bottom_bar.dart';
+
 import 'dart:convert';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
@@ -64,13 +65,10 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
             fit: FlexFit.tight,
             // chage the size to take up HALF the screen
             sizes: 'col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
-            child: Padding(
-              padding: const EdgeInsets.all(16.0),
               child: HistGraphCard(),
-            ),
           ),
         ],),
-      BootstrapCol(child: LastRefresh()),
+      BootstrapCol(child: BottomBar()),
       ],
     );
   }
