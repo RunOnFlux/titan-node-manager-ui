@@ -4,9 +4,10 @@ import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
 import 'package:testapp/ui/app/app.dart';
-import 'package:testapp/ui/screens/home/save_card.dart';
+import 'package:testapp/ui/components/save_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
+import 'package:testapp/ui/components/inline_edit.dart';
 
 class NodeInfoCard extends StatelessWidget with GetItMixin {
   NodeInfoCard({super.key});
@@ -73,6 +74,7 @@ class _MyDataTableState extends State<_MyDataTable> {
   }
 
   void updateState() {
+    print('updateState called');
     setState(() {});
   }
 
@@ -209,6 +211,7 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   DataCell _buildCell(
       MapEntry<String, String Function(NodeInfo)> e, NodeInfo node) {
+    // Save node button
     if (e.key == '') {
       return DataCell(
         ConstrainedBox(
@@ -272,6 +275,12 @@ class _MyDataTableState extends State<_MyDataTable> {
       );
     }
 
+    if (e.key == 'Name') {
+      text = nameField(node, value, updateState)[0];
+      // print('node.name in _buildCell: ${node.name}');
+      // node.name = nameField(node, value, updateState)[1];
+    }
+
     return DataCell(
       ConstrainedBox(
         constraints: BoxConstraints(
@@ -280,6 +289,20 @@ class _MyDataTableState extends State<_MyDataTable> {
         child: text,
       ),
     );
+  }
+
+  dynamic nameField(node, text, reset) {
+    TextEditingController _editingController =
+        TextEditingController(text: text);
+    // print('in nameField: ${_editingController.text}');
+    node.name = _editingController.text;
+    InlineTextEdit inline = InlineTextEdit(
+      node: node,
+      controller: _editingController,
+      reset: reset,
+    );
+    return [inline, inline.controller.text];
+    // bool _isEditingText = false;
   }
 
   dynamic indexNodeMap(int index, NodeInfo node) {
@@ -307,9 +330,10 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   showSnackBarTop(context) {
     SnackBar snackBar = SnackBar(
-      content: const Text('Copied Txhash to clipboard',
-          style: TextStyle(fontSize: 20, color: Color.fromARGB(255, 12, 0, 150)),
-          ),
+      content: const Text(
+        'Copied Txhash to clipboard',
+        style: TextStyle(fontSize: 20, color: Color.fromARGB(255, 12, 0, 150)),
+      ),
       backgroundColor: Color.fromARGB(255, 204, 204, 204),
       dismissDirection: DismissDirection.up,
       shape: RoundedRectangleBorder(

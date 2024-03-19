@@ -15,6 +15,8 @@ import 'package:flutter/services.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/utils/config.dart';
 
+import 'package:testapp/ui/components/save_node.dart';
+
 class SaveNodeButton extends StatelessWidget with GetItMixin {
   SaveNodeButton({this.node, required this.reset, Key? key}) : super(key: key);
 
@@ -130,8 +132,7 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
                                     TextButton(
                                       child: Text('Cancel'),
                                       onPressed: () {
-                                        providerController.text =
-                                            '--';
+                                        providerController.text = '--';
                                         Navigator.of(context).pop();
                                       },
                                     ),
@@ -193,7 +194,7 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
 
                     print('Inputs: $inputs');
 
-                    saveNode(context, node, inputs);
+                    saveNode(node, inputs, reset);
 
                     Navigator.of(context).pop();
                   },
@@ -206,50 +207,51 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
     );
   }
 
-  Future<http.Response> saveNode(BuildContext context, node, inputs) async {
-    var txhash = (node is NodeInfo)
-        ? node.txhash
-        : (node is InactiveInfo)
-            ? node.txid
-            : null;
-    dynamic outidx;
+  // Future<http.Response> saveNode(node, inputs) async {
+  //   var txhash = (node is NodeInfo)
+  //       ? node.txhash
+  //       : (node is InactiveInfo)
+  //           ? node.txid
+  //           : null;
+  //   dynamic outidx;
 
-    if (node is NodeInfo) {
-      outidx = int.tryParse(node.outidx);
-    } else if (node is InactiveInfo) {
-      outidx = node.vout;
-    }
+  //   if (node is NodeInfo) {
+  //     outidx = int.tryParse(node.outidx);
+  //   } else if (node is InactiveInfo) {
+  //     outidx = node.vout;
+  //   }
 
-    Map<String, dynamic> requestBody = {
-      'txhash': txhash,
-      'outidx': outidx,
-      'name': inputs['name'],
-      'provider': inputs['provider'],
-      'price': inputs['price'],
-    };
+  //   Map<String, dynamic> requestBody = {
+  //     'txhash': txhash,
+  //     'outidx': outidx,
+  //     'name': inputs['name'],
+  //     'provider': inputs['provider'],
+  //     'price': inputs['price'],
+  //   };
 
-    final String? jwt = await storage.read(key: "jwt");
-    var url = Uri.parse('${AppConfig().apiEndpoint}/update');
-    final response = await http.post(
-      url,
-      body: jsonEncode(requestBody),
-      headers: {
-        HttpHeaders.contentTypeHeader: "application/json",
-        HttpHeaders.authorizationHeader: "Bearer $jwt"
-      },
-    );
+  //   final String? jwt = await storage.read(key: "jwt");
+  //   var url = Uri.parse('${AppConfig().apiEndpoint}/update');
+  //   final response = await http.post(
+  //     url,
+  //     body: jsonEncode(requestBody),
+  //     headers: {
+  //       HttpHeaders.contentTypeHeader: "application/json",
+  //       HttpHeaders.authorizationHeader: "Bearer $jwt"
+  //     },
+  //   );
 
-    if (response.body == 'Update successful') {
-      node.name = inputs['name'];
-      node.provider = inputs['provider'];
-      node.price = double.parse(inputs['price']);
-      reset();
-    } else {
-      print('UPDATE FAILED');
-    }
+  //   if (response.body == 'Update successful') {
+  //     node.name = inputs['name'];
+  //     node.provider = inputs['provider'];
+  //     node.price = double.parse(inputs['price']);
+  //     print('UPDATE SUCCESSFUL');
+  //     reset();
+  //   } else {
+  //     print('UPDATE FAILED');
+  //   }
 
-    return response;
-  }
+  //   return response;
+  // }
 
   Future<String> addProvider(String provider) async {
     String? jwt = await storage.read(key: "jwt");
