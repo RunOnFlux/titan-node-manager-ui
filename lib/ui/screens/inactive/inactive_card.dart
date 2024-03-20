@@ -13,7 +13,6 @@ import 'package:data_table_2/data_table_2.dart';
 import 'package:testapp/utils/config.dart';
 import 'package:testapp/ui/screens/login/login_card.dart';
 
-
 class InactiveCard extends StatelessWidget with GetItMixin {
   InactiveCard({super.key});
   @override
@@ -189,7 +188,6 @@ class _MyDataTableState extends State<_MyDataTable> {
           if (attribute.keys.first == '') {
             // return DataColumn2(size: ColumnSize.M, label: Text(''));
             return DataColumn2(size: ColumnSize.M, label: Text(''));
-
           } else if (attribute.keys.first == 'Save') {
             return DataColumn2(size: ColumnSize.M, label: Text(''));
           } else {
@@ -214,11 +212,7 @@ class _MyDataTableState extends State<_MyDataTable> {
   DataRow buildDataRow(node, attributes) {
     DataCell getTextDataCell(String text, Color color) {
       return DataCell(
-        Text(
-          text,
-          style: TextStyle(color: color),
-          maxLines: 2
-        ),
+        Text(text, style: TextStyle(color: color), maxLines: 2),
       );
     }
 
@@ -232,9 +226,11 @@ class _MyDataTableState extends State<_MyDataTable> {
       if (attribute.keys.first == '') {
         return startCell;
       } else if (attribute.keys.first == 'Save') {
-        return DataCell(SaveNodeButton(node: node, reset: (() {
-          updateState();
-        })));
+        return DataCell(SaveNodeButton(
+            node: node,
+            reset: (() {
+              updateState();
+            })));
       } else if (keysToCheck.contains(attribute.keys.first)) {
         if (featureValue == '-1') {
           featureValue = 'NOT SET';
@@ -254,11 +250,8 @@ class _MyDataTableState extends State<_MyDataTable> {
                     content: Text('Copied txash to clipboard'),
                     // make this only last 1 second
                     duration: Duration(seconds: 1),
-                    
-
                   ),
                 );
-
               },
               child:
                   Text(node.txid, style: const TextStyle(color: Colors.red))),

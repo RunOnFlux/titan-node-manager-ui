@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
+import 'package:testapp/api/model/inactiveInfo.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/ui/components/save_node.dart';
 import 'package:url_launcher/url_launcher.dart';
@@ -11,7 +12,7 @@ import 'package:flutter/services.dart';
 class InlineTextEdit extends StatefulWidget {
   final TextEditingController controller;
   final VoidCallback reset;
-  final NodeInfo node;
+  final dynamic node;
 
   const InlineTextEdit(
       {Key? key,
@@ -28,12 +29,12 @@ class _InlineTextEditState extends State<InlineTextEdit> {
   late TextEditingController _controller;
   bool _isEditing = false;
   late VoidCallback _reset;
-  late NodeInfo _node;
-  // final String initialText;
+  late dynamic _node;
 
   @override
   void initState() {
     super.initState();
+    // if node can be cast as Nodeinfo cast it as Nodeinfo, if it can be cast as InactiveInfo cast it as InactiveInfo
     _controller = widget.controller;
     _reset = widget.reset;
     _node = widget.node;
@@ -55,7 +56,12 @@ class _InlineTextEditState extends State<InlineTextEdit> {
       onTap: () => setState(() {
         _isEditing = true;
       }),
-      child: Text(_controller.text),
+      child: Text(
+        _controller.text,
+        style: TextStyle(
+          color: _controller.text == 'NOT SET' ? Colors.red : Colors.green,
+        ),
+      ),
     );
   }
 
@@ -79,7 +85,6 @@ class _InlineTextEditState extends State<InlineTextEdit> {
           _isEditing = false;
         });
         _reset();
-
       },
       // Optional: Customize your TextField's appearance, behavior, etc.
     );

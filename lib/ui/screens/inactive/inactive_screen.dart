@@ -4,7 +4,9 @@ import 'package:flutter_base/ui/widgets/simple_screen.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/ui/components/info_card.dart';
 
-import 'package:testapp/ui/screens/inactive/inactive_card.dart';
+// import 'package:testapp/ui/screens/inactive/inactive_card.dart';
+import 'package:testapp/ui/screens/inactive/new_inactive_card.dart';
+
 import 'package:testapp/ui/components/bottom_bar.dart';
 
 import 'package:go_router/go_router.dart';
@@ -32,8 +34,7 @@ class InactiveScreenState extends SimpleScreenState<InactiveScreen>
     if (isTokenValid) {
       return inactivePage(context);
     } else {
-
-      Future.microtask(() => context.go('/')); 
+      Future.microtask(() => context.go('/'));
       return Container(); // Return an empty container to avoid any temporary rendering issues.
     }
   }
@@ -53,8 +54,8 @@ class InactiveScreenState extends SimpleScreenState<InactiveScreen>
       ),
       Container(
         child: SizedBox(
-            width: MediaQuery.of(context).size.width * 0.82,
-            height: MediaQuery.of(context).size.height * 0.68,
+          width: MediaQuery.of(context).size.width * 0.82,
+          height: MediaQuery.of(context).size.height * 0.68,
           child: InactiveCard(),
         ),
       ),

@@ -30,16 +30,8 @@ class LoginPage extends StatelessWidget with GetItMixin {
             AlertDialog(title: Text(title), content: Text(text)),
       );
 
-
-  
-
-
   Future<String?> attemptLogIn(String username, String password) async {
-
-
-
     var url = Uri.parse('${AppConfig().apiEndpoint}/login');
-
 
     // strip whitespace from front and back of username and password
     username = username.trim();
@@ -62,7 +54,6 @@ class LoginPage extends StatelessWidget with GetItMixin {
       var nodeinfo = await InfoService().fetchNodeInfo();
       var inactiveInfo = await InfoService().fetchInactiveInfo();
       var history = await InfoService().fetchHistory();
-
 
       GetIt.I<NodeManagerInfo>().info = info!;
       GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
