@@ -60,12 +60,15 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
 
   void initDefaultVals() {
     nameController.text = node.name;
+    // if (!providers.contains(node.provider.toUpperCase())) {
+    //   node.provider = '--';
+    // }
     if (node.provider == '') {
       providerController.text = '--';
     } else {
-      providerController.text = node.provider;
+      providerController.text = node.provider.toUpperCase();
     }
-    providerController.text = node.provider;
+    providerController.text = node.provider.toUpperCase();
     if (node.price == 0) {
       priceController.text = 'NOT SET';
     } else {
@@ -80,6 +83,8 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
     }
     // erase any potential duplicates
     providers = providers.toSet().toList();
+    // convert all providers to lowercase
+    providers = providers.map((provider) => provider.toUpperCase()).toList();
 
     return providers.map(
       (provider) {
@@ -92,7 +97,7 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
   Widget build(BuildContext context) {
     var processedProviders = processProviders(providers);
     String providerToBeCreated = '';
-    String displayProvider = node.provider;
+    String displayProvider = node.provider.toUpperCase();
 
     initDefaultVals();
     return IconButton(
@@ -193,7 +198,6 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
                     };
 
                     print('Inputs: $inputs');
-
                     saveNode(node, inputs, reset);
 
                     Navigator.of(context).pop();

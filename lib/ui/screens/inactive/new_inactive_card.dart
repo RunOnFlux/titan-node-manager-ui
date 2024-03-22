@@ -54,7 +54,7 @@ class _MyDataTableState extends State<_MyDataTable> {
   };
 
   // Holds key for each row that is selected
-  Map<String, InactiveInfo> selectedNodes = {};
+  Map<String, InactiveInfo> selectedRows = {};
   DataTable? dataTable;
   bool showButton = false; // Start selected nodes button
 
@@ -127,7 +127,7 @@ class _MyDataTableState extends State<_MyDataTable> {
               maintainAnimation: true,
               maintainState: true,
               visible: showButton,
-              child: StartSelectedNodes(selectedNodes.values.toList()),
+              child: StartSelectedNodes(selectedRows.values.toList()),
             ),
           ),
         ),
@@ -169,6 +169,10 @@ class _MyDataTableState extends State<_MyDataTable> {
     );
   }
 
+  Map<String, Color> rowColors = {};
+  Color scaffoldBackgroundDark = const Color.fromARGB(255, 20, 22, 41);
+  Color cardColorDark = const Color.fromARGB(255, 58, 58, 78);
+
   Widget _buildDataTable() {
     return DataTable(
       showCheckboxColumn: false,
@@ -194,14 +198,46 @@ class _MyDataTableState extends State<_MyDataTable> {
       }).toList(),
       rows: filteredList.map<DataRow>((node) {
         return DataRow(
-            // onSelectChanged: (t) => displayPopout(node),
-            cells: attributes.entries
-                .map<DataCell>(
-                  (e) => _buildCell(e, node),
-                )
-                .toList());
+          color: MaterialStateProperty.resolveWith<Color>(
+              (Set<MaterialState> states) {
+            return rowColors[node.txid] ?? scaffoldBackgroundDark;
+          }),
+          // onSelectChanged: (t) => displayPopout(node),
+          cells: attributes.entries
+              .map<DataCell>(
+                (e) => _buildCell(e, node),
+              )
+              .toList(),
+          onSelectChanged: (bool? selected) {
+            String myKey = node.txid;
+            if (selected != null) {
+              selected = selectedContains(node);
+              setState(() {
+                if (selected == false) {
+                  rowColors[myKey] = cardColorDark;
+                  selectedRows[myKey] = node;
+                  if (selectedRows.length > 1) {
+                    showButton = true;
+                  }
+                } else {
+                  rowColors[myKey] = scaffoldBackgroundDark;
+                  selectedRows.remove(myKey);
+                  if (selectedRows.length <= 1) {
+                    showButton = false;
+                  }
+                }
+              });
+            }
+          },
+        );
       }).toList(),
     );
+  }
+
+  bool selectedContains(node) {
+    String myKey = node.txid;
+    bool contain = selectedRows.containsKey(myKey);
+    return contain;
   }
 
   DataCell _buildCell(

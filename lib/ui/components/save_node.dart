@@ -15,9 +15,6 @@ import 'package:flutter/services.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/utils/config.dart';
 
-
-
-
 Future<http.Response> saveNode(node, inputs, reset) async {
   var txhash = (node is NodeInfo)
       ? node.txhash
@@ -31,6 +28,10 @@ Future<http.Response> saveNode(node, inputs, reset) async {
   } else if (node is InactiveInfo) {
     outidx = node.vout;
   }
+
+  // makes the case of the provider standard as in start with 1 capital letter and the rest are lower
+  inputs['provider'] = inputs['provider'].substring(0, 1).toUpperCase() +
+      inputs['provider'].substring(1).toLowerCase();
 
   Map<String, dynamic> requestBody = {
     'txhash': txhash,
