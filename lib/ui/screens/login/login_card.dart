@@ -15,7 +15,6 @@ import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/screens/inactive/inactive_card.dart';
 import 'package:go_router/go_router.dart';
 import 'package:testapp/utils/config.dart';
-import 'package:testapp/utils/config.dart';
 
 import 'package:testapp/api/services/fetchInfo.dart';
 
@@ -33,6 +32,11 @@ class LoginPage extends StatelessWidget with GetItMixin {
 
   Future<String?> attemptLogIn(String username, String password) async {
     var url = Uri.parse('${AppConfig().apiEndpoint}/login');
+
+    // strip whitespace from front and back of username and password
+    username = username.trim();
+    password = password.trim();
+
     var res = await http.post(url,
         headers: {
           // "Accept": "application/json",
@@ -50,7 +54,6 @@ class LoginPage extends StatelessWidget with GetItMixin {
       var nodeinfo = await InfoService().fetchNodeInfo();
       var inactiveInfo = await InfoService().fetchInactiveInfo();
       var history = await InfoService().fetchHistory();
-
 
       GetIt.I<NodeManagerInfo>().info = info!;
       GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;

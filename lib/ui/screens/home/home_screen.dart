@@ -5,6 +5,7 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/ui/components/info_card.dart';
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/components/last_refresh_card.dart';
+import 'package:testapp/ui/components/bottom_bar.dart';
 import 'dart:convert';
 import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
@@ -62,7 +63,7 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
           children: [
             BootstrapCol(
               sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
-              child: LastRefresh(),
+              child: BottomBar(),
             ),
           ],
         ),
