@@ -1,3 +1,5 @@
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
@@ -75,11 +77,32 @@ class _ProviderTableState extends State<_ProviderTable> {
       columns: [
         DataColumn(
           label: Text('Provider'),
-        )
+        ),
+        DataColumn(
+          label: Text('Nodes'),
+        ),
+        DataColumn(
+          label: Text('Price'),
+        ),
+        DataColumn(
+          label: Text(''),
+        ),
       ],
       rows: providers.map<DataRow>(
         (provider) {
-          return DataRow(cells: [DataCell(Text(provider))]);
+          return DataRow(
+            cells: [
+              DataCell(Text(provider)),
+              DataCell(Text('#nodes')),
+              DataCell(Text('price')),
+              DataCell(ElevatedButton(
+                child: Text('Remove provider {not implemented}'),
+                onPressed: () {
+                  print('Button clicked');
+                },
+              )),
+            ],
+          );
         },
       ).toList(),
     );
@@ -147,4 +170,15 @@ class _ProviderTableState extends State<_ProviderTable> {
 
     return response.body;
   }
+
+  // Future<String> removeProvider(String provider) async {
+  //   String? jwt = await storage.read(key: "jwt");
+  //   jwt ??= '';
+
+  //   Map<String, String> requestBody = {
+  //     'provider': provider,
+  //   };
+
+  //   var url = Uri.parse('${AppConfig().apiEndpoint}/removeprovider');
+  // }
 }
