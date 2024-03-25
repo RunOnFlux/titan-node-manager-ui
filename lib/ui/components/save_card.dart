@@ -142,7 +142,7 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
                                       },
                                     ),
                                     TextButton(
-                                      child: Text('Submit1'),
+                                      child: Text('Submit'),
                                       onPressed: () async {
                                         // setState(() => {});
                                         var response = await addProvider(
@@ -184,7 +184,7 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
                   },
                 ),
                 ElevatedButton(
-                  child: const Text('Submit2'),
+                  child: const Text('Submit'),
                   onPressed: () {
                     // providerController.text = displayProvider;
                     if (providerController.text == 'ADD NEW') {
