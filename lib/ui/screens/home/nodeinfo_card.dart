@@ -84,20 +84,12 @@ class _MyDataTableState extends State<_MyDataTable> {
   final horizontalScrollController = ScrollController();
 
   void initNullFields() {
-    nodeinfo.forEach((node) => {
-          if (node.name == null)
-            {
-              node.name = 'NOT SET',
-            },
-          if (node.provider == null)
-            {
-              node.provider = '--',
-            },
-          if (node.price == null)
-            {
-              node.price = -1,
-            }
-        });
+    nodeinfo.forEach((node) {
+      node.name ??= 'NOT SET';
+      node.name ??= 'NOT SET';
+      node.provider ??= '--';
+      node.price ??= -1;
+  });
   }
 
   @override
