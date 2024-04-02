@@ -15,6 +15,7 @@ import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/screens/inactive/inactive_card.dart';
 import 'package:go_router/go_router.dart';
 import 'package:testapp/utils/config.dart';
+import 'package:testapp/ui/app/loading.dart';
 
 import 'package:testapp/api/services/fetchInfo.dart';
 
@@ -45,21 +46,15 @@ class LoginPage extends StatelessWidget with GetItMixin {
         body: json.encode({"username": username, "password": password}));
     var token = res.body;
 
+    // print('token:: $token');
+    // print('statusCode: ${res.statusCode}');
+
     if (res.statusCode == 200) {
       GetIt.I<NodeManagerInfo>().isLoggedIn = true;
       await storage.write(key: "jwt", value: token);
-
-      // fetch data again
-      var info = await InfoService().fetchInfo();
-      var nodeinfo = await InfoService().fetchNodeInfo();
-      var inactiveInfo = await InfoService().fetchInactiveInfo();
-      var history = await InfoService().fetchHistory();
-
-      GetIt.I<NodeManagerInfo>().info = info!;
-      GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
-      GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
-      GetIt.I<NodeManagerInfo>().history = history!;
-      GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
+      // use fetchinfo
+      await InfoService().fetchInfo();
+      print('fetchinfo finished');
 
       return res.body;
     }
@@ -105,8 +100,12 @@ class LoginPage extends StatelessWidget with GetItMixin {
                       var username = _usernameController.text;
                       var password = _passwordController.text;
                       var jwt = await attemptLogIn(username, password);
+                      print('await jwt: $jwt');
                       if (jwt != null) {
-                        storage.write(key: "jwt", value: jwt);
+                        // save token
+                        GetIt.I<NodeManagerInfo>().setToken(jwt);
+                        GetIt.I<NodeManagerInfo>().isLoggedIn = true;
+                        await storage.write(key: "jwt", value: jwt);
                         context.push('/home');
                       } else {
                         displayDialog(
