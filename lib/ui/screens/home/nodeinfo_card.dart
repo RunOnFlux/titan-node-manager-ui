@@ -191,7 +191,7 @@ class _MyDataTableState extends State<_MyDataTable> {
       }).toList(),
       rows: filteredList.map<DataRow>((node) {
         return DataRow(
-            onSelectChanged: (t) => displayPopout(node),
+            // onSelectChanged: (t) => displayPopout(node),
             cells: attributes.entries
                 .map<DataCell>(
                   (e) => _buildCell(e, node),
@@ -268,9 +268,8 @@ class _MyDataTableState extends State<_MyDataTable> {
     }
 
     if (e.key == 'Name') {
-      text = nameField(node, value, updateState)[0];
-      // print('node.name in _buildCell: ${node.name}');
-      // node.name = nameField(node, value, updateState)[1];
+      text = nameField(node, value, updateState);
+
     }
 
     return DataCell(
@@ -293,7 +292,7 @@ class _MyDataTableState extends State<_MyDataTable> {
       controller: _editingController,
       reset: reset,
     );
-    return [inline, inline.controller.text];
+    return inline;
     // bool _isEditingText = false;
   }
 

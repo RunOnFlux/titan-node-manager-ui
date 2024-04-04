@@ -53,7 +53,7 @@ class _InlineTextEditState extends State<InlineTextEdit> {
 
   Widget _buildText() {
     return GestureDetector(
-      onTap: () => setState(() {
+      onDoubleTap: () => setState(() {
         _isEditing = true;
       }),
       child: Text(
@@ -65,20 +65,11 @@ class _InlineTextEditState extends State<InlineTextEdit> {
     );
   }
 
-  // void updateNodeName() {
-  //   // final node = getIt<App>().node;
-  //   final newNode = NodeInfo(
-  //     name: _controller.text,
-  //   );
-  //   getIt<App>().updateNode(newNode);
-  // }
-
   Widget _buildTextField() {
     return TextField(
       autofocus: true,
       controller: _controller,
       onSubmitted: (newValue) {
-        // node.name = newValue;
         updateName();
         setState(() {
           print('_node.name in onSubmitted: ${_node.name}');
@@ -86,7 +77,6 @@ class _InlineTextEditState extends State<InlineTextEdit> {
         });
         _reset();
       },
-      // Optional: Customize your TextField's appearance, behavior, etc.
     );
   }
 
@@ -102,8 +92,4 @@ class _InlineTextEditState extends State<InlineTextEdit> {
     print('after: ${_node.name}');
   }
 
-  String getNewName() {
-    // print('in get name: ${_controller.text}');
-    return _controller.text;
-  }
 }
