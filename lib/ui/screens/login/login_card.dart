@@ -31,6 +31,7 @@ class LoginPage extends StatelessWidget with GetItMixin {
       );
 
   Future<String?> attemptLogIn(String username, String password) async {
+    print('attempting login');
     var url = Uri.parse('${AppConfig().apiEndpoint}/login');
 
     // strip whitespace from front and back of username and password
@@ -48,8 +49,10 @@ class LoginPage extends StatelessWidget with GetItMixin {
     if (res.statusCode == 200) {
       GetIt.I<NodeManagerInfo>().isLoggedIn = true;
       await storage.write(key: "jwt", value: token);
+      print('Token saved to storage');
 
       // fetch data again
+      print('Fetching data after successful login');
       var info = await InfoService().fetchInfo();
       var nodeinfo = await InfoService().fetchNodeInfo();
       var inactiveInfo = await InfoService().fetchInactiveInfo();
@@ -57,12 +60,13 @@ class LoginPage extends StatelessWidget with GetItMixin {
 
       GetIt.I<NodeManagerInfo>().info = info!;
       GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
-      GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
+      GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo ?? [];
       GetIt.I<NodeManagerInfo>().history = history!;
       GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
       return res.body;
     }
+    print('Failed to log in');
     return null;
   }
 
