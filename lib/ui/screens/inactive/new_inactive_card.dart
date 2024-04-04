@@ -280,11 +280,12 @@ class _MyDataTableState extends State<_MyDataTable> {
       softWrap: true,
     );
 
-    if (e.key == 'IP Address') {
+    if (e.key == 'IP Address' && value != 'Unknown') {
       text = InkWell(
         onTap: () async {
           String port = value.contains(':') ? value.split(':')[0] : value;
           String url = 'http://$port:16126/';
+
 
           if (await canLaunchUrl(Uri.parse(url))) {
             await launchUrl(Uri.parse(url));
