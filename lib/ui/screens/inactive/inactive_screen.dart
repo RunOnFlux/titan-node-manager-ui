@@ -7,7 +7,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/api/services/fetchInfo.dart';
 
 // import 'package:testapp/ui/screens/inactive/inactive_card.dart';
-import 'package:testapp/ui/screens/inactive/new_inactive_card.dart';
+import 'package:testapp/ui/screens/inactive/inactive_card.dart';
 
 import 'package:testapp/ui/components/bottom_bar.dart';
 
@@ -16,7 +16,6 @@ import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/app/app.dart';
 
 final storage = FlutterSecureStorage();
-
 
 class InactiveScreen extends SimpleScreen with GetItStatefulWidgetMixin {
   InactiveScreen({Key? key}) : super(key: key, title: 'Inactive');
@@ -49,10 +48,10 @@ class InactiveScreenState extends SimpleScreenState<InactiveScreen>
     }
     print('jwt3: $jwt');
 
-    // TODO: We dont want to fetch info here, 
+    // TODO: We dont want to fetch info here,
     // so we need to figure out why the info doesn't stick around after REFRESH
     if (isTokenValid) {
-      await InfoService().fetchInfo(); 
+      await InfoService().fetchInfo();
     }
     await Future.delayed(Duration(milliseconds: 500));
 

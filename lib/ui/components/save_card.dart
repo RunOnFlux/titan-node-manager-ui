@@ -65,8 +65,6 @@ class _SaveNodeButtonState extends State<_SaveNodeButton> {
     // }
     if (node.provider == '') {
       providerController.text = '--';
-    } else {
-      providerController.text = node.provider.toUpperCase();
     }
     providerController.text = node.provider.toUpperCase();
     if (node.price == 0) {

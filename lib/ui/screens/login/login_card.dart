@@ -12,7 +12,7 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/ui/screens/home/home_screen.dart';
 import 'package:testapp/ui/components/info_card.dart';
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
-import 'package:testapp/ui/screens/inactive/inactive_card.dart';
+import 'package:testapp/ui/screens/inactive/old_inactive_card.dart';
 import 'package:go_router/go_router.dart';
 import 'package:testapp/utils/config.dart';
 import 'package:testapp/ui/app/loading.dart';

@@ -29,7 +29,7 @@ Future<http.Response> saveNode(node, inputs, reset) async {
     outidx = node.vout;
   }
 
-  // makes the case of the provider standard as in start with 1 capital letter and the rest are lower
+  // start with 1 capital letter
   inputs['provider'] = inputs['provider'].substring(0, 1).toUpperCase() +
       inputs['provider'].substring(1).toLowerCase();
 
@@ -56,6 +56,7 @@ Future<http.Response> saveNode(node, inputs, reset) async {
     node.name = inputs['name'];
     node.provider = inputs['provider'];
     node.price = double.parse(inputs['price']);
+
     reset();
   } else {
     print('UPDATE FAILED');
