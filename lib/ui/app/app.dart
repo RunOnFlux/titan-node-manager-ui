@@ -62,6 +62,7 @@ class NodeManagerAppState extends MinimalAppState<NodeManagerApp>
     print('Building main app');
     var loadingNotifier =
         (Provider.of<LoadingNotifier>(context) as NodeManagerLoadingNotifier);
+    
 
     Widget mainApp = super.buildMainApp(context);
 

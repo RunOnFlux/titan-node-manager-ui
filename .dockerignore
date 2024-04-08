@@ -1,0 +1,10 @@
+build
+.git*
+README.md
+Dockerfile*
+build_*
+android
+ios
+windows
+test
+linux

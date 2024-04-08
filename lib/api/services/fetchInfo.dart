@@ -50,6 +50,8 @@ class InfoService {
   Future<Info?> fetchMacroInfo() async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/info');
     print('Fetching from ${AppConfig().apiEndpoint}');
+    print('Fetching MacroInfo');
+
     // final token = GetIt.I<NodeManagerInfo>().token;
     final token = await jwtOrEmpty;
 
@@ -79,6 +81,7 @@ class InfoService {
   Future<List<NodeInfo>?> fetchNodeInfo() async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/nodeinfo');
     final token = await jwtOrEmpty;
+    print('Fetching NodeInfo');
 
     try {
       final response = await http.get(url, headers: {
@@ -107,6 +110,7 @@ class InfoService {
   Future<List<InactiveInfo>?> fetchInactiveInfo() async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/inactive');
     final token = await jwtOrEmpty;
+    print('Fetching InactiveInfo');
 
     try {
       final response = await http.get(url, headers: {
@@ -138,6 +142,7 @@ class InfoService {
 Future<History?> fetchHistory() async {
   final url = Uri.parse('${AppConfig().apiEndpoint}/history');
   final token = await jwtOrEmpty;
+  print('Fetching History');
 
   try {
     final response = await http.get(url, headers: {

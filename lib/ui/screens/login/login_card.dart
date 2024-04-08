@@ -32,6 +32,7 @@ class LoginPage extends StatelessWidget with GetItMixin {
       );
 
   Future<String?> attemptLogIn(String username, String password) async {
+    print('attempting login');
     var url = Uri.parse('${AppConfig().apiEndpoint}/login');
 
     // strip whitespace from front and back of username and password
@@ -56,8 +57,10 @@ class LoginPage extends StatelessWidget with GetItMixin {
       await InfoService().fetchInfo();
       print('fetchinfo finished');
 
+
       return res.body;
     }
+    print('Failed to log in');
     return null;
   }
 
