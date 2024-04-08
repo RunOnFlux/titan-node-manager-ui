@@ -321,6 +321,7 @@ class _MyDataTableState extends State<_MyDataTable> {
 
     if (e.key == 'Provider') {
       text = ProviderDropdown(
+        node: node,
         providers: providers,
         selectedProvider: value,
         onProviderSelected: (String provider) {

@@ -12,11 +12,14 @@ import 'package:flutter/services.dart';
 class ProviderDropdown extends StatefulWidget {
   final List<String> providers;
   final String selectedProvider;
+  final dynamic node;
+
   final Function(String) onProviderSelected;
 
   const ProviderDropdown({
     required this.providers,
     required this.selectedProvider,
+    required this.node,
     required this.onProviderSelected,
   });
 
@@ -53,9 +56,19 @@ class _ProviderDropdownState extends State<ProviderDropdown> {
       items: processProviders(widget.providers),
       onChanged: (String? provider) {
         if (provider != null) {
+          var inputs = {
+            'name': widget.node.name,
+            'provider': provider,
+            'price': widget.node.price.toString(),
+          };
+          void reset() {
+            setState(() {});
+          }
+
           setState(() {
             _selectedProvider = provider;
             widget.onProviderSelected(provider);
+            saveNode(widget.node, inputs, reset);
           });
         }
       },
