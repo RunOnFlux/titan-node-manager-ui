@@ -12,6 +12,12 @@ import 'package:testapp/api/model/history.dart';
 
 import 'package:testapp/ui/screens/login/login_card.dart';
 import 'package:testapp/utils/config.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:get_it/get_it.dart';
+import 'package:testapp/ui/app/app.dart';
+
+
+
 
 class InfoService {
   Future<String> get jwtOrEmpty async {
@@ -20,7 +26,28 @@ class InfoService {
     return jwt;
   }
 
-  Future<Info?> fetchInfo() async {
+  Future<void> fetchInfo() async {
+    var info = await fetchMacroInfo();
+    var nodeinfo = await fetchNodeInfo();
+    var inactiveInfo = await fetchInactiveInfo();
+    var history = await fetchHistory();
+
+    print('info: $info');
+
+    if (info == null || nodeinfo == null || inactiveInfo == null || history == null) {
+      print('Failed to fetch data');
+      return;
+    }
+
+    GetIt.I<NodeManagerInfo>().info = info!;
+    GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
+    GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
+    GetIt.I<NodeManagerInfo>().history = history!;
+    GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
+  }
+
+
+  Future<Info?> fetchMacroInfo() async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/info');
     print('Fetching from ${AppConfig().apiEndpoint}');
     print('Fetching MacroInfo');

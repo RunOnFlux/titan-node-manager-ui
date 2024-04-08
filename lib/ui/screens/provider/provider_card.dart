@@ -1,6 +1,10 @@
+// ignore_for_file: prefer_const_literals_to_create_immutables, prefer_const_constructors
+
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
+import 'package:get_it/get_it.dart';
+
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
@@ -9,6 +13,10 @@ import 'package:testapp/utils/config.dart';
 import 'package:testapp/ui/screens/login/login_card.dart';
 import 'dart:convert';
 import 'dart:io';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:testapp/api/model/nodeinfo.dart';
+import 'package:testapp/api/model/info.dart';
+
 
 class ProviderPage extends StatelessWidget with GetItMixin {
   ProviderPage({super.key});
@@ -75,11 +83,33 @@ class _ProviderTableState extends State<_ProviderTable> {
       columns: [
         DataColumn(
           label: Text('Provider'),
-        )
+        ),
+        DataColumn(
+          label: Text('Nodes'),
+        ),
+        DataColumn(
+          label: Text('Price'),
+        ),
+        DataColumn(
+          label: Text(''),
+        ),
       ],
       rows: providers.map<DataRow>(
         (provider) {
-          return DataRow(cells: [DataCell(Text(provider))]);
+          return DataRow(
+            cells: [
+              DataCell(Text(provider)),
+              DataCell(Text('#nodes')),
+              DataCell(Text('price')),
+              DataCell(ElevatedButton(
+                child: Text('Remove provider'),
+                onPressed: () {
+                  print('Button clicked');
+                  removeProvider(provider);
+                },
+              )),
+            ],
+          );
         },
       ).toList(),
     );
@@ -147,4 +177,47 @@ class _ProviderTableState extends State<_ProviderTable> {
 
     return response.body;
   }
+
+  Future<String> removeProvider(String provider) async {
+    String? jwt = await storage.read(key: "jwt");
+    jwt ??= '';
+
+    Map<String, String> requestBody = {
+      'provider': provider,
+    };
+
+    var url = Uri.parse('${AppConfig().apiEndpoint}/removeprovider');
+
+    final response = await http.post(
+      url,
+      body: jsonEncode(requestBody),
+      headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: "Bearer $jwt"
+      },
+    );
+
+    print('Response: ${response.body}');
+
+    if (response.body == 'Provider removed') {
+      providers.remove(provider);
+      providers.toSet().toList();
+      updateNodes(provider);
+
+      setState(() {});
+    }
+
+    return response.body;
+  }
+
+  void updateNodes(provider) {
+    List<NodeInfo> nodeinfo = GetIt.I<NodeManagerInfo>().nodeinfo;
+    // change the provider of all nodes with the removed provider to '--'
+    for (var node in nodeinfo) {
+      if (node.provider == provider) {
+        node.provider = '--';
+      }
+    }
+  }
+  
 }

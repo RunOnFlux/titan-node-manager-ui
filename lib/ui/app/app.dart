@@ -12,6 +12,10 @@ import 'package:testapp/ui/app/router.dart';
 
 import '../../utils/settings.dart';
 import 'loading.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+
+final secureStorage = FlutterSecureStorage();
+
 
 class NodeManagerApp extends MinimalApp {
   NodeManagerApp({Key? key})
@@ -88,9 +92,10 @@ class NodeManagerInfo with ChangeNotifier {
     notifyListeners();
   }
 
-  void logout() {
+  Future<void> logout() async {
     _token = '';
     isLoggedIn = false;
+    await secureStorage.delete(key: "jwt");
     notifyListeners();
   }
 

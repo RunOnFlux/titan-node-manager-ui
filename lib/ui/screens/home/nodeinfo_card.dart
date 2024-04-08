@@ -7,21 +7,26 @@ import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/ui/components/save_card.dart';
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
+
 import 'package:testapp/ui/components/inline_edit.dart';
+import 'package:testapp/ui/components/provider_dropdown.dart';
 
 class NodeInfoCard extends StatelessWidget with GetItMixin {
   NodeInfoCard({super.key});
   @override
   Widget build(BuildContext context) {
     var nodeinfo = watchOnly((NodeManagerInfo nodeinfo) => nodeinfo.nodeinfo);
-    return _MyDataTable(nodeinfo);
+    var providers = watchOnly((NodeManagerInfo info) => info.info.providers);
+
+    return _MyDataTable(nodeinfo, providers);
   }
 }
 
 class _MyDataTable extends StatefulWidget {
   final List<NodeInfo> nodeinfo;
+  final List<String> providers;
 
-  const _MyDataTable(this.nodeinfo);
+  const _MyDataTable(this.nodeinfo, this.providers);
   @override
   _MyDataTableState createState() => _MyDataTableState(nodeinfo);
 }
@@ -30,6 +35,7 @@ class _MyDataTable extends StatefulWidget {
 class _MyDataTableState extends State<_MyDataTable> {
   _MyDataTableState(this.nodeinfo);
   List<NodeInfo> nodeinfo;
+  late List<String> providers;
 
   Map<String, double> columnWidths = {
     'Name': 100,
@@ -61,7 +67,7 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Status': (node) => node.status,
     // 'Added Height': (node) => node.added_height.toString(),
     // 'Confirmed Height': (node) => node.confirmed_height.toString(),
-    '': (node) => ''
+    // '': (node) => ''
   };
 
   List<NodeInfo> filteredList = [];
@@ -70,11 +76,11 @@ class _MyDataTableState extends State<_MyDataTable> {
   void initState() {
     super.initState();
     filteredList = List.from(nodeinfo);
+    providers = widget.providers;
     initNullFields();
   }
 
   void updateState() {
-    print('updateState called');
     setState(() {});
   }
 
@@ -84,20 +90,12 @@ class _MyDataTableState extends State<_MyDataTable> {
   final horizontalScrollController = ScrollController();
 
   void initNullFields() {
-    nodeinfo.forEach((node) => {
-          if (node.name == null)
-            {
-              node.name = 'NOT SET',
-            },
-          if (node.provider == null)
-            {
-              node.provider = '--',
-            },
-          if (node.price == null)
-            {
-              node.price = -1,
-            }
-        });
+    nodeinfo.forEach((node) {
+      node.name ??= 'NOT SET';
+      node.name ??= 'NOT SET';
+      node.provider ??= '--';
+      node.price ??= -1;
+    });
   }
 
   @override
@@ -199,7 +197,7 @@ class _MyDataTableState extends State<_MyDataTable> {
       }).toList(),
       rows: filteredList.map<DataRow>((node) {
         return DataRow(
-            onSelectChanged: (t) => displayPopout(node),
+            // onSelectChanged: (t) => displayPopout(node),
             cells: attributes.entries
                 .map<DataCell>(
                   (e) => _buildCell(e, node),
@@ -276,9 +274,23 @@ class _MyDataTableState extends State<_MyDataTable> {
     }
 
     if (e.key == 'Name') {
-      text = nameField(node, value, updateState)[0];
-      // print('node.name in _buildCell: ${node.name}');
-      // node.name = nameField(node, value, updateState)[1];
+      text = inlineEdit(node, value, updateState, 'Name');
+    }
+
+    if (e.key == 'Price') {
+      text = inlineEdit(node, value, updateState, "Price");
+    }
+
+    if (e.key == 'Provider') {
+      text = ProviderDropdown(
+        node: node,
+        providers: providers,
+        selectedProvider: value,
+        onProviderSelected: (String provider) {
+          node.provider = provider;
+          updateState();
+        },
+      );
     }
 
     return DataCell(
@@ -291,18 +303,17 @@ class _MyDataTableState extends State<_MyDataTable> {
     );
   }
 
-  dynamic nameField(node, text, reset) {
+  InlineTextEdit inlineEdit(node, text, reset, property) {
     TextEditingController _editingController =
         TextEditingController(text: text);
-    // print('in nameField: ${_editingController.text}');
-    node.name = _editingController.text;
+
     InlineTextEdit inline = InlineTextEdit(
       node: node,
       controller: _editingController,
       reset: reset,
+      property: property,
     );
-    return [inline, inline.controller.text];
-    // bool _isEditingText = false;
+    return inline;
   }
 
   dynamic indexNodeMap(int index, NodeInfo node) {

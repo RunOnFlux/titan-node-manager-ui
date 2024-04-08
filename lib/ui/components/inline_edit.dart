@@ -13,12 +13,14 @@ class InlineTextEdit extends StatefulWidget {
   final TextEditingController controller;
   final VoidCallback reset;
   final dynamic node;
+  final String property;
 
   const InlineTextEdit(
       {Key? key,
       required this.node,
       required this.controller,
-      required this.reset})
+      required this.reset,
+      required this.property})
       : super(key: key);
 
   @override
@@ -30,6 +32,7 @@ class _InlineTextEditState extends State<InlineTextEdit> {
   bool _isEditing = false;
   late VoidCallback _reset;
   late dynamic _node;
+  late String _property;
 
   @override
   void initState() {
@@ -38,6 +41,7 @@ class _InlineTextEditState extends State<InlineTextEdit> {
     _controller = widget.controller;
     _reset = widget.reset;
     _node = widget.node;
+    _property = widget.property;
   }
 
   @override
@@ -51,13 +55,16 @@ class _InlineTextEditState extends State<InlineTextEdit> {
     return _isEditing ? _buildTextField() : _buildText();
   }
 
+  // not yet clicked
   Widget _buildText() {
     return GestureDetector(
-      onTap: () => setState(() {
+      onDoubleTap: () => setState(() {
         _isEditing = true;
       }),
       child: Text(
-        _controller.text,
+        _property == 'Price'
+            ? _formatPrice(_controller.text)
+            : _controller.text,
         style: TextStyle(
           color: _controller.text == 'NOT SET' ? Colors.red : Colors.green,
         ),
@@ -65,45 +72,59 @@ class _InlineTextEditState extends State<InlineTextEdit> {
     );
   }
 
-  // void updateNodeName() {
-  //   // final node = getIt<App>().node;
-  //   final newNode = NodeInfo(
-  //     name: _controller.text,
-  //   );
-  //   getIt<App>().updateNode(newNode);
-  // }
-
+  // clicked and editing
   Widget _buildTextField() {
     return TextField(
+      // only numbers
+
+      inputFormatters: _property == 'Price'
+          ? [FilteringTextInputFormatter.allow(RegExp(r'[0-9.]'))]
+          : [],
       autofocus: true,
       controller: _controller,
-      onSubmitted: (newValue) {
-        // node.name = newValue;
-        updateName();
+      // submite on click away
+      onTapOutside: (e) {
+        var newValue = _controller.text;
+        updateNode(newValue);
         setState(() {
-          print('_node.name in onSubmitted: ${_node.name}');
           _isEditing = false;
         });
         _reset();
       },
-      // Optional: Customize your TextField's appearance, behavior, etc.
+      onSubmitted: (newValue) {
+        updateNode(newValue);
+        setState(() {
+          _isEditing = false;
+        });
+        _reset();
+      },
     );
   }
 
-  void updateName() {
-    print('before: ${_node.name}');
+  String _formatPrice(String price) {
+    return price == 'NOT SET'
+        ? price
+        : '\$${double.parse(price).toStringAsFixed(2)}';
+  }
+
+  void updateNode(newValue) {
     var inputs = {
-      'name': _controller.text,
+      'name': _node.name,
       'provider': _node.provider,
       'price': _node.price.toString(),
     };
-    saveNode(_node, inputs, _reset);
-    _node.name = _controller.text;
-    print('after: ${_node.name}');
-  }
 
-  String getNewName() {
-    // print('in get name: ${_controller.text}');
-    return _controller.text;
+    if (_property == 'Name') {
+      inputs['name'] = newValue;
+      _node.name = newValue;
+    } else if (_property == 'Provider') {
+      inputs['provider'] = newValue;
+      _node.provider = newValue;
+    } else if (_property == 'Price') {
+      inputs['price'] = newValue;
+      _node.price = double.parse(newValue);
+    }
+
+    saveNode(_node, inputs, _reset);
   }
 }
