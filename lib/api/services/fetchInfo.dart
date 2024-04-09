@@ -125,6 +125,7 @@ class InfoService {
   Future<List<NodeInfo>?> fetchNodeInfo() async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/nodeinfo');
     final token = await jwtOrEmpty;
+    print('Fetching NodeInfo');
 
     try {
       final response = await http.get(url, headers: {
@@ -153,6 +154,7 @@ class InfoService {
   Future<List<InactiveInfo>?> fetchInactiveInfo() async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/inactive');
     final token = await jwtOrEmpty;
+    print('Fetching InactiveInfo');
 
     try {
       final response = await http.get(url, headers: {
@@ -206,6 +208,8 @@ class InfoService {
       }
     } catch (e) {
       print('Error encountered: $e');
+
+
       return null;
     }
   }
