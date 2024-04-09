@@ -6,8 +6,6 @@ import 'package:testapp/ui/app/app.dart';
 class NodeManagerLoadingNotifier extends LoadingNotifier {
   static int lastRefresh = 0;
 
-  
-
   // @override
   // Future<void> fetchData() async {
 
@@ -39,9 +37,10 @@ class NodeManagerLoadingNotifier extends LoadingNotifier {
     var inactiveInfo = await InfoService().fetchInactiveInfo();
     var history = await InfoService().fetchHistory();
 
-    print('info: $info');
-
-    if (info == null || nodeinfo == null || inactiveInfo == null || history == null) {
+    if (info == null ||
+        nodeinfo == null ||
+        inactiveInfo == null ||
+        history == null) {
       print('Failed to fetch data');
       return;
     }

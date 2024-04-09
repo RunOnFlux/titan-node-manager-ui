@@ -13,11 +13,9 @@ import 'package:testapp/api/model/history.dart';
 import 'package:testapp/ui/screens/login/login_card.dart';
 import 'package:testapp/utils/config.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/app/app.dart';
-
-
-
 
 class InfoService {
   Future<String> get jwtOrEmpty async {
@@ -27,32 +25,78 @@ class InfoService {
   }
 
   Future<void> fetchInfo() async {
+    // if there is data in persistent storage, fetch from there
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+
+    // testTiming(prefs);
+
+    if (prefs.getString('info') != null) {
+      await fetchInfoFromStorage(prefs);
+    } else {
+      await fetchInfoFromServer(prefs);
+    }
+  }
+
+  // fetch info from persistent storage
+  Future<void> fetchInfoFromStorage(prefs) async {
+    final info = prefs.getString('info');
+    final nodeinfo = prefs.getString('nodeinfo');
+    final inactiveInfo = prefs.getString('inactiveInfo');
+    final history = prefs.getString('history');
+
+    if (info == null ||
+        nodeinfo == null ||
+        inactiveInfo == null ||
+        history == null) {
+      print('Failed to fetch data from storage');
+      return;
+    }
+
+    // Save to session storage
+    GetIt.I<NodeManagerInfo>().info = Info.fromJson(jsonDecode(info));
+    GetIt.I<NodeManagerInfo>().nodeinfo = List<NodeInfo>.from(
+        jsonDecode(nodeinfo).map((model) => NodeInfo.fromJson(model)));
+    GetIt.I<NodeManagerInfo>().inactiveInfo = List<InactiveInfo>.from(
+        jsonDecode(inactiveInfo).map((model) => InactiveInfo.fromJson(model)));
+    GetIt.I<NodeManagerInfo>().history = History.fromJson(jsonDecode(history));
+    GetIt.I<NodeManagerInfo>().lastRefresh =
+        GetIt.I<NodeManagerInfo>().info.time;
+    GetIt.I<NodeManagerInfo>().isInfoFetched = true;
+  }
+
+  // fetch info from server
+  Future<void> fetchInfoFromServer(prefs) async {
+    print('Fetching info from server');
     var info = await fetchMacroInfo();
     var nodeinfo = await fetchNodeInfo();
     var inactiveInfo = await fetchInactiveInfo();
     var history = await fetchHistory();
 
-    print('info: $info');
-
-    if (info == null || nodeinfo == null || inactiveInfo == null || history == null) {
+    if (info == null ||
+        nodeinfo == null ||
+        inactiveInfo == null ||
+        history == null) {
       print('Failed to fetch data');
       return;
     }
 
-    GetIt.I<NodeManagerInfo>().info = info!;
-    GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
-    GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
-    GetIt.I<NodeManagerInfo>().history = history!;
+    // Save to session storage
+    GetIt.I<NodeManagerInfo>().info = info;
+    GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo;
+    GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo;
+    GetIt.I<NodeManagerInfo>().history = history;
     GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
-  }
 
+    // Save to persistent storage
+    prefs.setString('info', jsonEncode(info));
+    prefs.setString('nodeinfo', jsonEncode(nodeinfo));
+    prefs.setString('inactiveInfo', jsonEncode(inactiveInfo));
+    prefs.setString('history', jsonEncode(history));
+    GetIt.I<NodeManagerInfo>().isInfoFetched = true;
+  }
 
   Future<Info?> fetchMacroInfo() async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/info');
-    print('Fetching from ${AppConfig().apiEndpoint}');
-    print('Fetching MacroInfo');
-
-    // final token = GetIt.I<NodeManagerInfo>().token;
     final token = await jwtOrEmpty;
 
     try {
@@ -133,38 +177,40 @@ class InfoService {
         print('Failed to retrieve requested info');
         return null;
       }
-    } catch (e) {;
+    } catch (e) {
+      ;
       print('error: $e');
       return null;
     }
   }
 
-Future<History?> fetchHistory() async {
-  final url = Uri.parse('${AppConfig().apiEndpoint}/history');
-  final token = await jwtOrEmpty;
-  print('Fetching History');
+  Future<History?> fetchHistory() async {
+    final url = Uri.parse('${AppConfig().apiEndpoint}/history');
+    final token = await jwtOrEmpty;
 
-  try {
-    final response = await http.get(url, headers: {
-      HttpHeaders.contentTypeHeader: "application/json",
-      HttpHeaders.authorizationHeader: "Bearer $token"
-    });
-    if (response.statusCode == 200) {
-      final data = response.body;
-      final jsonData = jsonDecode(data);
-      final history = History.fromJson(jsonData);
-      return history;
-    } else if (response.statusCode == 401) {
-      print('401: Invalid credentials');
-      return null;
-    } else {
-      print('Failed to retrieve requested info with status code: ${response.statusCode}');
+    try {
+      final response = await http.get(url, headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: "Bearer $token"
+      });
+      if (response.statusCode == 200) {
+        final data = response.body;
+        final jsonData = jsonDecode(data);
+        final history = History.fromJson(jsonData);
+        return history;
+      } else if (response.statusCode == 401) {
+        print('401: Invalid credentials');
+        return null;
+      } else {
+        print(
+            'Failed to retrieve requested info with status code: ${response.statusCode}');
+        return null;
+      }
+    } catch (e) {
+      print('Error encountered: $e');
+
+
       return null;
     }
-  } catch (e) {
-    print('Error encountered: $e');
-    return null;
   }
-}
-
 }

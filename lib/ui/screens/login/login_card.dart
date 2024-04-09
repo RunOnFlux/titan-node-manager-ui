@@ -47,15 +47,11 @@ class LoginPage extends StatelessWidget with GetItMixin {
         body: json.encode({"username": username, "password": password}));
     var token = res.body;
 
-    // print('token:: $token');
-    // print('statusCode: ${res.statusCode}');
-
     if (res.statusCode == 200) {
       GetIt.I<NodeManagerInfo>().isLoggedIn = true;
       await storage.write(key: "jwt", value: token);
       // use fetchinfo
       await InfoService().fetchInfo();
-      print('fetchinfo finished');
 
 
       return res.body;
@@ -103,7 +99,6 @@ class LoginPage extends StatelessWidget with GetItMixin {
                       var username = _usernameController.text;
                       var password = _passwordController.text;
                       var jwt = await attemptLogIn(username, password);
-                      print('await jwt: $jwt');
                       if (jwt != null) {
                         // save token
                         GetIt.I<NodeManagerInfo>().setToken(jwt);

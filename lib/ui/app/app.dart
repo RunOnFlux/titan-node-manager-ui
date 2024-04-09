@@ -16,7 +16,6 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
 final secureStorage = FlutterSecureStorage();
 
-
 class NodeManagerApp extends MinimalApp {
   NodeManagerApp({Key? key})
       : super(
@@ -105,6 +104,7 @@ class NodeManagerInfo with ChangeNotifier {
   late History history;
 
   late int lastRefresh;
+  bool isInfoFetched = false;
 }
 
 class NodeManagerAppConfig extends AppConfig {

@@ -14,12 +14,13 @@ import 'package:testapp/ui/screens/history/hist_info_card.dart';
 import 'package:testapp/ui/screens/history/hist_graph_card.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/api/services/fetchInfo.dart';
+
 final storage = FlutterSecureStorage();
 
 class HistoryScreen extends SimpleScreen with GetItStatefulWidgetMixin {
   HistoryScreen({
     Key? key,
-  }) : super(key: key, title: 'Home');
+  }) : super(key: key, title: 'History');
   @override
   State<HistoryScreen> createState() => _HistoryScreenState();
 }
@@ -32,8 +33,8 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
     super.initState();
     bootstrapGridParameters(gutterSize: 20);
   }
+
   Future<bool> checkLogin() async {
-    print('checkinglogin');
     bool isTokenValid = false;
     final String? jwt = await storage.read(key: "jwt");
     if (jwt == null) {
@@ -44,17 +45,16 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
       isTokenValid = true;
       GetIt.I<NodeManagerInfo>().setToken(jwt);
     }
-    print('jwt3: $jwt');
 
-    // TODO: We dont want to fetch info here, 
-    // so we need to figure out why the info doesn't stick around after REFRESH
-    if (isTokenValid) {
-      await InfoService().fetchInfo(); 
+    bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
+    if (isTokenValid && !isInfoFetched) {
+      await InfoService().fetchInfo();
+      await Future.delayed(Duration(milliseconds: 50));
     }
-    await Future.delayed(Duration(milliseconds: 500));
 
     return isTokenValid;
   }
+
   @override
   Widget buildChild(BuildContext context) {
     return FutureBuilder(
@@ -74,16 +74,6 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
         }
       },
     );
-
-
-
-    if (isTokenValid) {
-      return historyPage(context);
-    } else {
-
-      Future.microtask(() => context.go('/'));
-      return Container(); // Return an empty container to avoid any temporary rendering issues.
-    }
   }
 
   BootstrapContainer historyPage(context) {
@@ -99,21 +89,23 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
             ),
           ],
         ),
-        BootstrapRow(children: [
-          BootstrapCol(
-            fit: FlexFit.tight,
-            // chage the size to take up HALF the screen
-            sizes: 'col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
-            child: HistoryCard(),
-          ),
-          BootstrapCol(
-            fit: FlexFit.tight,
-            // chage the size to take up HALF the screen
-            sizes: 'col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
+        BootstrapRow(
+          children: [
+            BootstrapCol(
+              fit: FlexFit.tight,
+              // chage the size to take up HALF the screen
+              sizes: 'col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
+              child: HistoryCard(),
+            ),
+            BootstrapCol(
+              fit: FlexFit.tight,
+              // chage the size to take up HALF the screen
+              sizes: 'col-12 col-sm-12 col-md-6 col-lg-6 col-xl-6',
               child: HistGraphCard(),
-          ),
-        ],),
-      BootstrapCol(child: BottomBar()),
+            ),
+          ],
+        ),
+        BootstrapCol(child: BottomBar()),
       ],
     );
   }
