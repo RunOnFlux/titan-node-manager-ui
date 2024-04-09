@@ -25,36 +25,18 @@ class HomeScreen extends SimpleScreen with GetItStatefulWidgetMixin {
 
 class HomeScreenState extends SimpleScreenState<HomeScreen>
     with GetItStateMixin {
-      late bool isTokenValid;
+  late bool isTokenValid;
 
   @override
   void initState() {
-    // Check if the token is valid.
-    // read from storage
-
-
     isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
-    print('isloggedin inside homescreen: $isTokenValid');
-
     super.initState();
     bootstrapGridParameters(gutterSize: 20);
-
-
   }
 
-  // read token from storage async
-  // check if token is valid
-  // if valid, return homePage
-
-  // Future<String> readToken() async {
-  //   final String? jwt = await storage.read(key: "jwt");
-  //   return jwt!;
-  // }
-
   Future<bool> checkLogin() async {
-    print('checkinglogin');
-
     final String? jwt = await storage.read(key: "jwt");
+
     if (jwt == null) {
       GetIt.I<NodeManagerInfo>().isLoggedIn = false;
       isTokenValid = false;
@@ -63,15 +45,12 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
       isTokenValid = true;
       GetIt.I<NodeManagerInfo>().setToken(jwt);
     }
-    print('jwt3: $jwt');
 
-    // TODO: We dont want to fetch info here, 
-    // so we need to figure out why the info doesn't stick around after REFRESH
-    if (isTokenValid) {
-      await InfoService().fetchInfo(); 
+    bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
+    if (isTokenValid && !isInfoFetched) {
+      await InfoService().fetchInfo();
+      await Future.delayed(const Duration(milliseconds: 50));
     }
-    await Future.delayed(Duration(milliseconds: 500));
-
     return isTokenValid;
   }
 
@@ -90,21 +69,10 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
             return Container(); // Return an empty container to avoid any temporary rendering issues.
           }
         } else {
-          return CircularProgressIndicator();
+          return const CircularProgressIndicator();
         }
       },
     );
-
-
-    checkLogin();
-    if (isTokenValid) {
-      print('buildchild token is valid: $isTokenValid');
-      return homePage(context);
-    } else {
-      // Directly navigate to the login page if the token is not valid.
-      Future.microtask(() => context.go('/')); 
-      return Container(); // Return an empty container to avoid any temporary rendering issues.
-    }
   }
 
   BootstrapContainer homePage(context) {

@@ -17,12 +17,14 @@ import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
 import 'package:testapp/api/model/info.dart';
 
-
 class ProviderPage extends StatelessWidget with GetItMixin {
   ProviderPage({super.key});
   @override
   Widget build(BuildContext context) {
-    var providers = watchOnly((NodeManagerInfo info) => info.info.providers);
+    var providersList =
+        watchOnly((NodeManagerInfo info) => info.info.providers);
+    // make a copy of the providers list so we don't modify the original
+    List<String> providers = List<String>.from(providersList);
     return _ProviderTable(providers);
   }
 }
@@ -54,7 +56,6 @@ class _ProviderTableState extends State<_ProviderTable> {
             child: ElevatedButton(
               child: Text('Add Provider'),
               onPressed: () {
-                print('Button pressed');
                 providerPopup(context);
               },
             ),
@@ -104,7 +105,6 @@ class _ProviderTableState extends State<_ProviderTable> {
               DataCell(ElevatedButton(
                 child: Text('Remove provider'),
                 onPressed: () {
-                  print('Button clicked');
                   removeProvider(provider);
                 },
               )),
@@ -219,5 +219,4 @@ class _ProviderTableState extends State<_ProviderTable> {
       }
     }
   }
-  
 }

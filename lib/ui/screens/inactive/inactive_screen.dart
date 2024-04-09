@@ -5,8 +5,6 @@ import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/ui/components/info_card.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/api/services/fetchInfo.dart';
-
-// import 'package:testapp/ui/screens/inactive/inactive_card.dart';
 import 'package:testapp/ui/screens/inactive/inactive_card.dart';
 
 import 'package:testapp/ui/components/bottom_bar.dart';
@@ -34,7 +32,6 @@ class InactiveScreenState extends SimpleScreenState<InactiveScreen>
   }
 
   Future<bool> checkLogin() async {
-    print('checkinglogin');
     bool isTokenValid = false;
 
     final String? jwt = await storage.read(key: "jwt");
@@ -46,14 +43,12 @@ class InactiveScreenState extends SimpleScreenState<InactiveScreen>
       isTokenValid = true;
       GetIt.I<NodeManagerInfo>().setToken(jwt);
     }
-    print('jwt3: $jwt');
 
-    // TODO: We dont want to fetch info here,
-    // so we need to figure out why the info doesn't stick around after REFRESH
-    if (isTokenValid) {
+    bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
+    if (isTokenValid && !isInfoFetched) {
       await InfoService().fetchInfo();
+      await Future.delayed(const Duration(milliseconds: 50));
     }
-    await Future.delayed(Duration(milliseconds: 500));
 
     return isTokenValid;
   }
@@ -77,13 +72,6 @@ class InactiveScreenState extends SimpleScreenState<InactiveScreen>
         }
       },
     );
-
-    if (isTokenValid) {
-      return inactivePage(context);
-    } else {
-      Future.microtask(() => context.go('/'));
-      return Container(); // Return an empty container to avoid any temporary rendering issues.
-    }
   }
 
   BootstrapContainer inactivePage(context) {

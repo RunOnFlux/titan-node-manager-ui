@@ -9,7 +9,6 @@ import 'package:go_router/go_router.dart';
 import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/app/loading.dart';
 
-
 class LoginScreen extends SimpleScreen with GetItStatefulWidgetMixin {
   LoginScreen({Key? key}) : super(key: key, title: 'Login');
 
@@ -19,7 +18,6 @@ class LoginScreen extends SimpleScreen with GetItStatefulWidgetMixin {
 
 class LoginScreenState extends SimpleScreenState<LoginScreen>
     with GetItStateMixin {
-
   // constructor
   LoginScreenState() {
     checkLogin();
@@ -29,7 +27,6 @@ class LoginScreenState extends SimpleScreenState<LoginScreen>
     super.initState();
     bootstrapGridParameters(gutterSize: 20);
   }
-
 
   void checkLogin() async {
     final String? jwt = await storage.read(key: "jwt");
@@ -45,12 +42,10 @@ class LoginScreenState extends SimpleScreenState<LoginScreen>
 
   @override
   Widget buildChild(BuildContext context) {
-    // print('isloggedin inside loginscreen: ${GetIt.I<NodeManagerInfo>().isLoggedIn}');
-    // print('jwt2: ${GetIt.I<NodeManagerInfo>().token}');
-
-    return SizedBox(child: LoginPage(),
-    width: 500,
-    height: 500,);
+    return SizedBox(
+      child: LoginPage(),
+      width: 500,
+      height: 500,
+    );
   }
-
 }

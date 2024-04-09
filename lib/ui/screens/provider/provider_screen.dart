@@ -8,6 +8,7 @@ import 'package:get_it/get_it.dart';
 import 'package:testapp/ui/app/app.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/api/services/fetchInfo.dart';
+
 final storage = FlutterSecureStorage();
 
 class ProviderScreen extends SimpleScreen with GetItStatefulWidgetMixin {
@@ -28,7 +29,6 @@ class ProviderScreenState extends SimpleScreenState<ProviderScreen>
   }
 
   Future<bool> checkLogin() async {
-    print('checkinglogin');
     bool isTokenValid = false;
     final String? jwt = await storage.read(key: "jwt");
     if (jwt == null) {
@@ -39,14 +39,12 @@ class ProviderScreenState extends SimpleScreenState<ProviderScreen>
       isTokenValid = true;
       GetIt.I<NodeManagerInfo>().setToken(jwt);
     }
-    print('jwt3: $jwt');
 
-    // TODO: We dont want to fetch info here, 
-    // so we need to figure out why the info doesn't stick around after REFRESH
-    if (isTokenValid) {
-      await InfoService().fetchInfo(); 
+    bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
+    if (isTokenValid && !isInfoFetched) {
+      await InfoService().fetchInfo();
+      await Future.delayed(Duration(milliseconds: 50));
     }
-    await Future.delayed(Duration(milliseconds: 500));
 
     return isTokenValid;
   }
@@ -70,11 +68,5 @@ class ProviderScreenState extends SimpleScreenState<ProviderScreen>
         }
       },
     );
-    if (isTokenValid) {
-      return ProviderPage();
-    } else {
-      Future.microtask(() => context.go('/'));
-      return Container();
-    }
   }
 }
