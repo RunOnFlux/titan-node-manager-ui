@@ -125,21 +125,13 @@ class _ProviderTableState extends State<_ProviderTable> {
               onChanged: (provider) {
                 providerToBeCreated = provider;
               },
+              onSubmitted: (provider) async {
+                var response = await addProvider(providerToBeCreated);
+                print('Response: $response');
+                Navigator.of(context).pop();
+              },
             ),
-            actions: [
-              TextButton(
-                  child: Text('Cancel'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  }),
-              TextButton(
-                  child: Text('Submit'),
-                  onPressed: () async {
-                    var response = await addProvider(providerToBeCreated);
-                    print('Response: $response');
-                    Navigator.of(context).pop();
-                  })
-            ],
+            actions: [],
           );
         });
   }

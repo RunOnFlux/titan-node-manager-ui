@@ -95,6 +95,19 @@ class InfoService {
     GetIt.I<NodeManagerInfo>().isInfoFetched = true;
   }
 
+  Future<void> updateCache() async {
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    final info = GetIt.I<NodeManagerInfo>().info;
+    final nodeinfo = GetIt.I<NodeManagerInfo>().nodeinfo;
+    final inactiveInfo = GetIt.I<NodeManagerInfo>().inactiveInfo;
+    final history = GetIt.I<NodeManagerInfo>().history;
+
+    prefs.setString('info', jsonEncode(info));
+    prefs.setString('nodeinfo', jsonEncode(nodeinfo));
+    prefs.setString('inactiveInfo', jsonEncode(inactiveInfo));
+    prefs.setString('history', jsonEncode(history));
+  }
+
   Future<Info?> fetchMacroInfo() async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/info');
     final token = await jwtOrEmpty;
@@ -208,7 +221,6 @@ class InfoService {
       }
     } catch (e) {
       print('Error encountered: $e');
-
 
       return null;
     }

@@ -8,6 +8,7 @@ import 'package:testapp/utils/config.dart';
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/inactiveInfo.dart';
 import 'package:testapp/api/model/nodeinfo.dart';
+import 'package:testapp/api/services/fetchInfo.dart';
 
 import 'package:testapp/ui/screens/login/login_card.dart';
 
@@ -56,6 +57,8 @@ Future<http.Response> saveNode(node, inputs, reset) async {
     node.name = inputs['name'];
     node.provider = inputs['provider'];
     node.price = double.parse(inputs['price']);
+    // use InfoService to update the cache
+    await InfoService().updateCache();
 
     reset();
   } else {
