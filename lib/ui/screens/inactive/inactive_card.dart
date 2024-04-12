@@ -297,6 +297,11 @@ class _MyDataTableState extends State<_MyDataTable> {
             throw 'Could not launch $url';
           }
         },
+        // On long press save the ip to clipboard
+        onLongPress: () async {
+          await Clipboard.setData(ClipboardData(text: value));
+          showSnackBarTop(context, 'IP Address copied to clipboard');
+        },
         child: text,
       );
     }
@@ -305,7 +310,7 @@ class _MyDataTableState extends State<_MyDataTable> {
       text = InkWell(
         onTap: () async {
           await Clipboard.setData(ClipboardData(text: node.txid));
-          showSnackBarTop(context);
+          showSnackBarTop(context, 'Txhash copied to clipboard');
         },
         child: text,
       );
@@ -371,10 +376,10 @@ class _MyDataTableState extends State<_MyDataTable> {
     }
   }
 
-  showSnackBarTop(context) {
+  showSnackBarTop(context, message) {
     SnackBar snackBar = SnackBar(
-      content: const Text(
-        'Copied Txhash to clipboard',
+      content: Text(
+        message,
         style: TextStyle(fontSize: 20, color: Color.fromARGB(255, 12, 0, 150)),
       ),
       backgroundColor: Color.fromARGB(255, 204, 204, 204),

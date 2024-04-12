@@ -39,12 +39,14 @@ class _ProviderDropdownState extends State<ProviderDropdown> {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: () {
-        setState(() {});
-      },
-      child: _buildDropdownButton(),
-    );
+    return _buildDropdownButton();
+
+    // return GestureDetector(
+    //   onTap: () {
+    //     setState(() {});
+    //   },
+    //   child: _buildDropdownButton(),
+    // );
   }
 
   Widget _buildDropdownButton() {
