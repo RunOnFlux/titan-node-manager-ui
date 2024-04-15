@@ -28,16 +28,25 @@ class InfoService {
     // if there is data in persistent storage, fetch from there
     final SharedPreferences prefs = await SharedPreferences.getInstance();
     // only pull from storage if the data is not stale
+    // if (prefs.getString('info') != null) {
+    //   await fetchInfoFromStorage(prefs);
+    // } else {
+    //   await fetchInfoFromServer(prefs);
+    // }
     // only pull from storage if the data is not stale
     if (prefs.getString('info') != null) {
+      print('Info is not null');
+      await fetchInfoFromStorage(prefs);
+
       final lastRefresh = GetIt.I<NodeManagerInfo>().lastRefresh;
       final now = DateTime.now().millisecondsSinceEpoch;
       final secondsElapsed = ((now - lastRefresh) / 1000).floor();
-      if (secondsElapsed < 60) {
-        await fetchInfoFromStorage(prefs);
+      if (secondsElapsed < 120) {
+        print('Info is not stale');
         return;
       }
     }
+    print('Info is stale or null');
     await fetchInfoFromServer(prefs);
   }
 
