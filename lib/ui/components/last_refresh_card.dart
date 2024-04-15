@@ -7,7 +7,7 @@ import 'package:testapp/ui/app/app.dart';
 class LastRefresh extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
-    final lastRefreshTime = watchOnly((NodeManagerInfo x) => x.lastRefresh);
+    final lastRefreshTime = watchOnly((NodeManagerInfo x) => x.info.time);
     return StreamBuilder<int>(
       stream: Stream.periodic(const Duration(seconds: 1), (i) => i),
       builder: (context, snapshot) {
