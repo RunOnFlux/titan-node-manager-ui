@@ -35,7 +35,6 @@ class NodeManagerApp extends MinimalApp {
 
 class NodeManagerAppState extends MinimalAppState<NodeManagerApp>
     with WidgetsBindingObserver {
-  late int lastRefresh;
   @override
   void initState() {
     super.initState();
@@ -103,7 +102,6 @@ class NodeManagerInfo with ChangeNotifier {
   late List<InactiveInfo> inactiveInfo;
   late History history;
 
-  late int lastRefresh;
   bool isInfoFetched = false;
 }
 

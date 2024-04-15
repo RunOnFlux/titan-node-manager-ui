@@ -38,15 +38,21 @@ class InfoService {
       print('Info is not null');
       await fetchInfoFromStorage(prefs);
 
-      final lastRefresh = GetIt.I<NodeManagerInfo>().lastRefresh;
+
+
+      final lastRefresh = GetIt.I<NodeManagerInfo>().info.time;
+
+
       final now = DateTime.now().millisecondsSinceEpoch;
       final secondsElapsed = ((now - lastRefresh) / 1000).floor();
+
+      print('Seconds elapsed: $secondsElapsed');
       if (secondsElapsed < 120) {
         print('Info is not stale');
         return;
       }
     }
-    print('Info is stale or null');
+    print('Info is stale');
     await fetchInfoFromServer(prefs);
   }
 
@@ -72,8 +78,6 @@ class InfoService {
     GetIt.I<NodeManagerInfo>().inactiveInfo = List<InactiveInfo>.from(
         jsonDecode(inactiveInfo).map((model) => InactiveInfo.fromJson(model)));
     GetIt.I<NodeManagerInfo>().history = History.fromJson(jsonDecode(history));
-    GetIt.I<NodeManagerInfo>().lastRefresh =
-        GetIt.I<NodeManagerInfo>().info.time;
     GetIt.I<NodeManagerInfo>().isInfoFetched = true;
   }
 
@@ -98,7 +102,7 @@ class InfoService {
     GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo;
     GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo;
     GetIt.I<NodeManagerInfo>().history = history;
-    GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
+    // GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
     // Save to persistent storage
     prefs.setString('info', jsonEncode(info));
