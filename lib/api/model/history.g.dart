@@ -20,12 +20,17 @@ History _$HistoryFromJson(Map<String, dynamic> json) => History(
         (k, e) => MapEntry(k,
             (e as List<dynamic>?)?.map((e) => (e as num).toDouble()).toList()),
       ),
+      dailyLoss: (json['dailyLoss'] as Map<String, dynamic>).map(
+        (k, e) => MapEntry(k,
+            (e as List<dynamic>?)?.map((e) => (e as num).toDouble()).toList()),
+      ),
     );
 
 Map<String, dynamic> _$HistoryToJson(History instance) => <String, dynamic>{
       'monthlyCost': instance.monthlyCost,
       'nodeActivity': instance.nodeActivity,
       'dailyEarnings': instance.dailyEarnings,
+      'dailyLoss': instance.dailyLoss,
     };
 
 NodeEvent _$NodeEventFromJson(Map<String, dynamic> json) => NodeEvent(

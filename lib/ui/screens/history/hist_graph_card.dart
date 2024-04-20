@@ -8,7 +8,7 @@ import 'package:fl_chart/fl_chart.dart';
 
 import 'package:testapp/api/model/history.dart';
 
-class HistGraphNodes extends StatelessWidget with GetItMixin {
+class DropsByMonth extends StatelessWidget with GetItMixin {
   @override
   Widget build(BuildContext context) {
     final History history =
@@ -83,7 +83,7 @@ class HistGraphNodes extends StatelessWidget with GetItMixin {
                       leftTitles: const AxisTitles(
                         sideTitles: SideTitles(
                           reservedSize: 30,
-                          interval: 5,
+                          interval: 2,
                           showTitles:
                               true, // Adjust based on whether you want to show left axis titles
                         ),
@@ -208,9 +208,16 @@ class HistGraphNodes extends StatelessWidget with GetItMixin {
       List<BarChartRodData> bars = [];
       // iterate through the providers and create a bar for each provider
       for (var provIndex = 0; provIndex < providers.length; provIndex++) {
+        var drops = providers[provIndex]['drops'][lastThreemonths[monthIndex]];
+        // Do not create a bar in the graph if there are no drops
+        if (drops == 0) {
+          continue;
+        }
+        if (drops > 10) {
+          drops = 10;
+        }
         bars.add(BarChartRodData(
-          toY: providers[provIndex]['drops'][lastThreemonths[monthIndex]]
-              .toDouble(),
+          toY: drops.toDouble(),
           color: providers[provIndex]['color'],
           width: 13,
         ));
@@ -224,8 +231,31 @@ class HistGraphNodes extends StatelessWidget with GetItMixin {
   }
 
   Widget buildLegend(Map<String, dynamic> data) {
+    // create the same legend but with a for loop instead
+
     return Row(
       children: data.values.map((value) {
+        if (value['color'] == Colors.grey) {
+          if (value['provider'] == '--') {
+            return Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 2.0),
+              child: Row(
+                children: [
+                  Container(
+                    width: 20,
+                    height: 20,
+                    color: value['color'],
+                  ),
+                  SizedBox(width: 8),
+                  Text('Other', style: TextStyle(fontSize: 10)),
+                ],
+              ),
+            );
+          } else {
+            return Container();
+          }
+        }
+        ;
         return Padding(
           padding: const EdgeInsets.symmetric(horizontal: 2.0),
           child: Row(
@@ -241,6 +271,242 @@ class HistGraphNodes extends StatelessWidget with GetItMixin {
           ),
         );
       }).toList(),
+    );
+  }
+}
+
+/////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+class DailyLoss extends StatelessWidget with GetItMixin {
+  final List<Color> gradientColors = [
+    const Color(0xff23b6e6),
+    const Color(0xff02d39a),
+  ];
+
+  List<DateTime> lastTenDays() {
+    var now = DateTime.now();
+    List<DateTime> days = [];
+    for (int i = 0; i < 10; i++) {
+      // Subtract `i` days from today's date and add to the list
+      days.add(now.subtract(Duration(days: i)));
+    }
+
+    // change the formatting of days to just be mm-dd-yyyy
+    days = days.map((day) {
+      return DateTime(day.year, day.month, day.day);
+    }).toList();
+    // Return the list in reverse order to start from 10 days ago to today
+
+    return days.reversed.toList();
+  }
+
+  Map<String, double> lineChartData(lastTenDays, dailyLoss) {
+    final Map<String, double> data = {};
+    for (var i = 0; i < lastTenDays.length; i++) {
+      var date = lastTenDays[i];
+      var formattedDate = '${date.month}/${date.day}/${date.year}';
+
+      if (dailyLoss[formattedDate] == null) {
+        data[formattedDate] = 0;
+        continue;
+      }
+      data[formattedDate] = dailyLoss[formattedDate][0] ?? 0;
+    }
+    return data;
+  }
+
+  Widget bottomTitleWidgets(double value, TitleMeta meta) {
+    var dayInterval = lastTenDays();
+    var dayIntervalString = dayInterval.map((day) {
+      return '${day.month}/${day.day}';
+    }).toList();
+    const style = TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 16,
+    );
+    Widget text;
+    switch (value.toInt()) {
+      case 0:
+        text = Text(dayIntervalString[0], style: style);
+        break;
+      case 1:
+        text = Text(dayIntervalString[1], style: style);
+        break;
+      case 2:
+        text = Text(dayIntervalString[2], style: style);
+        break;
+      case 3:
+        text = Text(dayIntervalString[3], style: style);
+        break;
+      case 4:
+        text = Text(dayIntervalString[4], style: style);
+        break;
+      case 5:
+        text = Text(dayIntervalString[5], style: style);
+        break;
+      case 6:
+        text = Text(dayIntervalString[6], style: style);
+        break;
+      case 7:
+        text = Text(dayIntervalString[7], style: style);
+        break;
+      case 8:
+        text = Text(dayIntervalString[8], style: style);
+        break;
+      case 9:
+        text = Text(dayIntervalString[9], style: style);
+        break;
+      default:
+        text = const Text('', style: style);
+        break;
+    }
+    return SideTitleWidget(
+      axisSide: meta.axisSide,
+      child: text,
+    );
+  }
+
+  Widget leftTitleWidgets(double value, TitleMeta meta) {
+    const style = TextStyle(
+      fontWeight: FontWeight.bold,
+      fontSize: 15,
+    );
+    String text;
+    switch (value.toInt()) {
+      case 1:
+        text = '10K';
+        break;
+      case 3:
+        text = '30k';
+        break;
+      case 5:
+        text = '50k';
+        break;
+      default:
+        return Container();
+    }
+
+    return Text(text, style: style, textAlign: TextAlign.left);
+  }
+
+  LineChartData mainData(data) {
+    return LineChartData(
+      gridData: FlGridData(
+        show: true,
+        drawVerticalLine: true,
+        horizontalInterval: 1,
+        verticalInterval: 1,
+        getDrawingHorizontalLine: (value) {
+          return FlLine(
+            color: const Color(0xff37434d),
+            strokeWidth: 1,
+          );
+        },
+        getDrawingVerticalLine: (value) {
+          return FlLine(
+            color: const Color(0xff37434d),
+            strokeWidth: 1,
+          );
+        },
+      ),
+      titlesData: FlTitlesData(
+        show: true,
+        rightTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        topTitles: const AxisTitles(
+          sideTitles: SideTitles(showTitles: false),
+        ),
+        bottomTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            reservedSize: 30,
+            interval: 1,
+            getTitlesWidget: bottomTitleWidgets,
+          ),
+        ),
+        leftTitles: AxisTitles(
+          sideTitles: SideTitles(
+            showTitles: true,
+            interval: 1,
+            getTitlesWidget: leftTitleWidgets,
+            reservedSize: 42,
+          ),
+        ),
+      ),
+      borderData: FlBorderData(
+        show: true,
+        border: Border.all(color: const Color(0xff37434d)),
+      ),
+      minX: 0,
+      maxX: 9,
+      minY: 0,
+      maxY: 6,
+      lineBarsData: [
+        LineChartBarData(
+          spots: [
+            FlSpot(0, data.values.elementAt(0)),
+            FlSpot(1, data.values.elementAt(1)),
+            FlSpot(2, data.values.elementAt(2)),
+            FlSpot(3, data.values.elementAt(3)),
+            FlSpot(4, data.values.elementAt(4)),
+            FlSpot(5, data.values.elementAt(5)),
+            FlSpot(6, data.values.elementAt(6)),
+            FlSpot(7, data.values.elementAt(7)),
+            FlSpot(8, data.values.elementAt(8)),
+            FlSpot(9, data.values.elementAt(9)),
+          ],
+          isCurved: true,
+          gradient: LinearGradient(
+            colors: gradientColors,
+          ),
+          barWidth: 5,
+          isStrokeCapRound: true,
+          dotData: const FlDotData(
+            show: false,
+          ),
+          belowBarData: BarAreaData(
+            show: true,
+            gradient: LinearGradient(
+              colors: gradientColors
+                  .map((color) => color.withOpacity(0.3))
+                  .toList(),
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final History history =
+        watchOnly((NodeManagerInfo nodeManagerInfo) => nodeManagerInfo.history);
+
+    final dailyLoss = history.dailyLoss;
+    final daysInterval = lastTenDays();
+    final data = lineChartData(daysInterval, dailyLoss);
+    print('data: $data');
+
+    return Container(
+      child: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: SizedBox(
+          // make the graph size dependent on the screen size
+          width: MediaQuery.of(context).size.width,
+          height: MediaQuery.of(context).size.height * 0.30,
+          // the child is a bar graph
+          child: Column(
+            children: [
+              Text('Daily Loss In The Last 10 Days',
+                  style: TextStyle(fontSize: 20)),
+              Expanded(
+                child: LineChart(mainData(data)),
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }
@@ -261,16 +527,13 @@ class HistGraphCard extends StatelessWidget with GetItMixin {
                 fit: FlexFit.tight,
                 sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
                 child: Container(
-                  // decoration: BoxDecoration(
-                  //   border: Border.all(color: Colors.red, width: 2),
-                  // ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SizedBox(
                       // make the graph size dependent on the screen size
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height * 0.30,
-                      child: HistGraphNodes(),
+                      child: DropsByMonth(),
                     ),
                   ),
                 ),
@@ -283,16 +546,13 @@ class HistGraphCard extends StatelessWidget with GetItMixin {
                 fit: FlexFit.tight,
                 sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
                 child: Container(
-                  decoration: BoxDecoration(
-                    border: Border.all(color: Colors.red, width: 2),
-                  ),
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: SizedBox(
                       // make the graph size dependent on the screen size
                       width: MediaQuery.of(context).size.width,
                       height: MediaQuery.of(context).size.height * 0.30,
-                      child: Text('Graph that shows profit with daily data points'),
+                      child: DailyLoss(),
                     ),
                   ),
                 ),
