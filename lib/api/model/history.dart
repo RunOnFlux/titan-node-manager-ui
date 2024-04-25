@@ -7,8 +7,10 @@ class History {
   List<MonthlyCost?> monthlyCost;
   List<NodeEvent?> nodeActivity;
 
-  // {mm/dd/yyyy: [earnings, timestamp]}
-  Map<String, List<double>?> dailyEarnings;
+  // {mm/dd/yyyy: [value, timestamp]}
+  Map<String, List<double>?> dailyEarnings; // value = earnings
+  Map<String, List<double>?> dailyLoss; // value = loss
+
 
   String? _id;
 
@@ -17,6 +19,7 @@ class History {
     required this.monthlyCost,
     required this.nodeActivity,
     required this.dailyEarnings,
+    required this.dailyLoss,
   });
 
 

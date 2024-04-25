@@ -369,8 +369,8 @@ class _MyDataTableState extends State<_MyDataTable> {
 
   void _onSort(int columnIndex, bool ascending) {
     setState(() {
-      _sortColumnIndex = columnIndex;
-      _sortAscending = ascending;
+      _sortColumnIndex = columnIndex; // Column to sort by
+      _sortAscending = ascending; // Which direction to sort
       // Sort the data based on the selected column and sorting direction
       filteredList.sort((a, b) {
         final aValue = indexNodeMap(columnIndex, a);
