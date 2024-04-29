@@ -373,14 +373,17 @@ class DailyLoss extends StatelessWidget with GetItMixin {
     );
     String text;
     switch (value.toInt()) {
-      case 1:
-        text = '10K';
+      case 0:
+        text = '0';
         break;
-      case 3:
-        text = '30k';
+      case 25:
+        text = '25';
         break;
-      case 5:
-        text = '50k';
+      case 50:
+        text = '50';
+        break;
+      case 75:
+        text = '75';
         break;
       default:
         return Container();
@@ -428,7 +431,7 @@ class DailyLoss extends StatelessWidget with GetItMixin {
         leftTitles: AxisTitles(
           sideTitles: SideTitles(
             showTitles: true,
-            interval: 1,
+            interval: 25,
             getTitlesWidget: leftTitleWidgets,
             reservedSize: 42,
           ),
@@ -441,7 +444,8 @@ class DailyLoss extends StatelessWidget with GetItMixin {
       minX: 0,
       maxX: 9,
       minY: 0,
-      maxY: 6,
+      // maxY should be the maximum value in the data
+      maxY: 75,
       lineBarsData: [
         LineChartBarData(
           spots: [

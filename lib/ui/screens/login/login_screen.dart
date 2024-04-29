@@ -20,7 +20,7 @@ class LoginScreenState extends SimpleScreenState<LoginScreen>
     with GetItStateMixin {
   // constructor
   LoginScreenState() {
-    checkLogin();
+    InfoService().checkLogin();
   }
   @override
   void initState() {
@@ -28,17 +28,22 @@ class LoginScreenState extends SimpleScreenState<LoginScreen>
     bootstrapGridParameters(gutterSize: 20);
   }
 
-  void checkLogin() async {
-    final String? jwt = await storage.read(key: "jwt");
-    if (jwt == null) {
-      GetIt.I<NodeManagerInfo>().isLoggedIn = false;
-    } else {
-      GetIt.I<NodeManagerInfo>().setToken(jwt);
-      GetIt.I<NodeManagerInfo>().isLoggedIn = true;
-      await InfoService().fetchInfo();
-      Future.microtask(() => context.go('/home'));
-    }
-  }
+  // void checkLogin() async {
+  //   final String? jwt = await storage.read(key: "jwt");
+  //   if (jwt == null) {
+  //     GetIt.I<NodeManagerInfo>().isLoggedIn = false;
+  //     return;
+  //   }
+
+  //   final bool tokenIsValid = await InfoService().fetchInfo();
+  //   if (!tokenIsValid) {
+  //     GetIt.I<NodeManagerInfo>().isLoggedIn = false;
+  //     return;
+  //   }
+  //   GetIt.I<NodeManagerInfo>().setToken(jwt);
+  //   GetIt.I<NodeManagerInfo>().isLoggedIn = true;
+  //   Future.microtask(() => context.go('/home'));
+  // }
 
   @override
   Widget buildChild(BuildContext context) {

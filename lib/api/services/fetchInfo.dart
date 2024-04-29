@@ -24,22 +24,73 @@ class InfoService {
     return jwt;
   }
 
-  Future<void> fetchInfo() async {
+
+  Future<bool> checkLogin() async {
+    final String? jwt = await storage.read(key: "jwt");
+    var isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
+    final bool checkToken = await this.checkToken(jwt);
+    print('Checktoken result: $checkToken');
+    if (jwt == null || checkToken == false) {
+      print('Token is null or expired');
+      GetIt.I<NodeManagerInfo>().isLoggedIn = false;
+      isTokenValid = false;
+    } else {
+      print('Token is valid in fetchInfo');
+      GetIt.I<NodeManagerInfo>().isLoggedIn = true;
+      isTokenValid = true;
+      GetIt.I<NodeManagerInfo>().setToken(jwt);
+    }
+
+    bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
+    if (isTokenValid && !isInfoFetched) {
+      await fetchInfo();
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
+    return isTokenValid;
+  }
+
+  // clear token
+  void clearToken() async {
+    print('Deleting expired token');
+    await storage.delete(key: "jwt");
+    GetIt.I<NodeManagerInfo>().isLoggedIn = false;
+  }
+
+  // check if token is expired
+  Future<bool> checkToken(String? jwt) async {
+    print('Checking token');
+    if (jwt == null) {
+      print('Token is null');
+      return false;
+    }
+    final url = Uri.parse('${AppConfig().apiEndpoint}/verify');
+    try {
+      final response = await http.get(url, headers: {
+        HttpHeaders.contentTypeHeader: "application/json",
+        HttpHeaders.authorizationHeader: "Bearer $jwt"
+      });
+
+      if (response.statusCode == 200) {
+        return true;
+      } else {
+        print('Token is expired');
+        clearToken();
+        return false;
+      }
+    } catch (e) {
+      print('Error in checktoken: $e');
+      return false;
+    }
+  }
+
+  Future<bool> fetchInfo() async {
+    print('Fetching info ');
     // if there is data in persistent storage, fetch from there
     final SharedPreferences prefs = await SharedPreferences.getInstance();
-    // only pull from storage if the data is not stale
-    // if (prefs.getString('info') != null) {
-    //   await fetchInfoFromStorage(prefs);
-    // } else {
-    //   await fetchInfoFromServer(prefs);
-    // }
     // only pull from storage if the data is not stale
     if (prefs.getString('info') != null) {
       print('Info is not null');
       await fetchInfoFromStorage(prefs);
-
-
-
       final lastRefresh = GetIt.I<NodeManagerInfo>().info.time;
 
 
@@ -49,11 +100,12 @@ class InfoService {
       print('Seconds elapsed: $secondsElapsed');
       if (secondsElapsed < 120) {
         print('Info is not stale');
-        return;
+        return true;
       }
     }
     print('Info is stale');
     await fetchInfoFromServer(prefs);
+    return true;
   }
 
   // fetch info from persistent storage

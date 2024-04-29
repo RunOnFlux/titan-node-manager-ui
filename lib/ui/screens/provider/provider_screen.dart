@@ -18,9 +18,7 @@ class ProviderScreen extends SimpleScreen with GetItStatefulWidgetMixin {
   State<ProviderScreen> createState() => ProviderScreenState();
 }
 
-class ProviderScreenState extends SimpleScreenState<ProviderScreen>
-    with GetItStateMixin {
-  final isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
+class ProviderScreenState extends SimpleScreenState<ProviderScreen> {
 
   @override
   void initState() {
@@ -28,31 +26,31 @@ class ProviderScreenState extends SimpleScreenState<ProviderScreen>
     bootstrapGridParameters(gutterSize: 20);
   }
 
-  Future<bool> checkLogin() async {
-    bool isTokenValid = false;
-    final String? jwt = await storage.read(key: "jwt");
-    if (jwt == null) {
-      GetIt.I<NodeManagerInfo>().isLoggedIn = false;
-      isTokenValid = false;
-    } else {
-      GetIt.I<NodeManagerInfo>().isLoggedIn = true;
-      isTokenValid = true;
-      GetIt.I<NodeManagerInfo>().setToken(jwt);
-    }
+  // Future<bool> checkLogin() async {
+  //   bool isTokenValid = false;
+  //   final String? jwt = await storage.read(key: "jwt");
+  //   if (jwt == null) {
+  //     GetIt.I<NodeManagerInfo>().isLoggedIn = false;
+  //     isTokenValid = false;
+  //   } else {
+  //     GetIt.I<NodeManagerInfo>().isLoggedIn = true;
+  //     isTokenValid = true;
+  //     GetIt.I<NodeManagerInfo>().setToken(jwt);
+  //   }
 
-    bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
-    if (isTokenValid && !isInfoFetched) {
-      await InfoService().fetchInfo();
-      await Future.delayed(Duration(milliseconds: 50));
-    }
+  //   bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
+  //   if (isTokenValid && !isInfoFetched) {
+  //     await InfoService().fetchInfo();
+  //     await Future.delayed(Duration(milliseconds: 50));
+  //   }
 
-    return isTokenValid;
-  }
+  //   return isTokenValid;
+  // }
 
   @override
   Widget buildChild(BuildContext context) {
     return FutureBuilder(
-      future: checkLogin(),
+      future: InfoService().checkLogin(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           bool loggedIn = snapshot.data as bool;

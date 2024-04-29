@@ -31,32 +31,32 @@ class InactiveScreenState extends SimpleScreenState<InactiveScreen>
     bootstrapGridParameters(gutterSize: 20);
   }
 
-  Future<bool> checkLogin() async {
-    bool isTokenValid = false;
+  // Future<bool> checkLogin() async {
+  //   bool isTokenValid = false;
 
-    final String? jwt = await storage.read(key: "jwt");
-    if (jwt == null) {
-      GetIt.I<NodeManagerInfo>().isLoggedIn = false;
-      isTokenValid = false;
-    } else {
-      GetIt.I<NodeManagerInfo>().isLoggedIn = true;
-      isTokenValid = true;
-      GetIt.I<NodeManagerInfo>().setToken(jwt);
-    }
+  //   final String? jwt = await storage.read(key: "jwt");
+  //   if (jwt == null) {
+  //     GetIt.I<NodeManagerInfo>().isLoggedIn = false;
+  //     isTokenValid = false;
+  //   } else {
+  //     GetIt.I<NodeManagerInfo>().isLoggedIn = true;
+  //     isTokenValid = true;
+  //     GetIt.I<NodeManagerInfo>().setToken(jwt);
+  //   }
 
-    bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
-    if (isTokenValid && !isInfoFetched) {
-      await InfoService().fetchInfo();
-      await Future.delayed(const Duration(milliseconds: 50));
-    }
+  //   bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
+  //   if (isTokenValid && !isInfoFetched) {
+  //     await InfoService().fetchInfo();
+  //     await Future.delayed(const Duration(milliseconds: 50));
+  //   }
 
-    return isTokenValid;
-  }
+  //   return isTokenValid;
+  // }
 
   @override
   Widget buildChild(BuildContext context) {
     return FutureBuilder(
-      future: checkLogin(),
+      future: InfoService().checkLogin(),
       builder: (context, snapshot) {
         if (snapshot.connectionState == ConnectionState.done) {
           bool loggedIn = snapshot.data as bool;
