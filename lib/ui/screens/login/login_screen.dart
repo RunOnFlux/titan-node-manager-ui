@@ -19,9 +19,9 @@ class LoginScreen extends SimpleScreen with GetItStatefulWidgetMixin {
 class LoginScreenState extends SimpleScreenState<LoginScreen>
     with GetItStateMixin {
   // constructor
-  LoginScreenState() {
-    InfoService().checkLogin();
-  }
+  // LoginScreenState() {
+  //   InfoService().checkLogin();
+  // }
   @override
   void initState() {
     super.initState();
@@ -47,10 +47,32 @@ class LoginScreenState extends SimpleScreenState<LoginScreen>
 
   @override
   Widget buildChild(BuildContext context) {
-    return SizedBox(
-      child: LoginPage(),
-      width: 500,
-      height: 500,
+    // return SizedBox(
+    //   child: LoginPage(),
+    //   width: 500,
+    //   height: 500,
+    // );
+
+    return FutureBuilder(
+      future: InfoService().checkLogin(),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done) {
+          bool loggedIn = snapshot.data as bool;
+          if (loggedIn) {
+            context.push('/home');
+            return Container();
+          } else {
+            // Directly navigate to the login page if the token is not valid.
+            return SizedBox(
+              child: LoginPage(),
+              width: 500,
+              height: 500,
+            ); // Return an empty container to avoid any temporary rendering issues.
+          }
+        } else {
+          return const CircularProgressIndicator();
+        }
+      },
     );
   }
 }
