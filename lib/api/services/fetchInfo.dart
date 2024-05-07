@@ -25,35 +25,19 @@ class InfoService {
   }
 
 
-  Future<bool> checkLogin() async {
-    final String? jwt = await storage.read(key: "jwt");
-    var isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
-    final bool checkToken = await this.checkToken(jwt);
-    print('Checktoken result: $checkToken');
-    if (jwt == null || checkToken == false) {
-      print('Token is null or expired');
-      GetIt.I<NodeManagerInfo>().isLoggedIn = false;
-      isTokenValid = false;
-    } else {
-      print('Token is valid in fetchInfo');
-      GetIt.I<NodeManagerInfo>().isLoggedIn = true;
-      isTokenValid = true;
-      GetIt.I<NodeManagerInfo>().setToken(jwt);
-    }
-
-    bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
-    if (isTokenValid && !isInfoFetched) {
-      await fetchInfo();
-      await Future.delayed(const Duration(milliseconds: 50));
-    }
-    return isTokenValid;
-  }
 
   // clear token
   void clearToken() async {
+    var prefs = await SharedPreferences.getInstance();
     print('Deleting expired token');
     await storage.delete(key: "jwt");
+    prefs.remove('info');
+    prefs.remove('nodeinfo');
+    prefs.remove('inactiveInfo');
+    prefs.remove('history');
     GetIt.I<NodeManagerInfo>().isLoggedIn = false;
+    GetIt.I<NodeManagerInfo>().isInfoFetched = false;
+  
   }
 
   // check if token is expired
@@ -82,6 +66,30 @@ class InfoService {
       return false;
     }
   }
+  Future<bool> checkLogin() async {
+    final String? jwt = await storage.read(key: "jwt");
+    var isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
+    final bool checkToken = await this.checkToken(jwt);
+    print('Checktoken result: $checkToken');
+    if (jwt == null || checkToken == false) {
+      print('Token is null or expired');
+      GetIt.I<NodeManagerInfo>().isLoggedIn = false;
+      isTokenValid = false;
+    } else {
+      print('Token is valid in fetchInfo');
+      GetIt.I<NodeManagerInfo>().isLoggedIn = true;
+      isTokenValid = true;
+      GetIt.I<NodeManagerInfo>().setToken(jwt);
+    }
+
+    bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
+    if (isTokenValid && !isInfoFetched) {
+      await fetchInfo();
+      await Future.delayed(const Duration(milliseconds: 50));
+    }
+    return isTokenValid;
+  }
+
 
   Future<bool> fetchInfo() async {
     print('Fetching info ');
