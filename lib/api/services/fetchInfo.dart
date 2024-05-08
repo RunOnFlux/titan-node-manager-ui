@@ -47,15 +47,19 @@ class InfoService {
     }
     final url = Uri.parse('${AppConfig().apiEndpoint}/verify');
     try {
+      print('before response');
       final response = await http.get(url, headers: {
         HttpHeaders.contentTypeHeader: "application/json",
         HttpHeaders.authorizationHeader: "Bearer $jwt"
       });
+      print('after response');
+
       print('response: ${response}');
       print('response status code: ${response.statusCode}');
       // clearToken();
 
       if (response.statusCode == 200) {
+        print('Token is active');
         return true;
       } else {
         print('Token is expired');
@@ -65,6 +69,9 @@ class InfoService {
       }
     } catch (e) {
       print('Error in checktoken: $e');
+      GetIt.I<NodeManagerInfo>().logout();
+
+      await clearToken();
       return false;
     }
   }
