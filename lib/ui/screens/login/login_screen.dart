@@ -59,7 +59,8 @@ class LoginScreenState extends SimpleScreenState<LoginScreen>
         if (snapshot.connectionState == ConnectionState.done) {
           bool loggedIn = snapshot.data as bool;
           if (loggedIn) {
-            context.push('/home');
+            print('pushing to home screen');
+            context.go('/home');
             return Container();
           } else {
             // Directly navigate to the login page if the token is not valid.

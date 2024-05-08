@@ -53,7 +53,6 @@ class LoginPage extends StatelessWidget with GetItMixin {
       // use fetchinfo
       await InfoService().fetchInfo();
 
-
       return res.body;
     }
     print('Failed to log in');
@@ -104,7 +103,7 @@ class LoginPage extends StatelessWidget with GetItMixin {
                         GetIt.I<NodeManagerInfo>().setToken(jwt);
                         GetIt.I<NodeManagerInfo>().isLoggedIn = true;
                         await storage.write(key: "jwt", value: jwt);
-                        context.push('/home');
+                        context.go('/home');
                       } else {
                         displayDialog(
                             context, "Incorrect Password", "Try again.");

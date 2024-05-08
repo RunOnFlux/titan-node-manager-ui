@@ -149,6 +149,7 @@ class InfoService {
         jsonDecode(inactiveInfo).map((model) => InactiveInfo.fromJson(model)));
     GetIt.I<NodeManagerInfo>().history = History.fromJson(jsonDecode(history));
     GetIt.I<NodeManagerInfo>().isInfoFetched = true;
+    print('Info fetched from storage');
   }
 
   // fetch info from server
@@ -180,6 +181,7 @@ class InfoService {
     prefs.setString('inactiveInfo', jsonEncode(inactiveInfo));
     prefs.setString('history', jsonEncode(history));
     GetIt.I<NodeManagerInfo>().isInfoFetched = true;
+    print('Info fetched from server');
   }
 
   Future<void> updateCache() async {
