@@ -24,8 +24,6 @@ class InfoService {
     return jwt;
   }
 
-
-
   // clear token
   void clearToken() async {
     var prefs = await SharedPreferences.getInstance();
@@ -37,11 +35,10 @@ class InfoService {
     prefs.remove('history');
     GetIt.I<NodeManagerInfo>().isLoggedIn = false;
     GetIt.I<NodeManagerInfo>().isInfoFetched = false;
-  
   }
 
   // check if token is expired
-  Future<bool> checkToken(String? jwt) async {
+  Future<bool> tokenIsActive(String? jwt) async {
     print('Checking token');
     if (jwt == null) {
       print('Token is null');
@@ -53,6 +50,9 @@ class InfoService {
         HttpHeaders.contentTypeHeader: "application/json",
         HttpHeaders.authorizationHeader: "Bearer $jwt"
       });
+      print('response: ${response}');
+      print('response status code: ${response.statusCode}');
+      clearToken();
 
       if (response.statusCode == 200) {
         return true;
@@ -66,12 +66,14 @@ class InfoService {
       return false;
     }
   }
+
   Future<bool> checkLogin() async {
     final String? jwt = await storage.read(key: "jwt");
+    final bool tokenIsActive = await this.tokenIsActive(jwt);
     var isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
-    final bool checkToken = await this.checkToken(jwt);
-    print('Checktoken result: $checkToken');
-    if (jwt == null || checkToken == false) {
+
+    print('Checktoken result: $tokenIsActive');
+    if (jwt == null || tokenIsActive == false) {
       print('Token is null or expired');
       GetIt.I<NodeManagerInfo>().isLoggedIn = false;
       isTokenValid = false;
@@ -90,29 +92,29 @@ class InfoService {
     return isTokenValid;
   }
 
-
   Future<bool> fetchInfo() async {
     print('Fetching info ');
     // if there is data in persistent storage, fetch from there
-    final SharedPreferences prefs = await SharedPreferences.getInstance();
-    // only pull from storage if the data is not stale
-    if (prefs.getString('info') != null) {
-      print('Info is not null');
-      await fetchInfoFromStorage(prefs);
-      final lastRefresh = GetIt.I<NodeManagerInfo>().info.time;
+    // final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // // only pull from storage if the data is not stale
+    // if (prefs.getString('info') != null) {
+    //   print('Info is not null');
+    //   await fetchInfoFromStorage(prefs);
+    //   final lastRefresh = GetIt.I<NodeManagerInfo>().info.time;
 
+    //   final now = DateTime.now().millisecondsSinceEpoch;
+    //   final secondsElapsed = ((now - lastRefresh) / 1000).floor();
 
-      final now = DateTime.now().millisecondsSinceEpoch;
-      final secondsElapsed = ((now - lastRefresh) / 1000).floor();
-
-      print('Seconds elapsed: $secondsElapsed');
-      if (secondsElapsed < 120) {
-        print('Info is not stale');
-        return true;
-      }
-    }
+    //   print('Seconds elapsed: $secondsElapsed');
+    //   if (secondsElapsed < 120) {
+    //     print('Info is not stale');
+    //     return true;
+    //   }
+    // }
     print('Info is stale');
-    await fetchInfoFromServer(prefs);
+    // await fetchInfoFromServer(prefs);
+    await fetchInfoFromServer();
+
     return true;
   }
 
@@ -142,7 +144,7 @@ class InfoService {
   }
 
   // fetch info from server
-  Future<void> fetchInfoFromServer(prefs) async {
+  Future<void> fetchInfoFromServer() async {
     print('Fetching info from server');
     var info = await fetchMacroInfo();
     var nodeinfo = await fetchNodeInfo();
@@ -165,10 +167,10 @@ class InfoService {
     // GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
     // Save to persistent storage
-    prefs.setString('info', jsonEncode(info));
-    prefs.setString('nodeinfo', jsonEncode(nodeinfo));
-    prefs.setString('inactiveInfo', jsonEncode(inactiveInfo));
-    prefs.setString('history', jsonEncode(history));
+    // prefs.setString('info', jsonEncode(info));
+    // prefs.setString('nodeinfo', jsonEncode(nodeinfo));
+    // prefs.setString('inactiveInfo', jsonEncode(inactiveInfo));
+    // prefs.setString('history', jsonEncode(history));
     GetIt.I<NodeManagerInfo>().isInfoFetched = true;
   }
 
