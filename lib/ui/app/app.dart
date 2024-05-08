@@ -60,7 +60,6 @@ class NodeManagerAppState extends MinimalAppState<NodeManagerApp>
     print('Building main app');
     var loadingNotifier =
         (Provider.of<LoadingNotifier>(context) as NodeManagerLoadingNotifier);
-    
 
     Widget mainApp = super.buildMainApp(context);
 
@@ -91,6 +90,7 @@ class NodeManagerInfo with ChangeNotifier {
   }
 
   Future<void> logout() async {
+    print('Logging out');
     _token = '';
     isLoggedIn = false;
     await secureStorage.delete(key: "jwt");

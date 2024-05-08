@@ -26,7 +26,7 @@ class InfoService {
   }
 
   // clear token
-  void clearToken() async {
+  Future<void> clearToken() async {
     var prefs = await SharedPreferences.getInstance();
     print('Deleting expired token');
     await storage.delete(key: "jwt");
@@ -59,7 +59,8 @@ class InfoService {
         return true;
       } else {
         print('Token is expired');
-        clearToken();
+        GetIt.I<NodeManagerInfo>().logout();
+        await clearToken();
         return false;
       }
     } catch (e) {
