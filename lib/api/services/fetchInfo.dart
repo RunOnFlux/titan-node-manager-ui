@@ -20,6 +20,7 @@ import 'package:testapp/ui/app/app.dart';
 class InfoService {
   Future<String> get jwtOrEmpty async {
     final String? jwt = await storage.read(key: "jwt");
+    print('jwt: $jwt');
     if (jwt == null) return "";
     return jwt;
   }
@@ -52,7 +53,7 @@ class InfoService {
       });
       print('response: ${response}');
       print('response status code: ${response.statusCode}');
-      clearToken();
+      // clearToken();
 
       if (response.statusCode == 200) {
         return true;
@@ -95,25 +96,24 @@ class InfoService {
   Future<bool> fetchInfo() async {
     print('Fetching info ');
     // if there is data in persistent storage, fetch from there
-    // final SharedPreferences prefs = await SharedPreferences.getInstance();
-    // // only pull from storage if the data is not stale
-    // if (prefs.getString('info') != null) {
-    //   print('Info is not null');
-    //   await fetchInfoFromStorage(prefs);
-    //   final lastRefresh = GetIt.I<NodeManagerInfo>().info.time;
+    final SharedPreferences prefs = await SharedPreferences.getInstance();
+    // only pull from storage if the data is not stale
+    if (prefs.getString('info') != null) {
+      print('Info is not null');
+      await fetchInfoFromStorage(prefs);
+      final lastRefresh = GetIt.I<NodeManagerInfo>().info.time;
 
-    //   final now = DateTime.now().millisecondsSinceEpoch;
-    //   final secondsElapsed = ((now - lastRefresh) / 1000).floor();
+      final now = DateTime.now().millisecondsSinceEpoch;
+      final secondsElapsed = ((now - lastRefresh) / 1000).floor();
 
-    //   print('Seconds elapsed: $secondsElapsed');
-    //   if (secondsElapsed < 120) {
-    //     print('Info is not stale');
-    //     return true;
-    //   }
-    // }
+      print('Seconds elapsed: $secondsElapsed');
+      if (secondsElapsed < 120) {
+        print('Info is not stale');
+        return true;
+      }
+    }
     print('Info is stale');
-    // await fetchInfoFromServer(prefs);
-    await fetchInfoFromServer();
+    await fetchInfoFromServer(prefs);
 
     return true;
   }
@@ -144,7 +144,7 @@ class InfoService {
   }
 
   // fetch info from server
-  Future<void> fetchInfoFromServer() async {
+  Future<void> fetchInfoFromServer(prefs) async {
     print('Fetching info from server');
     var info = await fetchMacroInfo();
     var nodeinfo = await fetchNodeInfo();
@@ -167,10 +167,10 @@ class InfoService {
     // GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
     // Save to persistent storage
-    // prefs.setString('info', jsonEncode(info));
-    // prefs.setString('nodeinfo', jsonEncode(nodeinfo));
-    // prefs.setString('inactiveInfo', jsonEncode(inactiveInfo));
-    // prefs.setString('history', jsonEncode(history));
+    prefs.setString('info', jsonEncode(info));
+    prefs.setString('nodeinfo', jsonEncode(nodeinfo));
+    prefs.setString('inactiveInfo', jsonEncode(inactiveInfo));
+    prefs.setString('history', jsonEncode(history));
     GetIt.I<NodeManagerInfo>().isInfoFetched = true;
   }
 
