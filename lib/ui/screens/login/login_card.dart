@@ -49,7 +49,11 @@ class LoginPage extends StatelessWidget with GetItMixin {
 
     if (res.statusCode == 200) {
       GetIt.I<NodeManagerInfo>().isLoggedIn = true;
+      GetIt.I<NodeManagerInfo>().user = username;
+
       await storage.write(key: "jwt", value: token);
+      await storage.write(key: "user", value: username);
+
       // use fetchinfo
       await InfoService().fetchInfo();
 
@@ -102,6 +106,7 @@ class LoginPage extends StatelessWidget with GetItMixin {
                         // save token
                         GetIt.I<NodeManagerInfo>().setToken(jwt);
                         GetIt.I<NodeManagerInfo>().isLoggedIn = true;
+                        GetIt.I<NodeManagerInfo>().user = username;
                         await storage.write(key: "jwt", value: jwt);
                         context.go('/home');
                       } else {

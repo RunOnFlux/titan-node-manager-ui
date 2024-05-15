@@ -20,7 +20,7 @@ import 'package:testapp/ui/app/app.dart';
 class InfoService {
   Future<String> get jwtOrEmpty async {
     final String? jwt = await storage.read(key: "jwt");
-    print('jwt: $jwt');
+    // print('jwt: $jwt');
     if (jwt == null) return "";
     return jwt;
   }
@@ -30,12 +30,14 @@ class InfoService {
     var prefs = await SharedPreferences.getInstance();
     print('Deleting expired token');
     await storage.delete(key: "jwt");
+    await storage.delete(key: "user");
     prefs.remove('info');
     prefs.remove('nodeinfo');
     prefs.remove('inactiveInfo');
     prefs.remove('history');
     GetIt.I<NodeManagerInfo>().isLoggedIn = false;
     GetIt.I<NodeManagerInfo>().isInfoFetched = false;
+    GetIt.I<NodeManagerInfo>().user = '';
   }
 
   // check if token is expired
@@ -78,6 +80,7 @@ class InfoService {
 
   Future<bool> checkLogin() async {
     final String? jwt = await storage.read(key: "jwt");
+
     final bool tokenIsActive = await this.tokenIsActive(jwt);
     var isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
 
@@ -86,6 +89,7 @@ class InfoService {
       print('Token is null or expired');
       GetIt.I<NodeManagerInfo>().isLoggedIn = false;
       isTokenValid = false;
+      GetIt.I<NodeManagerInfo>().user = '';
     } else {
       print('Token is valid in fetchInfo');
       GetIt.I<NodeManagerInfo>().isLoggedIn = true;
@@ -155,10 +159,18 @@ class InfoService {
   // fetch info from server
   Future<void> fetchInfoFromServer(prefs) async {
     print('Fetching info from server');
-    var info = await fetchMacroInfo();
-    var nodeinfo = await fetchNodeInfo();
-    var inactiveInfo = await fetchInactiveInfo();
-    var history = await fetchHistory();
+    String? user = GetIt.I<NodeManagerInfo>().user;
+    if (user == '') {
+      user = await storage.read(key: "user");
+    }
+    if (user == null) {
+      print('User is logged out');
+      return;
+    }
+    var info = await fetchMacroInfo(user);
+    var nodeinfo = await fetchNodeInfo(user);
+    var inactiveInfo = await fetchInactiveInfo(user);
+    var history = await fetchHistory(user);
 
     if (info == null ||
         nodeinfo == null ||
@@ -197,15 +209,20 @@ class InfoService {
     prefs.setString('history', jsonEncode(history));
   }
 
-  Future<Info?> fetchMacroInfo() async {
+  Future<Info?> fetchMacroInfo(user) async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/info');
     final token = await jwtOrEmpty;
-
+    print('Fetching MacroInfo');
     try {
-      final response = await http.get(url, headers: {
-        HttpHeaders.contentTypeHeader: "application/json",
-        HttpHeaders.authorizationHeader: "Bearer $token"
-      });
+      final response = await http.get(
+        url,
+        headers: {
+          HttpHeaders.contentTypeHeader: "application/json",
+          HttpHeaders.authorizationHeader: "Bearer $token",
+          'username': user,
+        },
+        // set the body
+      );
       if (response.statusCode == 200) {
         final data = response.body;
         final jsonData = jsonDecode(data);
@@ -224,7 +241,7 @@ class InfoService {
     }
   }
 
-  Future<List<NodeInfo>?> fetchNodeInfo() async {
+  Future<List<NodeInfo>?> fetchNodeInfo(user) async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/nodeinfo');
     final token = await jwtOrEmpty;
     print('Fetching NodeInfo');
@@ -232,7 +249,8 @@ class InfoService {
     try {
       final response = await http.get(url, headers: {
         HttpHeaders.contentTypeHeader: "application/json",
-        HttpHeaders.authorizationHeader: "Bearer $token"
+        HttpHeaders.authorizationHeader: "Bearer $token",
+        'username': user,
       });
       if (response.statusCode == 200) {
         final data = response.body;
@@ -253,7 +271,7 @@ class InfoService {
     }
   }
 
-  Future<List<InactiveInfo>?> fetchInactiveInfo() async {
+  Future<List<InactiveInfo>?> fetchInactiveInfo(user) async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/inactive');
     final token = await jwtOrEmpty;
     print('Fetching InactiveInfo');
@@ -261,8 +279,13 @@ class InfoService {
     try {
       final response = await http.get(url, headers: {
         HttpHeaders.contentTypeHeader: "application/json",
-        HttpHeaders.authorizationHeader: "Bearer $token"
+        HttpHeaders.authorizationHeader: "Bearer $token",
+        'username': user,
       });
+      print('response: $response');
+      // add more logging
+      print('response status code: ${response.statusCode}');
+      print('response body: ${response.body}');
       if (response.statusCode == 200) {
         final data = response.body;
         Iterable l = jsonDecode(data);
@@ -286,14 +309,15 @@ class InfoService {
     }
   }
 
-  Future<History?> fetchHistory() async {
+  Future<History?> fetchHistory(user) async {
     final url = Uri.parse('${AppConfig().apiEndpoint}/history');
     final token = await jwtOrEmpty;
-
+    print('Fetching History');
     try {
       final response = await http.get(url, headers: {
         HttpHeaders.contentTypeHeader: "application/json",
-        HttpHeaders.authorizationHeader: "Bearer $token"
+        HttpHeaders.authorizationHeader: "Bearer $token",
+        'username': user,
       });
       if (response.statusCode == 200) {
         final data = response.body;

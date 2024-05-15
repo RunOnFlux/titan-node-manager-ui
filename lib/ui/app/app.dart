@@ -81,6 +81,7 @@ class NodeManagerAppState extends MinimalAppState<NodeManagerApp>
 class NodeManagerInfo with ChangeNotifier {
   String _token = '';
   bool isLoggedIn = false;
+  String user = '';
 
   String get token => _token;
 
@@ -94,6 +95,7 @@ class NodeManagerInfo with ChangeNotifier {
     _token = '';
     isLoggedIn = false;
     await secureStorage.delete(key: "jwt");
+    await secureStorage.delete(key: "user");
     notifyListeners();
   }
 
