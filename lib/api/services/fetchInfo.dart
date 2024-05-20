@@ -289,10 +289,6 @@ class InfoService {
         HttpHeaders.authorizationHeader: "Bearer $token",
         'username': user,
       });
-      print('response: $response');
-      // add more logging
-      print('response status code: ${response.statusCode}');
-      print('response body: ${response.body}');
       if (response.statusCode == 200) {
         final data = response.body;
         Iterable l = jsonDecode(data);

@@ -15,8 +15,10 @@ class BottomBar extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           LastRefresh(),
-          AddAddress(rebuild: rebuild),
-          LogoutCard(),
+          Row(children: [
+            AddAddress(rebuild: rebuild),
+            LogoutCard(),
+          ])
         ],
       ),
     );
