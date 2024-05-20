@@ -11,6 +11,8 @@ import 'dart:convert';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 import 'package:testapp/ui/screens/home/home_screen.dart';
 import 'package:testapp/ui/components/info_card.dart';
+import 'package:testapp/ui/components/signup.dart';
+
 import 'package:testapp/ui/screens/home/nodeinfo_card.dart';
 import 'package:testapp/ui/screens/inactive/old_inactive_card.dart';
 import 'package:go_router/go_router.dart';
@@ -63,14 +65,16 @@ class LoginPage extends StatelessWidget with GetItMixin {
     return null;
   }
 
-  Future<int> attemptSignUp(String username, String password) async {
+  Future<int> attemptSignUp(
+      String username, String password, String address) async {
     var url = Uri.parse('${AppConfig().apiEndpoint}/signup');
     var res = await http.post(url, headers: {
       "Accept": "application/json",
       "content-type": "application/json"
     }, body: {
       "username": username,
-      "password": password
+      "password": password,
+      "address": address
     });
     return res.statusCode;
   }
@@ -116,35 +120,20 @@ class LoginPage extends StatelessWidget with GetItMixin {
                     },
                     child: Text("Log In")),
               ),
-              // Sign up button
-              // ElevatedButton(
-              //     onPressed: () async {
-              //       var username = _usernameController.text;
-              //       var password = _passwordController.text;
-
-              //       if (username.length < 4)
-              //         displayDialog(context, "Invalid Username",
-              //             "The username should be at least 4 characters long");
-              //       else if (password.length < 4)
-              //         displayDialog(context, "Invalid Password",
-              //             "The password should be at least 4 characters long");
-              //       else {
-              //         var res = await attemptSignUp(username, password);
-              //         if (res == 201)
-              //           displayDialog(context, "Success",
-              //               "The user was created. Log in now.");
-              //         else if (res == 409)
-              //           displayDialog(
-              //               context,
-              //               "That username is already registered",
-              //               "Please try to sign up using another username or log in if you already have an account.");
-              //         else {
-              //           displayDialog(
-              //               context, "Error", "An unknown error occurred.");
-              //         }
-              //       }
-              //     },
-              //     child: const Text("Sign Up"))
+              // button that pulls up the sign up card
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: ElevatedButton(
+                    onPressed: () {
+                      // show the sign up card
+                      showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return SignUpCard();
+                          });
+                    },
+                    child: Text("Sign Up")),
+              ),
             ],
           ),
         ));

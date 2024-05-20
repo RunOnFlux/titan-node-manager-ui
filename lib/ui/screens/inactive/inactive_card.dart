@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
+import 'package:get_it/get_it.dart';
 
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/inactiveInfo.dart';
@@ -496,7 +497,7 @@ class StartNodeButton extends StatelessWidget {
   }
 }
 
-class StartSelectedNodes extends StatelessWidget {
+class StartSelectedNodes extends StatelessWidget with GetItMixin {
   final List<InactiveInfo> nodes;
 
   StartSelectedNodes(this.nodes, {Key? key}) : super(key: key);
@@ -504,6 +505,7 @@ class StartSelectedNodes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String fullResponse = '';
+    final user = GetIt.I<NodeManagerInfo>().user;
 
     return ElevatedButton(
       child: const Text('Start Selected Nodes'),
@@ -544,13 +546,15 @@ Future<http.Response> startNode(BuildContext context, node) async {
     'outidx': outidx,
   };
   var url = Uri.parse('${AppConfig().apiEndpoint}/startnode');
+  var user = GetIt.I<NodeManagerInfo>().user;
 
   final response = await http.post(
     url,
     body: jsonEncode(requestBody),
     headers: {
       HttpHeaders.contentTypeHeader: "application/json",
-      HttpHeaders.authorizationHeader: "Bearer $token"
+      HttpHeaders.authorizationHeader: "Bearer $token",
+      'username': user,
     },
   );
 

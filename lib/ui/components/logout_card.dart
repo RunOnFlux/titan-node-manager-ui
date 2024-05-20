@@ -27,8 +27,8 @@ class LogoutCard extends StatelessWidget with GetItMixin {
     );
   }
 
-  void logout(BuildContext context) {
+  Future<void> logout(BuildContext context) async {
     context.go('/');
-    GetIt.I<NodeManagerInfo>().logout();
+    await GetIt.I<NodeManagerInfo>().logout();
   }
 }

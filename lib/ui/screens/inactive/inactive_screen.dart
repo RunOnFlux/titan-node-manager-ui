@@ -94,7 +94,11 @@ class InactiveScreenState extends SimpleScreenState<InactiveScreen>
           child: InactiveCard(),
         ),
       ),
-      BottomBar(),
+      BottomBar(
+        rebuild: () {
+          setState(() {});
+        },
+      ),
     ]);
   }
 }

@@ -13,6 +13,7 @@ import 'package:testapp/ui/app/router.dart';
 import '../../utils/settings.dart';
 import 'loading.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 final secureStorage = FlutterSecureStorage();
 
@@ -90,12 +91,35 @@ class NodeManagerInfo with ChangeNotifier {
     notifyListeners();
   }
 
+  void setUser(String newUser) {
+    user = newUser;
+    notifyListeners();
+  }
+
   Future<void> logout() async {
     print('Logging out');
+    var prefs = await SharedPreferences.getInstance();
+
     _token = '';
     isLoggedIn = false;
     await secureStorage.delete(key: "jwt");
     await secureStorage.delete(key: "user");
+
+    // remove from cache
+    prefs.remove('info');
+    prefs.remove('nodeinfo');
+    prefs.remove('inactiveInfo');
+    prefs.remove('history');
+
+    // remove from session storage
+    // info = null;
+    nodeinfo = [];
+    inactiveInfo = [];
+    // history = null;
+
+    isLoggedIn = false;
+    isInfoFetched = false;
+    user = '';
     notifyListeners();
   }
 

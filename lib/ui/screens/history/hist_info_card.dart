@@ -17,13 +17,13 @@ class HistInfoCard extends StatelessWidget with GetItMixin {
     var infoMap = {
       'Daily Earn': '0',
       'Daily Loss': '0',
-      'Monthly Cost': '0',
+      // 'Monthly Cost': '0',
       'Payouts Received Today': 'Not implemented',
     };
 
-    if (history.monthlyCost[0] != null) {
-      infoMap['Monthly Cost'] = history.monthlyCost.last!.cost.toString();
-    }
+    // if (history.monthlyCost[0] != null) {
+    //   infoMap['Monthly Cost'] = history.monthlyCost.last!.cost.toString();
+    // }
 
     if (history.dailyEarnings.isNotEmpty) {
       // round this value to the nearest 2 decimal places

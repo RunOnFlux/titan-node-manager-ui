@@ -77,7 +77,12 @@ class _MyDataTableState extends State<_MyDataTable> {
     super.initState();
     filteredList = List.from(nodeinfo);
     providers = widget.providers;
+    uniformProviders();
     initNullFields();
+  }
+
+  void uniformProviders() {
+    providers = providers.map((e) => e.toUpperCase()).toList().toSet().toList();
   }
 
   void updateState() {

@@ -25,6 +25,13 @@ class InfoService {
     return jwt;
   }
 
+  Future<String> get userOrEmpty async {
+    final String? user = await storage.read(key: "user");
+    // print('user: $user');
+    if (user == null) return "";
+    return user;
+  }
+
   // clear token
   Future<void> clearToken() async {
     var prefs = await SharedPreferences.getInstance();
@@ -49,37 +56,36 @@ class InfoService {
     }
     final url = Uri.parse('${AppConfig().apiEndpoint}/verify');
     try {
-      print('before response');
       final response = await http.get(url, headers: {
         HttpHeaders.contentTypeHeader: "application/json",
         HttpHeaders.authorizationHeader: "Bearer $jwt"
       });
-      print('after response');
-
-      print('response: ${response}');
-      print('response status code: ${response.statusCode}');
-      // clearToken();
 
       if (response.statusCode == 200) {
         print('Token is active');
         return true;
       } else {
         print('Token is expired');
-        GetIt.I<NodeManagerInfo>().logout();
-        await clearToken();
+        await GetIt.I<NodeManagerInfo>().logout();
+        // await clearToken();
         return false;
       }
     } catch (e) {
       print('Error in checktoken: $e');
-      GetIt.I<NodeManagerInfo>().logout();
+      await GetIt.I<NodeManagerInfo>().logout();
 
-      await clearToken();
       return false;
     }
   }
 
   Future<bool> checkLogin() async {
     final String? jwt = await storage.read(key: "jwt");
+    String? user = await storage.read(key: "user");
+
+    if (user == null) {
+      user = '';
+      return false;
+    }
 
     final bool tokenIsActive = await this.tokenIsActive(jwt);
     var isTokenValid = GetIt.I<NodeManagerInfo>().isLoggedIn;
@@ -95,6 +101,7 @@ class InfoService {
       GetIt.I<NodeManagerInfo>().isLoggedIn = true;
       isTokenValid = true;
       GetIt.I<NodeManagerInfo>().setToken(jwt);
+      GetIt.I<NodeManagerInfo>().setUser(user);
     }
 
     bool isInfoFetched = GetIt.I<NodeManagerInfo>().isInfoFetched;
@@ -232,7 +239,7 @@ class InfoService {
         print('401: Invalid credentials');
         return null;
       } else {
-        print('Failed to retrieve requested info');
+        print('Failed to retrieve macroinfo');
         return null;
       }
     } catch (e) {
@@ -262,7 +269,7 @@ class InfoService {
         print('401: Invalid credentials');
         return null;
       } else {
-        print('Failed to retrieve requested info');
+        print('Failed to retrieve nodeinfo');
         return null;
       }
     } catch (e) {
@@ -296,10 +303,10 @@ class InfoService {
         print('401: Invalid credentials for inactive info');
         return null;
       } else if (response.statusCode == 500) {
-        print('500: failed to retrieve info');
+        print('500: failed to retrieve inactiveinfo');
         return null;
       } else {
-        print('Failed to retrieve requested info');
+        print('Failed to retrieve inactive info');
         return null;
       }
     } catch (e) {
