@@ -45,7 +45,8 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Txhash': 300,
     'Tier': 100,
     'Rank': 100,
-    'Status': 100,
+    'Status': 80,
+    'Address': 100,
 
     // 'Added Height': 100,
     // 'Confirmed Height': 100,
@@ -64,6 +65,8 @@ class _MyDataTableState extends State<_MyDataTable> {
     'IP Address': (node) => node.ip,
     'Txhash': (node) => node.txhash,
     'Tier': (node) => node.tier,
+    'Address': (node) => node.payment_address,
+
     'Status': (node) => node.status,
     // 'Added Height': (node) => node.added_height.toString(),
     // 'Confirmed Height': (node) => node.confirmed_height.toString(),
@@ -103,41 +106,125 @@ class _MyDataTableState extends State<_MyDataTable> {
     });
   }
 
+  List<String> findAddresses() {
+    List<String> addresses = [];
+    for (var node in nodeinfo) {
+      if (!addresses.contains(node.payment_address)) {
+        addresses.add(node.payment_address);
+      }
+    }
+    return addresses;
+  }
+
+  List<String> selectedAddresses = [];
+
+  void selectAddress(String address) {
+    if (selectedAddresses.contains(address)) {
+      selectedAddresses.remove(address);
+    } else {
+      selectedAddresses.add(address);
+    }
+    setState(() {});
+  }
+
+  void filterDataByAddress() {
+    if (selectedAddresses.isEmpty) {
+      setState(() {
+        filteredList = nodeinfo;
+      });
+      return;
+    }
+    setState(() {
+      filteredList = nodeinfo.where((row) {
+        return selectedAddresses.contains(row.payment_address);
+      }).toList();
+    });
+  }
+
+  ElevatedButton filterAddress(address) {
+    bool selected = selectedAddresses.contains(address);
+    return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(selected
+            ? Colors.lightBlue
+            : const Color.fromARGB(255, 8, 76, 132)),
+      ),
+      onPressed: () {
+        selectAddress(address);
+        filterDataByAddress();
+      },
+      child: Text(address),
+    );
+  }
+
+  Widget filterAddresses() {
+    List<String> addresses = findAddresses();
+    List<Widget> addressButtons = [];
+
+    for (var address in addresses) {
+      addressButtons.add(Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: filterAddress(address),
+      ));
+    }
+    return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: addressButtons,
+        ));
+  }
+
+  BootstrapCol searchButton() {
+    return BootstrapCol(
+      sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: SizedBox(
+            width: 200,
+            height: 50,
+            child: TextField(
+              onSubmitted: filterData,
+              onChanged: (query) {
+                if (query.isEmpty) {
+                  setState(() => filteredList = nodeinfo);
+                }
+              },
+              decoration: const InputDecoration(
+                labelText: "Search",
+                suffixIcon: Icon(Icons.search),
+              ),
+            )),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return BootstrapContainer(
       fluid: true,
       children: [
-        BootstrapCol(
-          //  White space
-          sizes: 'col-12 col-sm-6 col-md-9 col-lg-9 col-xl-9',
-          child: const SizedBox(height: 50),
+        BootstrapRow(
+          children: [
+            // shows how many selected addresses
+            BootstrapCol(
+              sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
+              child: Text(
+                'Selected Addresses: ${selectedAddresses.length}',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
+            ),
+          ],
         ),
-        BootstrapCol(
-          // SEARCH BOX
-          sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: SizedBox(
-                width: 200,
-                height: 50,
-                child: TextField(
-                  onSubmitted: filterData,
-                  onChanged: (query) {
-                    if (query.isEmpty) {
-                      setState(() => filteredList = nodeinfo);
-                    }
-                  },
-                  decoration: const InputDecoration(
-                    labelText: "Search",
-                    suffixIcon: Icon(Icons.search),
-                  ),
-                )),
-          ),
-        ),
+        filterAddresses(),
+
+        // searchButton(),
+
         // DATATABLE
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.60,
+          height: MediaQuery.of(context).size.height * 0.58,
           child: ConstrainedBox(
             constraints: BoxConstraints.expand(
               width: MediaQuery.of(context).size.width,

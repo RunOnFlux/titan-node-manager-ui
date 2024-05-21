@@ -15,7 +15,7 @@ class LogoutCard extends StatelessWidget with GetItMixin {
       // padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          SizedBox(height: 16),
+          SizedBox(height: 5),
           ElevatedButton(
             onPressed: () {
               logout(context);

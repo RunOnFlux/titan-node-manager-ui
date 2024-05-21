@@ -192,7 +192,6 @@ class InfoService {
     GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo;
     GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo;
     GetIt.I<NodeManagerInfo>().history = history;
-    // GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
     // Save to persistent storage
     prefs.setString('info', jsonEncode(info));
@@ -200,7 +199,6 @@ class InfoService {
     prefs.setString('inactiveInfo', jsonEncode(inactiveInfo));
     prefs.setString('history', jsonEncode(history));
     GetIt.I<NodeManagerInfo>().isInfoFetched = true;
-    print('Info fetched from server');
   }
 
   Future<void> updateCache() async {
