@@ -15,7 +15,7 @@ class LogoutCard extends StatelessWidget with GetItMixin {
       // padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          SizedBox(height: 16),
+          SizedBox(height: 5),
           ElevatedButton(
             onPressed: () {
               logout(context);
@@ -27,8 +27,8 @@ class LogoutCard extends StatelessWidget with GetItMixin {
     );
   }
 
-  void logout(BuildContext context) {
+  Future<void> logout(BuildContext context) async {
     context.go('/');
-    GetIt.I<NodeManagerInfo>().logout();
+    await GetIt.I<NodeManagerInfo>().logout();
   }
 }

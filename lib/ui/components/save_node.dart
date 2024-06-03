@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'dart:io';
 
 import 'package:flutter/material.dart';
+import 'package:get_it/get_it.dart';
 import 'package:http/http.dart' as http;
 import 'package:testapp/utils/config.dart';
 
@@ -44,12 +45,14 @@ Future<http.Response> saveNode(node, inputs, reset) async {
 
   final String? jwt = await storage.read(key: "jwt");
   var url = Uri.parse('${AppConfig().apiEndpoint}/update');
+  var user = GetIt.I<NodeManagerInfo>().user;
   final response = await http.post(
     url,
     body: jsonEncode(requestBody),
     headers: {
       HttpHeaders.contentTypeHeader: "application/json",
-      HttpHeaders.authorizationHeader: "Bearer $jwt"
+      HttpHeaders.authorizationHeader: "Bearer $jwt",
+      'username': user,
     },
   );
 

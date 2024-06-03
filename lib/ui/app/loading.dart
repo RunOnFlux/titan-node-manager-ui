@@ -31,27 +31,27 @@ class NodeManagerLoadingNotifier extends LoadingNotifier {
   //   notifyListeners();
   // }
 
-  Future<void> fetchInfo() async {
-    var info = await InfoService().fetchMacroInfo();
-    var nodeinfo = await InfoService().fetchNodeInfo();
-    var inactiveInfo = await InfoService().fetchInactiveInfo();
-    var history = await InfoService().fetchHistory();
+  // Future<void> fetchInfo() async {
+  //   var info = await InfoService().fetchMacroInfo();
+  //   var nodeinfo = await InfoService().fetchNodeInfo();
+  //   var inactiveInfo = await InfoService().fetchInactiveInfo();
+  //   var history = await InfoService().fetchHistory();
 
-    if (info == null ||
-        nodeinfo == null ||
-        inactiveInfo == null ||
-        history == null) {
-      print('Failed to fetch data');
-      return;
-    }
+  //   if (info == null ||
+  //       nodeinfo == null ||
+  //       inactiveInfo == null ||
+  //       history == null) {
+  //     print('Failed to fetch data');
+  //     return;
+  //   }
 
-    GetIt.I<NodeManagerInfo>().info = info!;
-    GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
-    GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
-    GetIt.I<NodeManagerInfo>().history = history!;
-    // GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
+  //   GetIt.I<NodeManagerInfo>().info = info!;
+  //   GetIt.I<NodeManagerInfo>().nodeinfo = nodeinfo!;
+  //   GetIt.I<NodeManagerInfo>().inactiveInfo = inactiveInfo!;
+  //   GetIt.I<NodeManagerInfo>().history = history!;
+  //   // GetIt.I<NodeManagerInfo>().lastRefresh = info.time;
 
-    loadingComplete = true;
-    notifyListeners();
-  }
+  //   loadingComplete = true;
+  //   notifyListeners();
+  // }
 }

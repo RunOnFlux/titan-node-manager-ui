@@ -37,7 +37,6 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
   // Future<bool> checkLogin() async {
   //   final String? jwt = await storage.read(key: "jwt");
 
-
   //   if (jwt == null || InfoService().checkToken(jwt) == false) {
   //     GetIt.I<NodeManagerInfo>().isLoggedIn = false;
   //     isTokenValid = false;
@@ -100,7 +99,11 @@ class HomeScreenState extends SimpleScreenState<HomeScreen>
           children: [
             BootstrapCol(
               sizes: 'col-12 col-sm-12 col-md-12 col-lg-12 col-xl-12',
-              child: BottomBar(),
+              child: BottomBar(
+                rebuild: () {
+                  setState(() {});
+                },
+              ),
             ),
           ],
         ),

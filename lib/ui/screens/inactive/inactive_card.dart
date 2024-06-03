@@ -3,6 +3,7 @@ import 'dart:io';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_base/ui/utils/bootstrap.dart';
+import 'package:get_it/get_it.dart';
 
 import 'package:get_it_mixin/get_it_mixin.dart';
 import 'package:testapp/api/model/inactiveInfo.dart';
@@ -10,13 +11,21 @@ import 'package:testapp/ui/app/app.dart';
 import 'package:testapp/utils/config.dart';
 
 import 'package:http/http.dart' as http;
-import 'package:testapp/ui/components/save_card.dart';
 
 import 'package:url_launcher/url_launcher.dart';
 import 'package:flutter/services.dart';
+
+import 'package:testapp/ui/components/save_card.dart';
 import 'package:testapp/ui/components/inline_edit.dart';
 import 'package:testapp/ui/components/provider_dropdown.dart';
+import 'package:testapp/ui/components/filter_address.dart';
 import 'package:testapp/ui/screens/login/login_card.dart';
+
+// we have to have the widget calculate which addresss are within the node population
+// then it must display each address as a filter_address widget
+// when the filter_address widget is clicked, it must change color
+// and it must add the address to the list of selected addresses
+// then the table will only display the addresses that are in the selected list
 
 class InactiveCard extends StatelessWidget with GetItMixin {
   InactiveCard({super.key});
@@ -54,6 +63,7 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Tier': 80,
     'Status': 80,
     'Amount': 80,
+    'Address': 80,
     '': 50,
     'Save': 50
   };
@@ -76,6 +86,8 @@ class _MyDataTableState extends State<_MyDataTable> {
     'Tier': (node) => node.tier,
     'Status': (node) => node.status,
     'Amount': (node) => node.amount.toString(),
+    'Address': (node) => node.address,
+
     '': (node) => '',
     // 'Save': (node) => '',
   };
@@ -100,20 +112,122 @@ class _MyDataTableState extends State<_MyDataTable> {
   final horizontalScrollController = ScrollController();
 
   void initNullFields() {
-    inactiveInfo.forEach((node) => {
-          if (node.name == null)
-            {
-              node.name = 'NOT SET',
-            },
-          if (node.provider == null)
-            {
-              node.provider = '--',
-            },
-          if (node.price == null)
-            {
-              node.price = -1,
-            }
-        });
+    inactiveInfo.forEach((node) {
+      node.name ??= 'NOT SET';
+      node.provider ??= '--';
+      node.price ??= -1;
+    });
+  }
+
+  BootstrapCol startSelectedNodesButton() {
+    return BootstrapCol(
+      sizes: 'col-12 col-sm-9 col-md-9 col-lg-9 col-xl-9',
+      child: SizedBox(
+        width: 200,
+        height: 50,
+        child: Visibility(
+          maintainSize: true,
+          maintainAnimation: true,
+          maintainState: true,
+          visible: showButton,
+          child: StartSelectedNodes(selectedRows.values.toList()),
+        ),
+      ),
+    );
+  }
+
+  BootstrapCol searchButton() {
+    return BootstrapCol(
+      // SEARCH BOX
+      sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
+      child: Align(
+        alignment: Alignment.centerRight,
+        child: SizedBox(
+            width: 200,
+            height: 50,
+            child: TextField(
+              onSubmitted: filterData,
+              onChanged: (query) {
+                if (query.isEmpty) {
+                  setState(() => filteredList = inactiveInfo);
+                }
+              },
+              decoration: const InputDecoration(
+                labelText: "Search",
+                suffixIcon: Icon(Icons.search),
+              ),
+            )),
+      ),
+    );
+  }
+
+  List<String> findAddresses() {
+    List<String> addresses = [];
+    for (var node in inactiveInfo) {
+      if (!addresses.contains(node.address)) {
+        addresses.add(node.address);
+      }
+    }
+
+    return addresses;
+  }
+
+  List<String> selectedAddresses = [];
+
+  void selectAddress(String address) {
+    if (selectedAddresses.contains(address)) {
+      selectedAddresses.remove(address);
+    } else {
+      selectedAddresses.add(address);
+    }
+    setState(() {});
+  }
+
+  void filterDataByAddress() {
+    if (selectedAddresses.isEmpty) {
+      setState(() {
+        filteredList = inactiveInfo;
+      });
+      return;
+    }
+    setState(() {
+      filteredList = inactiveInfo.where((row) {
+        return selectedAddresses.contains(row.address);
+      }).toList();
+    });
+  }
+
+  ElevatedButton filterAddress(address) {
+    bool selected = selectedAddresses.contains(address);
+    return ElevatedButton(
+      style: ButtonStyle(
+        backgroundColor: MaterialStateProperty.all<Color>(selected
+            ? Colors.lightBlue
+            : const Color.fromARGB(255, 8, 76, 132)),
+      ),
+      onPressed: () {
+        selectAddress(address);
+        filterDataByAddress();
+      },
+      child: Text(address),
+    );
+  }
+
+  Widget filterAddresses() {
+    List<String> addresses = findAddresses();
+    List<Widget> addressButtons = [];
+
+    for (var address in addresses) {
+      addressButtons.add(Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: filterAddress(address),
+      ));
+    }
+    return SingleChildScrollView(
+        scrollDirection: Axis.horizontal,
+        child: Row(
+          children: addressButtons,
+        ));
   }
 
   @override
@@ -121,46 +235,27 @@ class _MyDataTableState extends State<_MyDataTable> {
     return BootstrapContainer(
       fluid: true,
       children: [
-        BootstrapCol(
-          //  White space
-          sizes: 'col-12 col-sm-6 col-md-9 col-lg-9 col-xl-9',
-          child: SizedBox(
-            width: 200,
-            height: 50,
-            child: Visibility(
-              maintainSize: true,
-              maintainAnimation: true,
-              maintainState: true,
-              visible: showButton,
-              child: StartSelectedNodes(selectedRows.values.toList()),
+        BootstrapRow(
+          children: [
+            // shows how many selected addresses
+            BootstrapCol(
+              sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
+              child: Text(
+                'Selected Addresses: ${selectedAddresses.length}',
+                style: const TextStyle(
+                  fontSize: 20,
+                  fontWeight: FontWeight.bold,
+                ),
+              ),
             ),
-          ),
+            startSelectedNodesButton(),
+          ],
         ),
-        BootstrapCol(
-          // SEARCH BOX
-          sizes: 'col-12 col-sm-3 col-md-3 col-lg-3 col-xl-3',
-          child: Align(
-            alignment: Alignment.centerRight,
-            child: SizedBox(
-                width: 200,
-                height: 50,
-                child: TextField(
-                  onSubmitted: filterData,
-                  onChanged: (query) {
-                    if (query.isEmpty) {
-                      setState(() => filteredList = inactiveInfo);
-                    }
-                  },
-                  decoration: const InputDecoration(
-                    labelText: "Search",
-                    suffixIcon: Icon(Icons.search),
-                  ),
-                )),
-          ),
-        ),
+        filterAddresses(),
+
         // DATATABLE
         SizedBox(
-          height: MediaQuery.of(context).size.height * 0.60,
+          height: MediaQuery.of(context).size.height * 0.55,
           child: ConstrainedBox(
             constraints: BoxConstraints.expand(
               width: MediaQuery.of(context).size.width,
@@ -182,8 +277,8 @@ class _MyDataTableState extends State<_MyDataTable> {
     return DataTable(
       showCheckboxColumn: false,
       showBottomBorder: true,
-      sortColumnIndex: _sortColumnIndex,
-      sortAscending: _sortAscending,
+      // sortColumnIndex: _sortColumnIndex,
+      // sortAscending: _sortAscending,
       columnSpacing: 0,
       dividerThickness: 0,
       columns: attributes.entries.map((e) {
@@ -423,6 +518,7 @@ class _MyDataTableState extends State<_MyDataTable> {
       node.tier,
       node.status,
       node.amount,
+      node.address,
     ];
   }
 
@@ -496,7 +592,7 @@ class StartNodeButton extends StatelessWidget {
   }
 }
 
-class StartSelectedNodes extends StatelessWidget {
+class StartSelectedNodes extends StatelessWidget with GetItMixin {
   final List<InactiveInfo> nodes;
 
   StartSelectedNodes(this.nodes, {Key? key}) : super(key: key);
@@ -504,6 +600,7 @@ class StartSelectedNodes extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     String fullResponse = '';
+    final user = GetIt.I<NodeManagerInfo>().user;
 
     return ElevatedButton(
       child: const Text('Start Selected Nodes'),
@@ -544,13 +641,15 @@ Future<http.Response> startNode(BuildContext context, node) async {
     'outidx': outidx,
   };
   var url = Uri.parse('${AppConfig().apiEndpoint}/startnode');
+  var user = GetIt.I<NodeManagerInfo>().user;
 
   final response = await http.post(
     url,
     body: jsonEncode(requestBody),
     headers: {
       HttpHeaders.contentTypeHeader: "application/json",
-      HttpHeaders.authorizationHeader: "Bearer $token"
+      HttpHeaders.authorizationHeader: "Bearer $token",
+      'username': user,
     },
   );
 

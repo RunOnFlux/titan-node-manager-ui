@@ -145,27 +145,33 @@ class _ProviderTableState extends State<_ProviderTable> {
     };
     var url = Uri.parse('${AppConfig().apiEndpoint}/provider');
 
+    var user = GetIt.I<NodeManagerInfo>().user;
+
     final response = await http.post(
       url,
       body: jsonEncode(requestBody),
       headers: {
         HttpHeaders.contentTypeHeader: "application/json",
-        HttpHeaders.authorizationHeader: "Bearer $jwt"
+        HttpHeaders.authorizationHeader: "Bearer $jwt",
+        'username': user,
       },
     );
 
     print('Response: ${response.body}');
 
     if (response.body == 'Provider added') {
+      print('Provider added: $provider');
       providers.add(provider);
       providers.toSet().toList(); // remove duplicates
     }
 
-    if (response.body == '') {
-      providers.add(provider);
-    }
+    // if (response.body == '') {
+    //   providers.add(provider);
+    // }
 
-    setState(() {});
+    setState(() {
+      GetIt.I<NodeManagerInfo>().info.providers = providers;
+    });
 
     return response.body;
   }
@@ -179,13 +185,15 @@ class _ProviderTableState extends State<_ProviderTable> {
     };
 
     var url = Uri.parse('${AppConfig().apiEndpoint}/removeprovider');
-
+    var user = GetIt.I<NodeManagerInfo>().user;
+    print('User: $user');
     final response = await http.post(
       url,
       body: jsonEncode(requestBody),
       headers: {
         HttpHeaders.contentTypeHeader: "application/json",
-        HttpHeaders.authorizationHeader: "Bearer $jwt"
+        HttpHeaders.authorizationHeader: "Bearer $jwt",
+        'username': user,
       },
     );
 
@@ -195,9 +203,10 @@ class _ProviderTableState extends State<_ProviderTable> {
       providers.remove(provider);
       providers.toSet().toList();
       updateNodes(provider);
-
-      setState(() {});
     }
+    setState(() {
+      GetIt.I<NodeManagerInfo>().info.providers = providers;
+    });
 
     return response.body;
   }

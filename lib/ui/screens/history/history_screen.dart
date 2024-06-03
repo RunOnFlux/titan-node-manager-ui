@@ -105,7 +105,9 @@ class _HistoryScreenState extends SimpleScreenState<HistoryScreen>
             ),
           ],
         ),
-        BootstrapCol(child: BottomBar()),
+        BootstrapCol(
+          child: BottomBar(rebuild: () => setState(() {})),
+        ),
       ],
     );
   }
